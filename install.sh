@@ -1,59 +1,95 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e # Exit immediately if a command exits with a non-zero status.
 
 DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+BACKUP_CREATED=false
 
-echo "Setting up dotfiles from $DOTFILES_DIR..."
-mkdir -p "$BACKUP_DIR"
+echo "🚀 Setting up dotfiles from $DOTFILES_DIR..."
 
-# Function to link a file
-link_file() {
-    local rel_path="$1"
-    local src="$DOTFILES_DIR/$rel_path"
-    local dest="$HOME/.$rel_path"
+# Files and directories to ignore in the root directory
+IGNORE_FILES=(
+  ".git"
+  ".gitignore"
+  ".editorconfig"
+  "install.sh"
+  "README.md"
+  "LICENSE"
+  "config" # Handled separately
+)
 
-    # Handle cases where the file is in config/ (e.g., config/nvim maps to ~/.config/nvim)
-    if [[ "$rel_path" == config/* ]]; then
-        dest="$HOME/.$rel_path"
-    else
-        dest="$HOME/.$rel_path"
-    fi
+# Helper function to check if an element exists in an array
+contains_element() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
 
-    local dest_dir="$(dirname "$dest")"
-    mkdir -p "$dest_dir"
+# Function to create a symlink
+create_link() {
+    local src="$1"
+    local dest="$2"
+    
+    # Create destination directory if it doesn't exist
+    mkdir -p "$(dirname "$dest")"
 
+    # Check if the link already exists and points to the correct source
     if [ -L "$dest" ]; then
-        echo "Skipping $rel_path: Already a symlink."
-        return
+        local current_link
+        current_link="$(readlink "$dest")"
+        if [ "$current_link" == "$src" ]; then
+            echo "  ✅ $dest is already linked correctly."
+            return
+        fi
     fi
 
-    if [ -e "$dest" ]; then
-        echo "Backing up existing $dest to $BACKUP_DIR"
+    # Backup existing file, directory, or link if it exists
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        if [ "$BACKUP_CREATED" = false ]; then
+            mkdir -p "$BACKUP_DIR"
+            BACKUP_CREATED=true
+            echo "  📦 Backup directory created: $BACKUP_DIR"
+        fi
+        echo "  ↪️  Backing up existing $(basename "$dest")"
         mv "$dest" "$BACKUP_DIR/"
     fi
 
-    echo "Linking $rel_path -> $dest"
+    echo "  🔗 Linking $(basename "$src") -> $dest"
     ln -s "$src" "$dest"
 }
 
-# List of files to link (relative to dotfiles root)
-# Root items (mapped to ~/.item)
-link_file "bashrc"
-link_file "bash_aliases"
-link_file "bash_functions"
-link_file "bash_profile"
-link_file "profile"
-link_file "gitconfig"
-link_file "tmux.conf"
-link_file "wezterm.lua"
+# 1. Link root-level files to $HOME/.<filename>
+echo "📂 Processing root config files..."
+for file in "$DOTFILES_DIR"/*; do
+    # Check if glob matched anything
+    [ -e "$file" ] || continue
+    
+    filename="$(basename "$file")"
+    
+    # Skip explicitly ignored files
+    if contains_element "$filename" "${IGNORE_FILES[@]}"; then
+        continue
+    fi
 
-# Config items (mapped to ~/.config/item)
-link_file "config/starship.toml"
-link_file "config/nvim"
-link_file "config/ghostty"
-link_file "config/kitty"
-link_file "config/btop"
-link_file "config/htop"
-link_file "config/neofetch"
+    create_link "$file" "$HOME/.$filename"
+done
 
-echo "Done! Old configurations backed up to $BACKUP_DIR"
+# 2. Link config/ directory items to $HOME/.config/<filename>
+echo "📂 Processing .config directory..."
+if [ -d "$DOTFILES_DIR/config" ]; then
+    mkdir -p "$HOME/.config"
+    for file in "$DOTFILES_DIR/config"/*; do
+        # Check if glob matched anything
+        [ -e "$file" ] || continue
+        
+        filename="$(basename "$file")"
+        create_link "$file" "$HOME/.config/$filename"
+    done
+fi
+
+echo "✨ Dotfiles setup complete!"
+if [ "$BACKUP_CREATED" = true ]; then
+    echo "📁 Old configurations were backed up to $BACKUP_DIR"
+fi
