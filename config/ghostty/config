@@ -1,0 +1,22 @@
+# Font
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+
+# Window settings
+window-padding-x = 0
+window-padding-y = 0
+background-opacity = 0.85
+window-decoration = false
+
+# Shell integration
+shell-integration = detect
+
+# Appearance
+theme = catppuccin-mocha
+
+# Cursor
+cursor-style = bar
+cursor-style-blink = true
+
+# Mouse
+mouse-hide-while-typing = true
