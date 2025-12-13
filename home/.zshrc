@@ -1,10 +1,39 @@
 #!/usr/bin/env zsh
-# ~/.zshrc - Zsh configuration for interactive shells
+# ~/.zshrc - Zsh configuration with Oh My Zsh integration
 
 # ======================================================================
-# INTERACTIVE SHELL CHECK
+# OH MY ZSH CONFIGURATION
 # ======================================================================
-[[ $- != *i* ]] && return
+export ZSH="$HOME/.oh-my-zsh"
+
+# Disable oh-my-zsh themes (we use Starship)
+ZSH_THEME=""
+
+# Oh My Zsh settings
+zstyle ':omz:update' mode auto
+zstyle ':omz:update' frequency 13
+ENABLE_CORRECTION="true"
+COMPLETION_WAITING_DOTS="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Oh My Zsh plugins
+plugins=(
+    git
+    docker
+    kubectl
+    npm
+    pip
+    python
+    rust
+    sudo
+    command-not-found
+    colored-man-pages
+    zsh-syntax-highlighting
+    zsh-autosuggestions
+)
+
+# Load Oh My Zsh
+source $ZSH/oh-my-zsh.sh
 
 # ======================================================================
 # ENVIRONMENT VARIABLES
@@ -40,29 +69,17 @@ setopt NO_BEEP              # Disable beep on error
 setopt INTERACTIVE_COMMENTS # Allow comments in interactive shell
 
 # ======================================================================
-# ZSH COMPLETION SYSTEM
+# ZSH COMPLETION SYSTEM (Additional styling)
 # ======================================================================
-autoload -Uz compinit
-compinit
-
-# Completion styling
 zstyle ':completion:*' menu select
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'  # Case insensitive
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' rehash true
-zstyle ':completion:*' completer _expand _complete _ignored _approximate
 zstyle ':completion:*' squeeze-slashes true
-
-# Cache completions
-zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path ~/.zsh/cache
 
 # ======================================================================
 # KEY BINDINGS
 # ======================================================================
-# Use emacs keybindings
-bindkey -e
-
 # Better history navigation
 autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search
@@ -151,7 +168,7 @@ if command -v thefuck &>/dev/null; then
     eval "$(thefuck --alias f)"
 fi
 
-# Starship Prompt
+# Starship Prompt (loaded AFTER oh-my-zsh to override theme)
 if command -v starship &>/dev/null; then
     eval "$(starship init zsh)"
 fi
@@ -201,3 +218,20 @@ _welcome_bar
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# ======================================================================
+# ZSH SYNTAX HIGHLIGHTING (must be at the end)
+# ======================================================================
+# If installed via pacman instead of oh-my-zsh plugin
+[[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ======================================================================
+# ZSH AUTOSUGGESTIONS
+# ======================================================================
+# If installed via pacman instead of oh-my-zsh plugin
+[[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]] && \
+    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# Autosuggestions color
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
