@@ -53,50 +53,27 @@ alias pomodoro='pomodoro-tui'
 # ======================================================================
 # ALIASES - DOCKER
 # ======================================================================
-alias dps='docker ps'
-alias dpsa='docker ps -a'
-alias di='docker images'
-alias dexec='docker exec -it'
-alias dlogs='docker logs -f'
-alias dstop='docker stop'
-alias drm='docker rm'
-alias dprune='docker system prune -af'
+# Note: oh-my-zsh docker plugin provides dps, dpsa
+# We keep our custom/conflicting ones only
+alias di='docker images'           # Conflicts with omz's 'dii' (docker image inspect)
+alias dexec='docker exec -it'      # Shorter than omz's 'dxcit'
+alias dlogs='docker logs -f'       # Custom - follow logs
+alias dstop='docker stop'          # Shorter than omz's 'dstp'
+alias drm='docker rm'              # Shorter than omz's full version
+alias dprune='docker system prune -af'  # Custom - aggressive prune
 
 # ======================================================================
 # ALIASES - GIT
 # ======================================================================
-alias g='git'
-alias ga='git add'
-alias gaa='git add --all'
-alias gap='git add -p'
-alias gb='git branch'
-alias gbr='git branch -r'
-alias gba='git branch -a'
-alias gc='git commit -m'
-alias gca='git commit -am'
-alias gco='git checkout'
-alias gcb='git checkout -b'
-alias gcp='git cherry-pick'
-alias gd='git diff'
-alias gds='git diff --staged'
-alias gf='git fetch'
-alias gfa='git fetch --all --prune'
-alias gl='git log --oneline --graph --decorate'
-alias gll='git log --graph --pretty=format:"%C(yellow)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(reset)"'
-alias gp='git push'
-alias gpf='git push --force-with-lease'
-alias gpo='git push origin'
-alias gpu='git push --set-upstream origin'
-alias gr='git rebase'
-alias gri='git rebase -i'
-alias grs='git reset'
-alias grh='git reset --hard'
-alias gs='git status -sb'
-alias gst='git status'
-alias gsh='git show'
-alias gss='git stash'
-alias gsp='git stash pop'
-alias gsa='git stash apply'
-alias gsl='git stash list'
-alias gsu='git submodule update --init --recursive'
-alias gt='git tag'
+# Note: oh-my-zsh git plugin provides most common git aliases
+# We keep only our custom/unique ones that differ from omz
+
+# Custom aliases (not in omz or different)
+alias gap='git add -p'             # Conflicts with omz's 'git apply' - ours is interactive add
+alias gc='git commit -m'           # Quick commit with message
+alias gca='git commit -am'         # Add all and commit
+alias gd='git diff'                # View changes
+alias gds='git diff --staged'      # View staged changes
+alias gs='git status -sb'          # Short status (omz has different version)
+alias gl='git log --oneline --graph --decorate'  # Pretty log
+alias gll='git log --graph --pretty=format:"%C(yellow)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(reset)"'  # Detailed pretty log
