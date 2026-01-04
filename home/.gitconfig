@@ -6,7 +6,34 @@
 [user]
 	name = semyonfox
 	email = semyon.fox@gmail.com
+[safe]
+	directory = C:/Users/foxsc/GitHub/swim
+	directory = C:/Users/foxsc/GitHub/Algorithms
+	directory = C:/Users/foxsc/GitHub/artificial
+	directory = C:/Users/foxsc/GitHub/FarmerWasReplaced
+	directory = C:/Users/foxsc/GitHub/foghlaim
+	directory = C:/Users/foxsc/GitHub/Obsidian
+	directory = C:/Users/foxsc/GitHub/Programming
+	directory = C:/Users/foxsc/GitHub/ScrimBrain
+	directory = C:/Users/foxsc/GitHub/server_stacks
+	directory = C:/Users/foxsc/GitHub/SplitComparison
+	directory = C:/Users/foxsc/GitHub/Webdev
+	directory = C:/Users/foxsc/GitHub/Webpage
+	directory = C:/Users/foxsc/GitHub/WindowsMaintenance
+	directory = C:/Users/foxsc/code/personal/swim
+	directory = C:/Users/foxsc/code/personal/server-stacks
+	directory = C:/Users/foxsc/code/personal/split-comparison
+	directory = C:/Users/foxsc/code/university/webdev-ct1113
+	directory = C:/Users/foxsc/code/university/algorithms-ct102
+	directory = C:/Users/foxsc/code/personal/farmer-was-replaced
+	directory = C:/Users/foxsc/code/personal/foghlaim
+	directory = C:/Users/foxsc/Obsidian
+	directory = C:/Users/foxsc/code/university/programming-ct103
+	directory = C:/Users/foxsc/code/personal/webpage-portfolio
+	directory = C:/Users/foxsc/code/personal/windows-maintenance
+	directory = C:/Users/foxsc/code/personal/ScrimBrain
+	directory = C:/Users/foxsc/code/university/java/CT2106 Assignment 2
 [core]
-	autocrlf = input
-[coderabbit]
-	machineId = cli/34b5d0586c7a48508500f690a0f057f6
+	autocrlf = true
+[gui]
+	recentrepo = C:/Users/foxsc/Obsidian
