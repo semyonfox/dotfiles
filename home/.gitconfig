@@ -10,3 +10,7 @@
 	autocrlf = input
 [coderabbit]
 	machineId = cli/34b5d0586c7a48508500f690a0f057f6
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true
