@@ -1,0 +1,18 @@
+# Claude Code - sensitive files
+.claude.json
+.claude.json.backup*
+.credentials.json
+cache/
+history.jsonl
+debug/
+file-history/
+shell-snapshots/
+stats-cache.json
+telemetry/
+statsig/
+todos/
+
+# These directories are placeholders and can be populated locally
+agents/*
+plugins/*
+!.gitkeep

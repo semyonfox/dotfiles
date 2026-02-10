@@ -1,0 +1,1 @@
+- each of the parallel processing agents must only work on one file at a time, to keep context overloading likelihood to a minimum
