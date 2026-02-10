@@ -20,16 +20,16 @@ config.mouse_bindings = {
 }
 
 -- Platform-specific settings
-if wezterm.target_triple:find("windows") then
+--if wezterm.target_triple:find("windows") then
     -- WINDOWS ONLY: Use WSL by default
-    config.default_domain = "WSL:archlinux" -- Change "Arch" to your actual distro name if different
+    --config.default_domain = "WSL:archlinux" -- Change "Arch" to your actual distro name if different
     -- config.font = wezterm.font("JetBrainsMonoNL-Regular")
     -- Optional: Windows-specific backdrop (since kde_window_background_blur doesn't work here)
     -- config.win32_system_backdrop = "Acrylic" 
-elseif wezterm.target_triple:find("linux") then
+--elseif wezterm.target_triple:find("linux") then
     -- LINUX ONLY (e.g. your Arch install)
-    config.kde_window_background_blur = true
+    --config.kde_window_background_blur = true
     -- config.font = wezterm.font("JetBrainsMono Nerd Font Mono")
-end
+--end
 
 return config
