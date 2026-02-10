@@ -1,32 +1,39 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) as global instructions across all projects.
+guidance for claude code across all projects
 
-## Git
+## git
 
-- Never mention AI, Claude, or co-authorship in commit messages
-- Rebase workflow preferred (pull --rebase, auto-stash enabled)
-- Line endings: `autocrlf = input` (LF in repo)
+- never mention ai, claude, or co-authorship in commit messages
+- rebase workflow preferred (pull --rebase, auto-stash enabled)
+- line endings: `autocrlf = input` (LF in repo)
 
-## Agent Behaviour
+## comments & documentation
 
-- Each parallel processing agent must only work on one file at a time, to keep context overloading likelihood to a minimum
+- keep comments minimal and conversational, no unnecessary punctuation
+- lowercase at start unless referring to identifiers (e.g. className)
+- avoid emoji unless specifically requested
+- this applies to code comments, commit messages, and documentation
 
-## Environment
+## agent behaviour
 
-- **OS**: Windows with WSL2 (cross-platform dotfiles targeting Arch, Ubuntu, Fedora, macOS)
-- **Package managers**: pnpm (Node.js), pip (Python), cargo (Rust)
-- **Shell**: Bash and Zsh (parallel configs maintained via GNU Stow dotfiles)
-- **Editors**: VSCode Insiders, Cursor, PyCharm (JetBrains)
+- each parallel processing agent must only work on one file at a time
 
-## Languages & Runtimes
+## environment
+
+- os: Windows with WSL2 (cross-platform dotfiles targeting Arch, Ubuntu, Fedora, macOS)
+- package managers: pnpm (Node.js), pip (Python), cargo (Rust)
+- shell: Bash and Zsh (parallel configs maintained via GNU Stow dotfiles)
+- editors: VSCode Insiders, Cursor, PyCharm (JetBrains)
+
+## languages & runtimes
 
 - Node.js 24+ / TypeScript (primary — pnpm workspaces for monorepos)
 - Python 3.13+
 - Rust 1.91+
 - Java (JDK available)
 
-## Formatting & Style
+## formatting & style
 
 - Prettier and ESLint for JS/TS projects
 - 2-space indent for shell, JSON, YAML, TOML, Lua

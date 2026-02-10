@@ -9,6 +9,7 @@ hey there! welcome to my personal configuration files. this is where i keep my l
 - [dependencies](#dependencies)
 - [switching to zsh](#switching-to-zsh)
 - [managing dotfiles](#managing-dotfiles)
+- [claude code configuration](#claude-code-configuration)
 - [troubleshooting](#troubleshooting)
 - [wsl2 compatibility](#wsl2-compatibility)
 - [license](#license)
@@ -200,6 +201,23 @@ stow -R home  # recreate symlinks
 - `install-deps.sh` - standalone dependency installer
 - `setup.sh` - standalone stow deployment
 - `switch-to-zsh.sh` - standalone shell switcher
+
+## claude code configuration
+
+if you use [claude code](https://claude.ai/code), there's a separate `claude/` package with global instructions and configuration:
+
+```bash
+stow claude
+```
+
+this creates symlinks for:
+- `~/.claude/CLAUDE.md` - global instructions for claude code
+- `~/.claude/agents/` - agent configurations (local)
+- `~/.claude/plugins/` - plugin configurations (local)
+
+sensitive files (`.claude.json`, `.credentials.json`, cache, history) are gitignored and managed locally.
+
+each project can override the global instructions by adding a `CLAUDE.md` at its root. see [claude/README.md](claude/README.md) for details.
 
 ## troubleshooting
 

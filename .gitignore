@@ -21,3 +21,6 @@ Desktop.ini
 
 # Backups created by install.sh
 dotfiles_backup_*
+
+# Claude Code local files (should not be tracked)
+home/.claude/
