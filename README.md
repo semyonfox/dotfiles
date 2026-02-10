@@ -2,6 +2,17 @@
 
 hey there! welcome to my personal configuration files. this is where i keep my linux setup tidy, organized, and ready to roll.
 
+## table of contents
+- [what's inside](#whats-inside)
+- [getting started](#getting-started)
+- [structure and usage](#structure-and-usage)
+- [dependencies](#dependencies)
+- [switching to zsh](#switching-to-zsh)
+- [managing dotfiles](#managing-dotfiles)
+- [troubleshooting](#troubleshooting)
+- [wsl2 compatibility](#wsl2-compatibility)
+- [license](#license)
+
 ## what's inside
 
 *   **shell** - bash & zsh with custom aliases, functions, and history handling
@@ -12,83 +23,66 @@ hey there! welcome to my personal configuration files. this is where i keep my l
 
 ## getting started
 
-### automatic setup (recommended)
+### one-command install (recommended)
 ```bash
 git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./setup.sh
+./install.sh
 ```
 
-the setup script will:
-- detect your OS (arch, ubuntu, fedora, macos, etc.)
-- install stow using the right package manager
-- backup any existing dotfiles that would conflict (including .config items)
-- deploy all configs with stow
-- verify everything is working
-- rollback automatically if anything fails
+the installer will:
+- detect your OS (arch, ubuntu, fedora, macos, wsl2)
+- prompt you for each step:
+  1. install dependencies? (core tools + CLI tools)
+  2. install optional CLI tools? (thefuck, pyenv)
+  3. deploy dotfiles with stow?
+  4. switch to zsh?
+  5. install zsh enhancements? (oh-my-zsh - asked when switching to zsh)
+- backup any conflicting files automatically
+- safe to re-run if something fails
 
-**dry-run mode:**
+**installation flow:**
+```
+1. Install dependencies? (y/n)
+   -> installs: zsh, git, tmux, neovim, stow, eza, bat, fd, ripgrep, etc.
+2. Install optional CLI tools? (y/n)
+   -> thefuck, pyenv
+3. Deploy dotfiles? (y/n)
+   -> creates symlinks with stow
+4. Switch to zsh? (y/n)
+   -> if yes, asks: install oh-my-zsh? (y/n) [y]
+   -> changes default shell
+```
+
+### alternative: individual scripts
+if you prefer to run things separately:
 ```bash
-./setup.sh --dry-run  # or -n
+./install-deps.sh  # just install packages
+./setup.sh         # just deploy dotfiles
+./switch-to-zsh.sh # just switch shell
 ```
-test the installation without making any changes
 
-### quick manual install
+### manual install
 ```bash
-git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles && cd ~/dotfiles && stow home
+# install stow first, then:
+git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+stow home
 ```
-make sure stow is installed first!
-
-### detailed setup
-
-setting this up on a new machine is super easy:
-
-1.  **install stow**
-    ```bash
-    # arch/endeavouros
-    sudo pacman -S stow
-
-    # ubuntu/debian
-    sudo apt install stow
-
-    # fedora
-    sudo dnf install stow
-
-    # macos
-    brew install stow
-    ```
-
-2.  **clone the repo**
-    ```bash
-    git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
-    cd ~/dotfiles
-    ```
-
-3.  **deploy with stow**
-    ```bash
-    stow home
-    ```
-
-    that's it! stow will symlink everything from the `home/` package to your `$HOME` directory.
-
-4.  **verify installation** (optional)
-    ```bash
-    # check if symlinks were created
-    ls -la ~ | grep "dotfiles"
-
-    # test bashrc loads without errors
-    bash -c "source ~/.bashrc && echo 'success'"
-    ```
 
 ### what gets installed
 
-stow will create symlinks for:
-- shell configs (bash): `.bashrc`, `.bash_aliases`, `.bash_functions`, `.bash_profile`, `.profile`
-- shell configs (zsh): `.zshrc`, `.zsh_aliases`, `.zsh_functions`, `.zprofile`
-- terminal: `.wezterm.lua`
+when you run `./install.sh` or `stow home`, these configs are symlinked:
+
+**shell configs:**
+- bash: `.bashrc`, `.bash_aliases`, `.bash_functions`, `.bash_profile`, `.profile`
+- zsh: `.zshrc`, `.zsh_aliases`, `.zsh_functions`, `.zprofile`
+
+**application configs:**
 - git: `.gitconfig`
 - tmux: `.tmux.conf`
-- apps: `.config/btop`, `.config/ghostty`, `.config/htop`, `.config/kitty`, `.config/neofetch`, `.config/starship.toml`
+- terminal: `.wezterm.lua`
+- other: `.config/btop`, `.config/ghostty`, `.config/htop`, `.config/kitty`, `.config/neofetch`, `.config/starship.toml`
 
 ## structure and usage
 
@@ -97,6 +91,65 @@ this repo uses [GNU Stow](https://www.gnu.org/software/stow/) for symlink manage
 *   **home/** - package containing all dotfiles (`.bashrc`, `.config/nvim`, etc.)
 *   when you run `stow home`, it creates symlinks in `~` that point to files in `home/`
 *   **example**: `home/.bashrc` → `~/.bashrc`
+
+## dependencies
+
+### what install-deps.sh installs
+
+**core tools (always installed):**
+- `zsh` - modern shell with powerful features
+- `git` - version control
+- `tmux` - terminal multiplexer
+- `neovim` - modern vim-based editor
+- `stow` - symlink manager for dotfiles
+- `curl`, `wget` - download tools
+
+**modern cli tools (always installed):**
+- `eza` - modern replacement for ls
+- `bat` - cat with syntax highlighting
+- `fd` - modern find alternative
+- `ripgrep` - faster grep
+- `fzf` - fuzzy finder
+- `zoxide` - smarter cd command
+- `starship` - customizable prompt
+
+**optional (prompted during install):**
+- `oh-my-zsh` - zsh plugin framework
+- `thefuck` - command correction tool
+- `pyenv` - python version manager
+- `tpm` - tmux plugin manager (auto-installed)
+
+**terminal emulators (configs included, manual install):**
+- wezterm - config: `.wezterm.lua`
+- ghostty - config: `.config/ghostty/`
+- kitty - config: `.config/kitty/`
+- note: these are skipped in wsl2 (use windows terminal)
+
+### manual installations needed
+
+after running the setup scripts, you may want to install:
+
+1. **terminal emulator** (if not using wsl2)
+   - [wezterm](https://wezfurlong.org/wezterm/) - recommended
+   - [ghostty](https://ghostty.org/) - fast and minimal
+   - [kitty](https://sw.kovidgoyal.net/kitty/) - gpu-accelerated
+
+2. **nerd font** for icons in terminal
+   ```bash
+   # arch
+   sudo pacman -S ttf-jetbrains-mono-nerd
+
+   # ubuntu/debian
+   mkdir -p ~/.local/share/fonts
+   cd ~/.local/share/fonts
+   curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip
+   unzip JetBrainsMono.zip && rm JetBrainsMono.zip
+   fc-cache -fv
+   ```
+
+3. **tmux plugins** (after setup)
+   - open tmux and press `prefix + I` (ctrl-b then I)
+   - tpm will install configured plugins automatically
 
 ## switching to zsh
 
@@ -122,13 +175,31 @@ the zsh configs mirror all the bash functionality with zsh-specific improvements
 
 ## managing dotfiles
 
-**add new configs**: place them in `home/` (or `home/.config/` for XDG configs), then run `stow home`
+**add new configs:**
+```bash
+# add file to home/ directory
+cp ~/.newconfig home/.newconfig
+stow home  # create symlink
+```
 
-**update existing**: just edit files in the repo, changes are instant (they're symlinked!)
+**update existing:**
+just edit files in the repo, changes are instant (they're symlinked)
 
-**remove symlinks**: `stow -D home` (deletes all symlinks created by stow)
+**remove symlinks:**
+```bash
+stow -D home  # removes all symlinks
+```
 
-**re-stow**: if symlinks get broken, run `stow -R home` to recreate them
+**re-stow:**
+```bash
+stow -R home  # recreate symlinks
+```
+
+**scripts available:**
+- `install.sh` - unified installer (recommended)
+- `install-deps.sh` - standalone dependency installer
+- `setup.sh` - standalone stow deployment
+- `switch-to-zsh.sh` - standalone shell switcher
 
 ## troubleshooting
 
@@ -160,6 +231,94 @@ cd ~/dotfiles
 stow -D home  # remove all symlinks
 cp ~/backup/* ~/  # restore from backup
 ```
+
+## wsl2 compatibility
+
+these dotfiles are **fully compatible with wsl2** (windows subsystem for linux). the setup scripts automatically detect wsl2 and adjust accordingly.
+
+### wsl2 setup guide
+
+1. **install wsl2 with ubuntu/debian/arch**
+   ```powershell
+   # in powershell (windows)
+   wsl --install -d Ubuntu
+   # or for arch: wsl --install -d Arch
+   ```
+
+2. **install dotfiles in wsl**
+   ```bash
+   # inside wsl terminal
+   git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
+   cd ~/dotfiles
+   ./install.sh  # automatically detects wsl2 and adjusts
+   ```
+
+### wsl2 specific notes
+
+**what works:**
+- all shell configurations (bash/zsh)
+- all cli tools (eza, bat, fd, zoxide, starship, etc.)
+- tmux with full functionality
+- neovim and all editor configs
+- git configurations
+
+**what's different in wsl2:**
+- **terminal emulators**: use windows terminal instead of wezterm/ghostty/kitty
+  - install from microsoft store: `winget install Microsoft.WindowsTerminal`
+  - configs for linux terminal emulators are skipped automatically
+- **gui applications**: require x server (vcxsrv/x410) or use wslg (built-in on windows 11)
+- **systemd**: available on ubuntu 22.04+ in wsl2, may need enabling
+
+**wsl2 optimizations:**
+
+1. **configure .wslconfig** (optional, on windows side)
+   create `C:\Users\YourName\.wslconfig`:
+   ```ini
+   [wsl2]
+   memory=8GB           # limit memory usage
+   processors=4         # limit cpu cores
+   swap=2GB
+   localhostForwarding=true
+   ```
+
+2. **configure wsl.conf** (optional, in wsl)
+   edit `/etc/wsl.conf`:
+   ```ini
+   [boot]
+   systemd=true         # enable systemd (ubuntu 22.04+)
+
+   [interop]
+   appendWindowsPath=false  # optional: don't pollute PATH with windows dirs
+
+   [network]
+   generateResolvConf=true
+   ```
+
+3. **windows terminal integration**
+   - configs are symlinked and work immediately
+   - starship prompt works perfectly in windows terminal
+   - font recommendation: install a nerd font (jetbrains mono nf, fira code nf)
+
+4. **performance tips**
+   - keep project files in linux filesystem (`~/projects`) not windows (`/mnt/c/`)
+   - use git from linux, not windows
+   - wsl2 has near-native linux performance when files are in `~`
+
+**known issues:**
+- clipboard integration: install `xclip` or use windows terminal's native clipboard
+- some aliases reference `pacman` (arch-specific) - they'll error on ubuntu/debian (harmless)
+- `.wezterm.lua` config exists but wezterm should be run on windows side, not in wsl
+
+**recommended setup:**
+```bash
+# 1. install windows terminal
+# 2. set default profile to your wsl distro
+# 3. install a nerd font in windows
+# 4. run the dotfiles setup as shown above
+# 5. configure windows terminal to use installed font
+```
+
+for more wsl2 help: https://learn.microsoft.com/en-us/windows/wsl/
 
 ## license
 

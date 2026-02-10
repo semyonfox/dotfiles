@@ -2,115 +2,63 @@
 
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Source common functions
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
 
-# Global variables
+# Globals
 DRY_RUN=false
 BACKUP_DIR=""
 
-# Helper functions
-info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-    exit 1
-}
-
-# Rollback function
+# Rollback on error
 rollback() {
     if [[ -n "$BACKUP_DIR" && -d "$BACKUP_DIR" ]]; then
         warn "Rolling back changes..."
+        cd "$SCRIPT_DIR"
+        stow -D home 2>/dev/null || true
 
-        # Unstow if stow was run
-        cd "$(dirname "${BASH_SOURCE[0]}")"
-        if stow -D home 2>/dev/null; then
-            info "Removed symlinks"
-        fi
-
-        # Restore from backup
         if [[ -n "$(ls -A "$BACKUP_DIR" 2>/dev/null)" ]]; then
             cp -r "$BACKUP_DIR"/* "$HOME/" 2>/dev/null || true
             cp -r "$BACKUP_DIR"/.* "$HOME/" 2>/dev/null || true
             success "Restored files from backup"
         fi
 
-        error "Setup failed. Original files have been restored."
+        error "Setup failed. Original files restored."
     else
         error "Setup failed. No backup to restore."
     fi
 }
 
-# Set trap for errors
 trap rollback ERR
 
-# Detect OS and package manager
-detect_os() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "macos"
-    elif [[ -f /etc/os-release ]]; then
-        . /etc/os-release
-        echo "$ID"
-    else
-        echo "unknown"
+# Install stow if needed
+ensure_stow() {
+    if command -v stow &>/dev/null; then
+        return 0
     fi
-}
 
-# Install stow based on OS
-install_stow() {
     local os=$(detect_os)
+    local base_os=$(get_base_os)
 
-    if command -v stow &> /dev/null; then
-        success "stow is already installed ($(stow --version | head -1))"
-        return 0
-    fi
+    info "Installing stow..."
 
-    if [[ "$DRY_RUN" == true ]]; then
-        info "[DRY RUN] Would install stow for $os"
-        return 0
-    fi
-
-    info "Installing stow for $os..."
-
-    case "$os" in
+    case "$base_os" in
         arch|endeavouros|manjaro)
-            sudo pacman -S --noconfirm stow
-            ;;
+            sudo pacman -S --noconfirm stow ;;
         ubuntu|debian|pop|linuxmint)
-            sudo apt update && sudo apt install -y stow
-            ;;
+            sudo apt update && sudo apt install -y stow ;;
         fedora|rhel|centos)
-            sudo dnf install -y stow
-            ;;
+            sudo dnf install -y stow ;;
         opensuse*)
-            sudo zypper install -y stow
-            ;;
+            sudo zypper install -y stow ;;
         macos)
-            if ! command -v brew &> /dev/null; then
-                error "Homebrew not found. Please install from https://brew.sh"
-            fi
-            brew install stow
-            ;;
+            command -v brew &>/dev/null || error "Homebrew required. Install from https://brew.sh"
+            brew install stow ;;
         *)
-            error "Unsupported OS: $os. Please install stow manually."
-            ;;
+            error "Unsupported OS: $os. Install stow manually." ;;
     esac
 
-    success "stow installed successfully"
+    success "stow installed"
 }
 
 # Backup existing dotfiles
@@ -118,7 +66,6 @@ backup_existing() {
     BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
     local files_to_backup=()
 
-    # Check for conflicting files in home directory
     local dotfiles=(.bashrc .bash_aliases .bash_functions .bash_profile .zshrc .zsh_aliases .zsh_functions .zprofile .profile .gitconfig .tmux.conf .wezterm.lua)
 
     for file in "${dotfiles[@]}"; do
@@ -127,9 +74,7 @@ backup_existing() {
         fi
     done
 
-    # Check for conflicting directories/files in .config
     local config_items=(btop ghostty htop kitty neofetch starship.toml)
-
     for item in "${config_items[@]}"; do
         if [[ -e "$HOME/.config/$item" && ! -L "$HOME/.config/$item" ]]; then
             files_to_backup+=(".config/$item")
@@ -137,60 +82,50 @@ backup_existing() {
     done
 
     if [[ ${#files_to_backup[@]} -eq 0 ]]; then
-        info "No existing dotfiles to backup"
+        info "No conflicting files found"
         return 0
     fi
-
-    warn "Found existing dotfiles that will conflict:"
-    printf '%s\n' "${files_to_backup[@]}"
 
     if [[ "$DRY_RUN" == true ]]; then
-        info "[DRY RUN] Would backup these files to $BACKUP_DIR"
+        info "[DRY RUN] Would backup ${#files_to_backup[@]} files to $BACKUP_DIR"
         return 0
     fi
 
+    warn "Found ${#files_to_backup[@]} conflicting files"
     read -p "Backup these files? (y/n) " -n 1 -r
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         mkdir -p "$BACKUP_DIR"
         for file in "${files_to_backup[@]}"; do
-            # Create parent directory structure in backup
             local backup_path="$BACKUP_DIR/$file"
             mkdir -p "$(dirname "$backup_path")"
-
             mv "$HOME/$file" "$backup_path"
-            info "Backed up $file to $BACKUP_DIR/"
         done
         success "Backup created at $BACKUP_DIR"
     else
-        error "Cannot proceed with existing files. Please backup manually."
+        error "Cannot proceed with existing files"
     fi
 }
 
-# Deploy dotfiles with stow
+# Deploy dotfiles
 deploy_dotfiles() {
-    local dotfiles_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    info "Deploying dotfiles from $SCRIPT_DIR"
+    cd "$SCRIPT_DIR"
 
-    info "Deploying dotfiles from $dotfiles_dir"
-
-    cd "$dotfiles_dir"
-
-    # Check for conflicts first
     if stow -n home 2>&1 | grep -q "conflict"; then
-        warn "Stow detected conflicts. Running backup..."
+        warn "Conflicts detected"
         backup_existing
     fi
 
-    # Deploy with stow
     if [[ "$DRY_RUN" == true ]]; then
-        info "[DRY RUN] Simulating stow deployment..."
+        info "[DRY RUN] Simulating deployment..."
         stow -n -v home
-        info "[DRY RUN] No changes made to filesystem"
-    else
-        stow home
-        success "Dotfiles deployed successfully"
+        return 0
     fi
+
+    stow home
+    success "Dotfiles deployed"
 }
 
 # Verify installation
@@ -199,104 +134,66 @@ verify_installation() {
 
     local verified=0
     local failed=0
-
-    local dotfiles=(.bashrc .bash_aliases .bash_functions .bash_profile .zshrc .zsh_aliases .zsh_functions .zprofile .profile .gitconfig .tmux.conf .wezterm.lua)
+    local dotfiles=(.bashrc .zshrc .gitconfig .tmux.conf .wezterm.lua)
 
     for file in "${dotfiles[@]}"; do
         if [[ -L "$HOME/$file" ]]; then
             ((verified++))
         else
             ((failed++))
-            warn "$file is not a symlink"
         fi
     done
 
-    echo ""
-    info "Verification Results:"
     echo "  Verified: $verified"
-    [[ $failed -gt 0 ]] && echo "  Failed: $failed" || true
-    echo ""
-
-    # Test bashrc
-    if bash -c "source ~/.bashrc" &> /dev/null; then
-        success ".bashrc loads without errors"
-    else
-        warn ".bashrc has errors (this might be expected if dependencies are missing)"
-    fi
-
-    # Test zshrc if zsh is installed
-    if command -v zsh &> /dev/null && [[ -f "$HOME/.zshrc" ]]; then
-        if zsh -c "source ~/.zshrc" &> /dev/null; then
-            success ".zshrc loads without errors"
-        else
-            warn ".zshrc has errors (this might be expected if dependencies are missing)"
-        fi
-    fi
+    [[ $failed -gt 0 ]] && echo "  Missing: $failed"
 }
 
-# Main installation flow
+# Main function
 main() {
-    # Parse command line arguments
+    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
             --dry-run|-n)
                 DRY_RUN=true
-                shift
-                ;;
+                shift ;;
             --help|-h)
                 echo "Usage: $0 [OPTIONS]"
                 echo ""
                 echo "Options:"
-                echo "  --dry-run, -n    Simulate installation without making changes"
-                echo "  --help, -h       Show this help message"
-                echo ""
-                exit 0
-                ;;
+                echo "  --dry-run, -n    Simulate without making changes"
+                echo "  --help, -h       Show this help"
+                exit 0 ;;
             *)
-                error "Unknown option: $1. Use --help for usage information."
-                ;;
+                error "Unknown option: $1" ;;
         esac
     done
 
     echo ""
-    echo "╔════════════════════════════════════════╗"
-    echo "║   Dotfiles Setup Script                ║"
-    echo "║   Device-Aware Installation            ║"
-    echo "╚════════════════════════════════════════╝"
+    echo "================================"
+    echo "  Dotfiles Setup (stow only)"
+    echo "================================"
     echo ""
 
-    if [[ "$DRY_RUN" == true ]]; then
-        warn "DRY RUN MODE - No changes will be made"
-        echo ""
-    fi
+    [[ "$DRY_RUN" == true ]] && warn "DRY RUN MODE"
 
-    info "Detected OS: $(detect_os)"
+    ensure_stow
     echo ""
-
-    # Step 1: Install stow
-    install_stow
-    echo ""
-
-    # Step 2: Deploy dotfiles
     deploy_dotfiles
     echo ""
 
-    # Step 3: Verify
     if [[ "$DRY_RUN" == false ]]; then
         verify_installation
-        echo ""
-    fi
-
-    if [[ "$DRY_RUN" == true ]]; then
-        success "Dry run complete! No changes were made."
-    else
-        # Disable rollback trap on success
         trap - ERR
+        echo ""
         success "Setup complete!"
-        info "Start a new shell or run: source ~/.bashrc"
+        info "Restart terminal or run: source ~/.bashrc"
+    else
+        success "Dry run complete"
     fi
     echo ""
 }
 
-# Run main function
-main "$@"
+# Run main if executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

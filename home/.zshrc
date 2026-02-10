@@ -235,3 +235,6 @@ eval "$(pyenv init -)"
 
 # Autosuggestions color
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+
+# opencode
+export PATH=/home/semyon/.opencode/bin:$PATH

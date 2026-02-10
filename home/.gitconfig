@@ -34,6 +34,12 @@
 	directory = C:/Users/foxsc/code/personal/ScrimBrain
 	directory = C:/Users/foxsc/code/university/java/CT2106 Assignment 2
 [core]
-	autocrlf = true
+	autocrlf = input
 [gui]
 	recentrepo = C:/Users/foxsc/Obsidian
+[coderabbit]
+	machineId = cli/34b5d0586c7a48508500f690a0f057f6
+[pull]
+	rebase = true
+[rebase]
+	autoStash = true
