@@ -1,49 +1,103 @@
 add_newline = false
 command_timeout = 1000
 
-# Simple, clean prompt with Catppuccin Mocha colors
 format = """
+$character\
+[](fg:white bg:bright-black)\
+[█](fg:bright-black bg:black)\
 $directory\
-$git_branch\
-$git_status\
+[█](fg:bright-black bg:black)\
+[$kubernetes](bg:black fg:cyan)\
+[$docker_context](bold bg:black fg:blue)\
+[$git_branch\
+$git_state\
+$git_status](bold bg:black fg:white)\
 $fill\
 $cmd_duration\
-$character"""
-
-[directory]
-style = "bold #89b4fa"
-format = "[ $path]($style) "
-truncation_length = 5
-truncate_to_repo = true
-
-[git_branch]
-style = "bold #f5c2e7"
-format = "[ $branch]($style) "
-
-[git_status]
-style = "#f9e2af"
-format = "([$all_status$ahead_behind]($style) )"
-conflicted = "⚔️ "
-ahead = "⇡${count} "
-behind = "⇣${count} "
-diverged = "⇕⇡${ahead_count}⇣${behind_count} "
-untracked = "? "
-stashed = "📦 "
-modified = "! "
-staged = "+ "
-renamed = "» "
-deleted = "✘ "
-
-[cmd_duration]
-min_time = 500
-show_milliseconds = false
-format = "[⏱ $duration]($style) "
-style = "#fab387"
-
-[fill]
-symbol = " "
+[](fg:red bg:black)\
+[ ](fg:black bg:red)\
+$username\
+[](fg:green bg:bright-black)\
+[󰌽 ](fg:green bg:black inverted)\
+$hostname\
+$line_break\
+[‎]()"""
 
 [character]
-success_symbol = "[❯](#a6e3a1)"
-error_symbol = "[❯](#f38ba8)"
-vimcmd_symbol = "[V](#a6e3a1)"
+format = "$symbol"
+error_symbol = "[█](fg:red bg:black)[ ERROR](fg:red bg:black inverted bold)[](fg:red bg:white)"
+success_symbol = "[█](fg:bright-white bg:black)[ PROMPT](fg:bright-white bg:black inverted bold)[](fg:bright-white bg:white)"
+
+[fill]
+symbol = ' '
+style = 'bg:black'
+
+[kubernetes]
+disabled = false
+format = '[$symbol$context( \($namespace\))]($style) '
+style = "cyan bold"
+symbol = "☸ "
+
+[docker_context]
+format = "[$symbol$context]($style) "
+symbol = " "
+style = "blue bold"
+
+[package]
+disabled = false
+
+[cmd_duration]
+min_time = 1000
+show_milliseconds = false
+disabled = false
+format="[󰞌 $duration ]($style)"
+style="bold bg:black"
+
+[directory]
+truncation_length = 5
+format = "[󰉋 $path]($style)[$lock_symbol]($lock_style)"
+style = "bold fg:bright-white bg:bright-black"
+read_only = "🔒"
+read_only_style= "bold white"
+
+[username]
+show_always = true
+style_user = "bg:bright-black"
+style_root = "bg:bright-black"
+format = '[ $user ]($style)'
+
+[hostname]
+format = "[ $hostname ]($style)"
+ssh_only = false
+trim_at = ".companyname.com"
+disabled = false
+style = "fg:green bg:bright-black"
+
+[git_commit]
+commit_hash_length = 8
+style = "bold white"
+
+[status]
+style = "bg:transparent"
+symbol = "💥 "
+format = '($style)'
+disabled = false
+
+[git_branch]
+format = " 󰘬 $branch"
+style = "bold fg:bright-black bg:black"
+
+[git_status]
+format = " $conflicted$untracked$modified$staged$renamed$deleted$ahead_behind$stashed"
+style = "cyan"
+conflicted = ""
+untracked = ""
+modified = ""
+staged = ""
+renamed = ""
+deleted = ""
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "cyan"
