@@ -34,11 +34,12 @@
 
 /* Control Center */
 .control-center {
-  background: alpha(@ctp-base, 0.85);
+  background: alpha(@ctp-base, 0.95);
   border: 2px solid @ctp-surface0;
   border-radius: 16px;
   margin: 10px;
   padding: 0;
+  max-height: 500px;
 }
 
 .control-center .widget-title {
