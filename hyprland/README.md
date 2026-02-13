@@ -1,14 +1,63 @@
 # Hyprland Configuration
 
-**based on HyDE (HyprDots) with Catppuccin Mocha theme**
+Based on HyDE (HyprDots) with Catppuccin Mocha theme.
 
-This is a fully functional Hyprland configuration using the HyDE framework as a starting point. The configuration has been customized and is now maintained as a standalone stow package.
+This is a fully functional Hyprland configuration using the HyDE framework as a starting point. The configuration has been customized and is now maintained as a standalone stow package for portability and version control.
+
+## Deployment
+
+### Prerequisites
+
+Ensure stow is installed:
+```bash
+sudo pacman -S stow  # arch/cachyos
+sudo apt install stow  # ubuntu/debian
+sudo dnf install stow  # fedora
+```
+
+### Deploy This Package
+
+From the dotfiles directory:
+```bash
+cd ~/dotfiles
+stow hyprland
+```
+
+This creates symlinks from ~/.config/hypr/ to the configuration files in this package.
+
+Verify deployment:
+```bash
+ls -la ~/.config/hypr/
+# should show symlinks pointing to ~/dotfiles/hyprland/.config/hypr/
+```
+
+### Deploy with Related Packages
+
+Deploy hyprland along with waybar (status bar):
+```bash
+cd ~/dotfiles
+stow hyprland waybar
+```
+
+Or include shell configs:
+```bash
+cd ~/dotfiles
+stow home hyprland waybar
+```
+
+### Remove This Package
+
+To remove the symlinks:
+```bash
+cd ~/dotfiles
+stow -D hyprland
+```
 
 ## Credits
 
-- **HyDE (HyprDots)** - Hyprland dots framework and theme
-  - Repository: https://github.com/prasanthrangan/hyprdots
-  - Theme: Catppuccin Mocha
+HyDE (HyprDots) - Hyprland dots framework and theme
+Repository: https://github.com/prasanthrangan/hyprdots
+Theme: Catppuccin Mocha
 
 ## Configuration Structure
 
