@@ -299,3 +299,11 @@ scrollbar slider {
 scrollbar slider:hover {
   background: @ctp-overlay0;
 }
+
+/* Force remove any backdrop/overlay windows */
+.control-center-overlay,
+.notification-window-backdrop,
+window.background {
+  background: transparent !important;
+  opacity: 0 !important;
+}
