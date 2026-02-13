@@ -1,139 +1,49 @@
 add_newline = false
 command_timeout = 1000
 
-# Catppuccin Mocha color palette
-palette = "catppuccin_mocha"
-
-[palettes.catppuccin_mocha]
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
-pink = "#f5c2e7"
-mauve = "#cba6f7"
-red = "#f38ba8"
-maroon = "#eba0ac"
-peach = "#fab387"
-yellow = "#f9e2af"
-green = "#a6e3a1"
-teal = "#94e2d5"
-sky = "#89dceb"
-sapphire = "#74c7ec"
-blue = "#89b4fa"
-lavender = "#b4befe"
-text = "#cdd6f4"
-subtext1 = "#bac2de"
-subtext0 = "#a6adc8"
-overlay2 = "#9399b2"
-overlay1 = "#7f849c"
-overlay0 = "#6c7086"
-surface2 = "#585b70"
-surface1 = "#45475a"
-surface0 = "#313244"
-base = "#1e1e2e"
-mantle = "#181825"
-crust = "#11111b"
-
+# Simple, clean prompt with Catppuccin Mocha colors
 format = """
-╭─\
-[󰣇 ](bg:surface0 fg:pink)\
-[ $directory]($directory.style)\
+$directory\
 $git_branch\
 $git_status\
 $fill\
 $cmd_duration\
-$time\
-[](bg:surface0 fg:surface0)
-╰─[❯ ](bold blue)"""
-
-fill = { symbol = " " }
+$character"""
 
 [directory]
-style = "bg:surface0 fg:text"
-format = "[$path]($style)[$read_only]($read_only_style) "
+style = "bold #89b4fa"
+format = "[ $path]($style) "
 truncation_length = 5
 truncate_to_repo = true
-read_only = " 🔒"
 
 [git_branch]
-format = "[  $branch]($style) "
-style = "bg:surface0 fg:mauve bold"
+style = "bold #f5c2e7"
+format = "[ $branch]($style) "
 
 [git_status]
-format = "[$all_status$ahead_behind]($style) "
-style = "bg:surface0 fg:yellow"
+style = "#f9e2af"
+format = "([$all_status$ahead_behind]($style) )"
 conflicted = "⚔️ "
 ahead = "⇡${count} "
 behind = "⇣${count} "
 diverged = "⇕⇡${ahead_count}⇣${behind_count} "
-untracked = "🔍 "
+untracked = "? "
 stashed = "📦 "
-modified = "✏️ "
-staged = "[++\\($count\\)](green) "
-renamed = "👅 "
-deleted = "🗑️ "
+modified = "! "
+staged = "+ "
+renamed = "» "
+deleted = "✘ "
 
 [cmd_duration]
 min_time = 500
 show_milliseconds = false
 format = "[⏱ $duration]($style) "
-style = "bg:surface0 fg:peach"
+style = "#fab387"
 
-[time]
-disabled = false
-time_format = "%H:%M:%S"
-style = "bg:surface0 fg:lavender"
-format = "[🕙 $time]($style) "
+[fill]
+symbol = " "
 
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
-vimcmd_symbol = "[V](bold green)"
-
-[username]
-style_user = "bg:surface0 fg:green"
-style_root = "bg:surface0 fg:red"
-format = "[🧑 $user]($style) "
-show_always = true
-
-[hostname]
-ssh_only = false
-format = "[💻 $hostname]($style) "
-style = "bg:surface0 fg:blue"
-disabled = false
-
-[kubernetes]
-disabled = false
-format = "[☸ $context]($style) "
-style = "bg:surface0 fg:teal"
-
-[docker_context]
-format = "[ $context]($style) "
-style = "bg:surface0 fg:blue"
-
-[package]
-disabled = false
-format = "[📦 $version]($style) "
-style = "bg:surface0 fg:yellow"
-
-[nodejs]
-disabled = false
-format = "[ $version]($style) "
-style = "bg:surface0 fg:green"
-
-[python]
-disabled = false
-format = "[ $version]($style) "
-style = "bg:surface0 fg:blue"
-
-[rust]
-disabled = false
-format = "[🦀 $version]($style) "
-style = "bg:surface0 fg:peach"
-
-[status]
-style = "bg:surface0 fg:red"
-symbol = "💥"
-format = '[\[$symbol $status\]]($style) '
-disabled = false
-
-[line_break]
-disabled = false
+success_symbol = "[❯](#a6e3a1)"
+error_symbol = "[❯](#f38ba8)"
+vimcmd_symbol = "[V](#a6e3a1)"
