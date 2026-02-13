@@ -247,6 +247,15 @@
   background: transparent;
 }
 
+/* Backdrop - disable the purple fade overlay */
+.control-center .notification-center-child-inner {
+  background: transparent;
+}
+
+.notification-background-close {
+  background: transparent;
+}
+
 /* Inhibitors Widget */
 .widget-inhibitors {
   background: alpha(@ctp-surface0, 0.6);
