@@ -2,7 +2,7 @@ add_newline = false
 command_timeout = 1000
 
 # Catppuccin Mocha themed, 2-line prompt
-# Top: dir + git + context logos + duration ─── user@host
+# Top: dir + git + all context logos + duration ─── user@host
 # Bottom: ╰─> (green success, red fail)
 
 format = """
@@ -11,11 +11,23 @@ $git_branch\
 $git_status\
 $docker_context\
 $kubernetes\
+$aws\
+$gcloud\
+$azure\
+$terraform\
+$firebase\
 $nodejs\
 $python\
 $rust\
 $golang\
 $java\
+$php\
+$ruby\
+$elixir\
+$lua\
+$c\
+$cmake\
+$dart\
 $fill\
 $cmd_duration\
 $username\
@@ -58,7 +70,6 @@ symbol = " "
 style = "bold #89dceb"
 only_with_files = true
 detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
-detect_folders = []
 
 # Kubernetes - only when kubectl config exists
 [kubernetes]
@@ -68,6 +79,43 @@ style = "bold #89dceb"
 disabled = false
 detect_files = ["k8s"]
 detect_folders = ["k8s", ".kube"]
+
+# AWS - when AWS credentials/config exist
+[aws]
+format = "[via](fg:#cdd6f4) [$symbol($profile)(\($region\))]($style) "
+symbol = " "
+style = "bold #f9e2af"
+disabled = false
+
+# Google Cloud - when gcloud config exists
+[gcloud]
+format = "[via](fg:#cdd6f4) [$symbol$account(@$domain)(\($project\))]($style) "
+symbol = "󱇶 "
+style = "bold #89dceb"
+disabled = false
+
+# Azure - when Azure CLI config exists
+[azure]
+format = "[via](fg:#cdd6f4) [$symbol($subscription)]($style) "
+symbol = "󰠅 "
+style = "bold #89dceb"
+disabled = false
+
+# Terraform - when .tf files exist
+[terraform]
+format = "[via](fg:#cdd6f4) [$symbol$workspace]($style) "
+symbol = "󱁢 "
+style = "bold #cba6f7"
+detect_files = ["*.tf", ".terraform"]
+detect_folders = [".terraform"]
+
+# Firebase - when firebase.json exists
+[package]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = "󰥨 "
+style = "bold #f9e2af"
+display_private = false
+disabled = false
 
 # Node.js - Catppuccin green
 [nodejs]
@@ -98,7 +146,6 @@ format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
 symbol = " "
 style = "bold #94e2d5"
 detect_files = ["go.mod", "go.sum"]
-detect_folders = []
 
 # Java - Catppuccin red
 [java]
@@ -106,7 +153,57 @@ format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
 symbol = " "
 style = "bold #f38ba8"
 detect_files = ["pom.xml", "build.gradle", "build.gradle.kts"]
-detect_folders = []
+
+# PHP - Catppuccin mauve
+[php]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #cba6f7"
+detect_files = ["composer.json", ".php-version"]
+
+# Ruby - Catppuccin red
+[ruby]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #f38ba8"
+detect_files = ["Gemfile", ".ruby-version"]
+
+# Elixir - Catppuccin mauve
+[elixir]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #cba6f7"
+detect_files = ["mix.exs"]
+
+# Lua - Catppuccin blue
+[lua]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #89b4fa"
+detect_files = [".lua-version"]
+detect_folders = ["lua"]
+
+# C/C++ - Catppuccin blue
+[c]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #89b4fa"
+detect_files = []
+detect_extensions = ["c", "h", "cpp", "hpp"]
+
+# CMake - Catppuccin teal
+[cmake]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = "△ "
+style = "bold #94e2d5"
+detect_files = ["CMakeLists.txt"]
+
+# Dart/Flutter - Catppuccin blue
+[dart]
+format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+symbol = " "
+style = "bold #89b4fa"
+detect_files = ["pubspec.yaml", "pubspec.yml"]
 
 # Command duration - always show if > 1s
 [cmd_duration]

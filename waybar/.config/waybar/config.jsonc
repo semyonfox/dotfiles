@@ -2,7 +2,7 @@
   "layer": "top",
   "position": "top",
   "height": 36,
-  "spacing": 4,
+  "spacing": 0,
   
   "modules-left": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"],
   "modules-center": ["clock"],
