@@ -4,9 +4,24 @@
   "height": 36,
   "spacing": 0,
   
-  "modules-left": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"],
+  "modules-left": ["group/actions"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "temperature", "memory", "network", "bluetooth", "pulseaudio", "custom/notification"],
+  "modules-right": ["group/system", "group/notification"],
+  
+  "group/actions": {
+    "orientation": "horizontal",
+    "modules": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"]
+  },
+  
+  "group/system": {
+    "orientation": "horizontal",
+    "modules": ["cpu", "temperature", "memory", "network", "bluetooth", "pulseaudio"]
+  },
+  
+  "group/notification": {
+    "orientation": "horizontal",
+    "modules": ["custom/notification"]
+  },
 
   "custom/power": {
     "format": "⏻",
@@ -107,16 +122,16 @@
 
   "custom/notification": {
     "tooltip": false,
-    "format": "{icon} {text}",
+    "format": "{icon}",
     "format-icons": {
-      "notification": "<span foreground='red'><sup></sup></span>",
-      "none": "",
-      "dnd-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-none": "",
-      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
-      "dnd-inhibited-none": ""
+      "notification": "<span foreground='#f38ba8'><sup></sup></span>",
+      "none": "",
+      "dnd-notification": "<span foreground='#f38ba8'><sup></sup></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span foreground='#f38ba8'><sup></sup></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span foreground='#f38ba8'><sup></sup></span>",
+      "dnd-inhibited-none": ""
     },
     "return-type": "json",
     "exec-if": "which swaync-client",

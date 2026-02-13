@@ -73,5 +73,15 @@ tooltip {
 
 #pulseaudio {
   border-radius: 0px 21px 21px 0px;
-  margin-right: 9px;
+  margin-right: 0px;
+}
+
+#custom-notification {
+  color: @main-fg;
+  background: @main-bg;
+  opacity: 1;
+  margin: 4px 9px 4px 9px;
+  padding: 4px 12px;
+  border-radius: 21px;
+  font-size: 14px;
 }
