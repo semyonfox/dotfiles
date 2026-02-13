@@ -1,0 +1,7 @@
+    "custom/keybindhint": {
+        "format": " ",
+        "tooltip-format": " Keybinds",
+        "rotate": ${r_deg},
+        "on-click": "/home/semyon/.local/share/bin/keybinds_hint.sh"
+    },
+

@@ -1,0 +1,11 @@
+    "custom/wbar": {
+        "format": "{}", //    //
+        "rotate": ${r_deg},
+        "exec": "echo ; echo  switch bar //  dock",
+        "on-click": "/home/semyon/.local/share/bin/wbarconfgen.sh n",
+        "on-click-right": "/home/semyon/.local/share/bin/wbarconfgen.sh p",
+        "on-click-middle": "sleep 0.1 && /home/semyon/.local/share/bin/quickapps.sh kitty firefox spotify code dolphin",
+        "interval" : 86400,
+        "tooltip": true
+    },
+

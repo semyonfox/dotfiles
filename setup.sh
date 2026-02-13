@@ -43,7 +43,7 @@ ensure_stow() {
     info "Installing stow..."
 
     case "$base_os" in
-        arch|endeavouros|manjaro)
+        arch|endeavouros|manjaro|cachyos)
             sudo pacman -S --noconfirm stow ;;
         ubuntu|debian|pop|linuxmint)
             sudo apt update && sudo apt install -y stow ;;

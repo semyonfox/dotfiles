@@ -1,0 +1,11 @@
+    "custom/wallchange": {
+        "format": "{}",
+        "rotate": ${r_deg},
+        "exec": "echo ; echo 󰆊 switch wallpaper",
+        "on-click": "/home/semyon/.local/share/bin/swwwallpaper.sh -n",
+        "on-click-right": "/home/semyon/.local/share/bin/swwwallpaper.sh -p",
+        "on-click-middle": "sleep 0.1 && /home/semyon/.local/share/bin/swwwallselect.sh",
+        "interval" : 86400, // once every day
+        "tooltip": true
+    },
+

@@ -1,0 +1,10 @@
+    "custom/power": {
+        "format": "{}",
+        "rotate": ${r_deg},
+        "exec": "echo ; echo  logout",
+        "on-click": "/home/semyon/.local/share/bin/logoutlaunch.sh 2",
+        "on-click-right": "/home/semyon/.local/share/bin/logoutlaunch.sh 1",
+        "interval" : 86400, // once every day
+        "tooltip": true
+    },
+

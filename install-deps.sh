@@ -14,7 +14,7 @@ install_core_packages() {
     info "Installing core packages for $os..."
 
     case "$base_os" in
-        arch|endeavouros|manjaro)
+        arch|endeavouros|manjaro|cachyos)
             sudo pacman -S --needed --noconfirm \
                 zsh zsh-completions git tmux neovim curl wget base-devel \
                 eza bat fd ripgrep fzf zoxide starship
@@ -82,7 +82,7 @@ install_optional_tools() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]] && ! command -v thefuck &>/dev/null; then
         case "$base_os" in
-            arch|endeavouros|manjaro)
+            arch|endeavouros|manjaro|cachyos)
                 sudo pacman -S --needed --noconfirm python python-pip ;;
         esac
         pip install --user thefuck || pip3 install --user thefuck
