@@ -82,14 +82,14 @@ detect_folders = ["k8s", ".kube"]
 
 # AWS - when AWS credentials/config exist
 [aws]
-format = "[via](fg:#cdd6f4) [$symbol($profile)(\($region\))]($style) "
+format = "[via](fg:#cdd6f4) [$symbol($profile)(\\($region\\))]($style) "
 symbol = " "
 style = "bold #f9e2af"
 disabled = false
 
 # Google Cloud - when gcloud config exists
 [gcloud]
-format = "[via](fg:#cdd6f4) [$symbol$account(@$domain)(\($project\))]($style) "
+format = "[via](fg:#cdd6f4) [$symbol$account(@$domain)(\\($project\\))]($style) "
 symbol = "󱇶 "
 style = "bold #89dceb"
 disabled = false
