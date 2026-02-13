@@ -2,245 +2,183 @@ add_newline = false
 command_timeout = 1000
 
 # Catppuccin Mocha themed, 2-line prompt
-# Top: dir + git + all context logos + duration ─── user@host
-# Bottom: ╰─> (green success, red fail)
+# Top: dir + git + tech stack + duration ─── user@host
+# Bottom: ╰─> with vertical loop connector
+
+palette = "catppuccin_mocha"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
 
 format = """
+[╭](bold text)\
 $directory\
 $git_branch\
+$git_state\
 $git_status\
 $docker_context\
 $kubernetes\
 $aws\
-$gcloud\
-$azure\
-$terraform\
-$firebase\
 $nodejs\
 $python\
 $rust\
 $golang\
-$java\
-$php\
-$ruby\
-$elixir\
-$lua\
-$c\
-$cmake\
-$dart\
 $fill\
 $cmd_duration\
 $username\
 $hostname\
 $line_break\
+[│](bold surface1)\
 $character"""
 
-# Directory - Catppuccin blue
+# Directory
 [directory]
+style = "bold blue"
+format = "[](bold blue) $path"
 truncation_length = 3
 truncate_to_repo = true
-format = "[ $path]($style) "
-style = "bold #89b4fa"
 truncation_symbol = "…/"
+read_only = " 🔒"
+read_only_style = "bold red"
 
-# Git branch - Catppuccin mauve
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+# Git branch
 [git_branch]
-format = "[on](fg:#cdd6f4) [$symbol$branch]($style) "
+style = "bold yellow"
 symbol = " "
-style = "bold #cba6f7"
+format = "( on [$symbol$branch]($style))"
 
-# Git status - Catppuccin red for changes
+# Git state (merge, rebase, etc)
+[git_state]
+style = "bold red"
+format = '( [$state( $progress_current/$progress_total)]($style))'
+
+# Git status
 [git_status]
-format = "([$all_status$ahead_behind]($style) )"
-style = "bold #f38ba8"
+style = "bold red"
+format = '([\[$all_status$ahead_behind\]]($style))'
 conflicted = "="
 untracked = "?"
 modified = "!"
 staged = "+"
 renamed = "»"
 deleted = "✘"
-ahead = "⇡${count}"
-behind = "⇣${behind_count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 
-# Docker - only when in docker context
+# Docker
 [docker_context]
-format = "[via](fg:#cdd6f4) [$symbol$context]($style) "
+style = "bold sky"
 symbol = " "
-style = "bold #89dceb"
+format = "( via [$symbol$context]($style))"
 only_with_files = true
 detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
 
-# Kubernetes - only when kubectl config exists
+# Kubernetes
 [kubernetes]
-format = "[via](fg:#cdd6f4) [$symbol$context]($style) "
+style = "bold yellow"
 symbol = "󱃾 "
-style = "bold #89dceb"
+format = "( in [$symbol$context]($style))"
 disabled = false
 detect_files = ["k8s"]
 detect_folders = ["k8s", ".kube"]
 
-# AWS - when AWS credentials/config exist
+# AWS
 [aws]
-format = "[via](fg:#cdd6f4) [$symbol($profile)(\\($region\\))]($style) "
+style = "bold yellow"
 symbol = " "
-style = "bold #f9e2af"
+format = "( via [$symbol($profile)(\\($region\\))]($style))"
 disabled = false
 
-# Google Cloud - when gcloud config exists
-[gcloud]
-format = "[via](fg:#cdd6f4) [$symbol$account(@$domain)(\\($project\\))]($style) "
-symbol = "󱇶 "
-style = "bold #89dceb"
-disabled = false
-
-# Azure - when Azure CLI config exists
-[azure]
-format = "[via](fg:#cdd6f4) [$symbol($subscription)]($style) "
-symbol = "󰠅 "
-style = "bold #89dceb"
-disabled = false
-
-# Terraform - when .tf files exist
-[terraform]
-format = "[via](fg:#cdd6f4) [$symbol$workspace]($style) "
-symbol = "󱁢 "
-style = "bold #cba6f7"
-detect_files = ["*.tf", ".terraform"]
-detect_folders = [".terraform"]
-
-# Firebase - when firebase.json exists
-[package]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = "󰥨 "
-style = "bold #f9e2af"
-display_private = false
-disabled = false
-
-# Node.js - Catppuccin green
+# Node.js
 [nodejs]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+style = "bold green"
 symbol = " "
-style = "bold #a6e3a1"
+format = "( via [$symbol$version]($style))"
 detect_files = ["package.json", ".node-version", ".nvmrc"]
 detect_folders = ["node_modules"]
 
-# Python - Catppuccin yellow
+# Python
 [python]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+style = "bold yellow"
 symbol = " "
-style = "bold #f9e2af"
+format = "( via [$symbol$version]($style))"
 detect_extensions = ["py"]
 detect_files = [".python-version", "Pipfile", "pyproject.toml", "requirements.txt", "setup.py", "poetry.lock"]
 
-# Rust - Catppuccin peach
+# Rust
 [rust]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+style = "bold peach"
 symbol = " "
-style = "bold #fab387"
+format = "( via [$symbol$version]($style))"
 detect_files = ["Cargo.toml", "Cargo.lock"]
 
-# Go - Catppuccin teal
+# Go
 [golang]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
+style = "bold sky"
 symbol = " "
-style = "bold #94e2d5"
+format = "( via [$symbol$version]($style))"
 detect_files = ["go.mod", "go.sum"]
 
-# Java - Catppuccin red
-[java]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #f38ba8"
-detect_files = ["pom.xml", "build.gradle", "build.gradle.kts"]
-
-# PHP - Catppuccin mauve
-[php]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #cba6f7"
-detect_files = ["composer.json", ".php-version"]
-
-# Ruby - Catppuccin red
-[ruby]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #f38ba8"
-detect_files = ["Gemfile", ".ruby-version"]
-
-# Elixir - Catppuccin mauve
-[elixir]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #cba6f7"
-detect_files = ["mix.exs"]
-
-# Lua - Catppuccin blue
-[lua]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #89b4fa"
-detect_files = [".lua-version"]
-detect_folders = ["lua"]
-
-# C/C++ - Catppuccin blue
-[c]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #89b4fa"
-detect_files = []
-detect_extensions = ["c", "h", "cpp", "hpp"]
-
-# CMake - Catppuccin teal
-[cmake]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = "△ "
-style = "bold #94e2d5"
-detect_files = ["CMakeLists.txt"]
-
-# Dart/Flutter - Catppuccin blue
-[dart]
-format = "[via](fg:#cdd6f4) [$symbol$version]($style) "
-symbol = " "
-style = "bold #89b4fa"
-detect_files = ["pubspec.yaml", "pubspec.yml"]
-
-# Command duration - always show if > 1s
-[cmd_duration]
-min_time = 1000
-format = "[took](fg:#cdd6f4) [$duration]($style) "
-style = "bold #f9e2af"
-show_milliseconds = false
-
-# Username - Catppuccin lavender
-[username]
-show_always = false
-format = "[$user]($style)"
-style_user = "bold #b4befe"
-style_root = "bold #f38ba8"
-
-# Hostname - Catppuccin green (SSH only)
-[hostname]
-ssh_only = true
-format = "[@$hostname]($style) "
-style = "bold #a6e3a1"
-
-# Fill with subtle line
+# Fill with line
 [fill]
 symbol = "─"
-style = "#45475a"
+style = "surface1"
 
-# Status module - hidden but affects character color
-[status]
-disabled = false
-format = ""
+# Command duration
+[cmd_duration]
+min_time = 1000
+style = "bold yellow"
+format = "(took [$duration]($style))"
+show_milliseconds = false
 
-# Prompt character - rounded arrow, changes color based on exit
+# Username
+[username]
+show_always = true
+style_user = "bold lavender"
+style_root = "bold red"
+format = "[@$user]($style)"
+
+# Hostname
+[hostname]
+ssh_only = false
+style = "bold green"
+format = "on [@$hostname]($style)"
+
+# Prompt character
 [character]
 format = "$symbol "
-success_symbol = "[╰─>](bold #a6e3a1)"
-error_symbol = "[╰─>](bold #f38ba8)"
-vimcmd_symbol = "[╰─<](bold #cba6f7)"
-vimcmd_replace_one_symbol = "[╰─<](bold #fab387)"
-vimcmd_replace_symbol = "[╰─<](bold #fab387)"
-vimcmd_visual_symbol = "[╰─<](bold #f9e2af)"
+success_symbol = "[╰─>](bold green)"
+error_symbol = "[╰─>](bold red)"
+vimcmd_symbol = "[╰─<](bold mauve)"
+vimcmd_replace_one_symbol = "[╰─<](bold peach)"
+vimcmd_replace_symbol = "[╰─<](bold peach)"
+vimcmd_visual_symbol = "[╰─<](bold yellow)"
