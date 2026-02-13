@@ -282,7 +282,7 @@
 /* Scrollbar */
 scrollbar {
   background: transparent;
-  width: 8px;
+  min-width: 8px;
 }
 
 scrollbar trough {
