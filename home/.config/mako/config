@@ -1,0 +1,15 @@
+max-visible=5
+layer=top
+font=Sarasa UI SC 10
+width=350
+height=100
+background-color=#1e1e2edd
+text-color=#cdd6f4
+border-color=#45475a
+border-radius=8
+border-size=2
+max-icon-size=32
+default-timeout=5000
+anchor=top-right
+margin=15
+padding=12,16
