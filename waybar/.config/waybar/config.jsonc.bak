@@ -15,7 +15,7 @@
   
   "group/system": {
     "orientation": "horizontal",
-    "modules": ["cpu", "temperature", "memory", "battery", "network", "bluetooth", "pulseaudio"]
+    "modules": ["cpu", "temperature", "memory", "network", "bluetooth", "pulseaudio"]
   },
   
   "group/notification": {
@@ -98,8 +98,7 @@
     "format-ethernet": "  {ipaddr}",
     "format-disconnected": "冷  Disconnected",
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
-    "tooltip-format-wifi": "{essid} ({signalStrength}%)
-{ipaddr}/{cidr}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
     "on-click": "xdg-terminal-exec impala"
   },
 
@@ -119,18 +118,6 @@
       "default": ["", "", ""]
     },
     "on-click": "xdg-terminal-exec wiremix"
-  },
-
-  "battery": {
-    "interval": 10,
-    "states": {
-      "warning": 30,
-      "critical": 15
-    },
-    "format": "{icon}  {capacity:3}%",
-    "format-charging": "  {capacity:3}%",
-    "format-icons": ["", "", "", "", ""],
-    "tooltip-format": "{timeTo}"
   },
 
   "custom/notification": {

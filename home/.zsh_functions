@@ -69,7 +69,10 @@ _sssh_complete() {
     hosts=$(grep "^Host" ~/.ssh/config 2>/dev/null | grep -v "[?*]" | awk '{print $2}')
     _values 'hosts' $hosts $custom_hosts
 }
-compdef _sssh_complete sssh
+# Only register compdef if completion system is loaded
+if (( $+functions[compdef] )); then
+    compdef _sssh_complete sssh
+fi
 
 # ======================================================================
 # FUNCTIONS - SYSTEM MAINTENANCE
@@ -136,44 +139,23 @@ cleanup() {
 # ======================================================================
 
 _welcome_bar() {
-    # Get CPU load (1-minute average)
-    local cpu_load
-    cpu_load=$(cut -d " " -f1 /proc/loadavg)
-
-    # Calculate CPU percentage (assuming 4 cores, adjust as needed)
-    local cpu_cores
-    cpu_cores=$(nproc)
-    local cpu_pct
-    cpu_pct=$(awk -v loadavg="$cpu_load" -v cores="$cpu_cores" 'BEGIN {printf "%.0f", (loadavg/cores)*100}')
-    [[ $cpu_pct -gt 100 ]] && cpu_pct=100
-
-    # Get memory usage
-    local mem_total mem_available mem_used mem_pct
-    mem_total=$(grep MemTotal /proc/meminfo | awk '{print $2}')
-    mem_available=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
-    mem_used=$((mem_total - mem_available))
-    mem_pct=$((mem_used * 100 / mem_total))
-
-    # Create progress bars (handle empty/zero values)
-    local cpu_filled mem_filled
-    cpu_filled=$((cpu_pct / 5))
-    mem_filled=$((mem_pct / 5))
-    [[ $cpu_filled -lt 1 ]] && cpu_filled=0
-    [[ $mem_filled -lt 1 ]] && mem_filled=0
-
-    local cpu_bar cpu_empty mem_bar mem_empty
-    cpu_bar=$([ "$cpu_filled" -gt 0 ] && printf "\e[92m%0.s█\e[90m" {1..$cpu_filled} || echo "")
-    cpu_empty=$(printf "%0.s░" {1..$((20 - cpu_filled))})
-    mem_bar=$([ "$mem_filled" -gt 0 ] && printf "\e[94m%0.s█\e[90m" {1..$mem_filled} || echo "")
-    mem_empty=$(printf "%0.s░" {1..$((20 - mem_filled))})
-
-    # Display welcome message
+    local greeting="Welcome back"
+    local hour=$(date +%H)
+    
+    # Time-based greeting
+    if [[ $hour -ge 5 && $hour -lt 12 ]]; then
+        greeting="Good morning"
+    elif [[ $hour -ge 12 && $hour -lt 17 ]]; then
+        greeting="Good afternoon"
+    elif [[ $hour -ge 17 && $hour -lt 22 ]]; then
+        greeting="Good evening"
+    else
+        greeting="Burning the midnight oil"
+    fi
+    
     echo
     echo -e "\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    printf "\e[96m│\e[0m  \e[1;97mWelcome back, %s\e[0m%*s\e[96m│\e[0m\n" "$USER" $((32 - ${#USER})) ""
-    echo -e "\e[96m├─────────────────────────────────────────────────┤\e[0m"
-    printf "\e[96m│\e[0m  \e[97mCPU\e[0m  [%s%s\e[0m] \e[92m%-4s%%\e[0m       \e[96m│\e[0m\n" "$cpu_bar" "$cpu_empty" "$cpu_pct"
-    printf "\e[96m│\e[0m  \e[97mRAM\e[0m  [%s%s\e[0m] \e[94m%-4s%%\e[0m       \e[96m│\e[0m\n" "$mem_bar" "$mem_empty" "$mem_pct"
+    printf "\e[96m│\e[0m  \e[1;97m%-45s\e[96m│\e[0m\n" "$greeting, $USER"
     echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m"
     echo
 }

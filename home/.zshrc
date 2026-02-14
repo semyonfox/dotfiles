@@ -216,8 +216,10 @@ _welcome_bar
 
 # Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv >/dev/null; then
+    eval "$(pyenv init -)"
+fi
 
 # ======================================================================
 # ZSH SYNTAX HIGHLIGHTING (must be at the end)
