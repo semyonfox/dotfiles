@@ -15,7 +15,7 @@
   
   "group/system": {
     "orientation": "horizontal",
-    "modules": ["cpu", "temperature", "memory", "battery", "network", "bluetooth", "pulseaudio"]
+    "modules": ["cpu", "temperature", "memory", "battery", "network", "custom/bluetooth", "pulseaudio"]
   },
   
   "group/notification": {
@@ -79,9 +79,9 @@
 
   "temperature": {
     "interval": 2,
-    "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+    "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
     "critical-threshold": 80,
-    "format": " {temperatureC:2}°C",
+    "format": "\uf2c9 {temperatureC:2}°C",
     "on-click": "xdg-terminal-exec btop"
   },
 
@@ -103,13 +103,15 @@
     "on-click": "xdg-terminal-exec impala"
   },
 
-  "bluetooth": {
-    "format": "  {status}",
-    "format-disabled": "  Off",
-    "format-connected": "  {num_connections}",
-    "tooltip-format": "{status}",
-    "tooltip-format-connected": "{device_alias}",
-    "on-click": "xdg-terminal-exec bluetui"
+  "custom/bluetooth": {
+    "format": "{text}",
+    "return-type": "json",
+    "exec": "$HOME/.config/waybar/scripts/bluetooth.sh",
+    "exec-if": "command -v bluetoothctl",
+    "interval": 2,
+    "on-click": "xdg-terminal-exec bluetui",
+    "tooltip": true,
+    "escape": true
   },
 
   "pulseaudio": {
@@ -135,22 +137,13 @@
 
   "custom/notification": {
     "tooltip": false,
-    "format": "{icon}",
-    "format-icons": {
-      "notification": "<span foreground='#f38ba8'><sup></sup></span>",
-      "none": "",
-      "dnd-notification": "<span foreground='#f38ba8'><sup></sup></span>",
-      "dnd-none": "",
-      "inhibited-notification": "<span foreground='#f38ba8'><sup></sup></span>",
-      "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='#f38ba8'><sup></sup></span>",
-      "dnd-inhibited-none": ""
-    },
+    "format": "",
     "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
+    "exec-if": "which makoctl",
+    "exec": "makoctl mode 2>/dev/null | jq -Rs '{text: ., alt: ., tooltip: \"Notification: \" + ., class: \"notification\"}'",
+    "on-click": "makoctl dismiss",
+    "on-click-right": "makoctl dismiss -a",
+    "interval": 5,
     "escape": true
   }
 }
