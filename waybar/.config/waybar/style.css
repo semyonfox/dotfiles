@@ -89,8 +89,9 @@ tooltip {
   color: @main-fg;
   background: @main-bg;
   opacity: 1;
-  margin: 4px 9px 4px 9px;
-  padding: 4px 12px;
+  margin: 4px 9px;
+  padding: 4px 8px;
   border-radius: 21px;
   font-size: 14px;
+  min-width: 20px;
 }

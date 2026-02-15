@@ -302,7 +302,13 @@ scrollbar slider:hover {
 /* Force remove any backdrop/overlay windows */
 .control-center-overlay,
 .notification-window-backdrop,
-window.background {
-  background: transparent;
-  opacity: 0;
+window.background,
+.background {
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Hide any extra windows or containers */
+.control-center-window {
+  background: transparent !important;
 }
