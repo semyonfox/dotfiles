@@ -58,7 +58,7 @@ tooltip {
 #memory,
 #battery,
 #network,
-#bluetooth,
+#custom-bluetooth,
 #pulseaudio {
   color: @main-fg;
   background: @main-bg;
