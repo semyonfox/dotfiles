@@ -63,7 +63,7 @@ tooltip {
   color: @main-fg;
   background: @main-bg;
   opacity: 1;
-  margin: 4px 0px 4px 0px;
+  margin: 4px 0px;
   padding: 4px 12px;
 }
 

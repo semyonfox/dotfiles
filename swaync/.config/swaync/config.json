@@ -3,7 +3,7 @@
   "positionX": "right",
   "positionY": "top",
   "layer": "top",
-  "control-center-layer": "top",
+  "control-center-layer": "overlay",
   "layer-shell": true,
   "cssPriority": "application",
   "control-center-exclusive-zone": false,
