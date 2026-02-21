@@ -181,3 +181,6 @@ _welcome_bar
 export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
+
+# Zed alias
+alias zed=zeditor

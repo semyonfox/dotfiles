@@ -100,7 +100,7 @@
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)
 {ipaddr}/{cidr}",
-    "on-click": "xdg-terminal-exec impala"
+    "on-click": "xdg-terminal-exec gazelle"
   },
 
   "custom/bluetooth": {
