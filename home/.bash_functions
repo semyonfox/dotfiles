@@ -176,3 +176,14 @@ _welcome_bar() {
     echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m"
     echo
 }
+
+# ======================================================================
+# FUNCTIONS - GUI APPLICATIONS
+# ======================================================================
+
+# Nautilus with Hyprland/Wayland compatibility fix
+nautilus() {
+    export WAYLAND_DISPLAY=wayland-0
+    export XDG_CURRENT_DESKTOP=sway
+    command nautilus "$@" &
+}

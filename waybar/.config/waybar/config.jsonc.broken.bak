@@ -1,0 +1,101 @@
+{
+    "position": "top",
+    "layer": "top",
+    "exclusive": false,
+    "start_hidden": false,
+    "reload_style_on_change": true,
+    "height": 32,
+
+    "modules-left": [
+        "hyprland/workspaces",
+        "hyprland/window"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "tray",
+        "network",
+        "cpu",
+        "memory",
+        "battery"
+    ],
+
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "format-icons": {
+            "active": "",
+            "default": ""
+        },
+        "persistent-workspaces": {
+            "*": [1, 2, 3, 4, 5]
+        }
+    },
+
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 50,
+        "tooltip": false,
+        "seperate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%B %d, %H:%M}",
+        "tooltip-format": "{:%A, %Y (%S)}",
+        "interval": 1,
+        "on-click": "rofi -show drun",
+        "on-click-right": "rofi -show powermenu"
+    },
+
+    "mpris": {
+        "format": "󰎇 {dynamic}",
+        "dynamic-order": ["artist", "title"],
+        "max-length": 30,
+        "tooltip-format": "{status}",
+        "on-scroll-up": "playerctl volume 0.10+",
+        "on-scroll-down": "playerctl volume 0.10-"
+    },
+
+    "tray": {
+        "icon-size": 14,
+        "spacing": 12
+    },
+
+    "network": {
+        "interval": 5,
+        "format": "{ifname}",
+        "format-wifi": "{icon} {essid}",
+        "format-ethernet": " {ifname}",
+        "format-disconnected": "󰤮 disconnected",
+        "format-disabled": "󰤭 disabled",
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+        "tooltip-format": "{ifname} - {ipaddr}\nDown Speed: {bandwidthDownBytes}\nUp Speed: {bandwidthUpBytes}",
+        "on-click-right": "nmtui"
+    },
+
+    "cpu": {
+        "interval": 10,
+        "format": " {usage}%",
+        "max-length": 10,
+        "on-click-right": "btop"
+    },
+
+    "memory": {
+        "interval": 10,
+        "format": " {}%",
+        "max-length": 10,
+        "on-click-right": "btop"
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}",
+        "format-charging": "󰂄 {capacity}",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "tooltip-format": "{timeTo}",
+        "states": {
+            "warning": 30,
+            "critical": 10
+        },
+        "interval": 30
+    }
+}
