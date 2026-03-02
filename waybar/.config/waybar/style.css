@@ -80,6 +80,15 @@ tooltip {
   color: #f38ba8;
 }
 
+#custom-bluetooth.off {
+  color: @main-fg;
+  opacity: 0.4;
+}
+
+#custom-bluetooth.connected {
+  color: #89b4fa;
+}
+
 #pulseaudio {
   border-radius: 0px 21px 21px 0px;
   margin-right: 0px;

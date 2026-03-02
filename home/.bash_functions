@@ -180,10 +180,3 @@ _welcome_bar() {
 # ======================================================================
 # FUNCTIONS - GUI APPLICATIONS
 # ======================================================================
-
-# Nautilus with Hyprland/Wayland compatibility fix
-nautilus() {
-    export WAYLAND_DISPLAY=wayland-0
-    export XDG_CURRENT_DESKTOP=sway
-    command nautilus "$@" &
-}

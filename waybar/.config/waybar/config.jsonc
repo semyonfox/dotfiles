@@ -6,7 +6,7 @@
   
   "modules-left": ["group/actions"],
   "modules-center": ["clock"],
-  "modules-right": ["group/system", "group/notification"],
+  "modules-right": ["group/system"],
   
   "group/actions": {
     "orientation": "horizontal",
@@ -17,11 +17,6 @@
     "orientation": "horizontal",
     "modules": ["cpu", "temperature", "memory", "custom/battery", "network", "custom/bluetooth", "pulseaudio"]
   },
-  
-  "group/notification": {
-    "orientation": "horizontal",
-    "modules": ["custom/notification"]
-  },
 
   "custom/power": {
     "format": "⏻",
@@ -30,19 +25,19 @@
   },
 
   "custom/terminal": {
-    "format": "",
+    "format": "\uf120",
     "on-click": "xdg-terminal-exec",
     "tooltip-format": "Terminal"
   },
 
   "custom/files": {
-    "format": "",
-    "on-click": "nautilus",
+    "format": "\uf07b",
+    "on-click": "thunar",
     "tooltip-format": "Files"
   },
 
   "custom/browser": {
-    "format": "",
+    "format": "\uf268",
     "on-click": "brave",
     "tooltip-format": "Browser"
   },
@@ -98,8 +93,7 @@
     "format-ethernet": "  {ipaddr}",
     "format-disconnected": "冷  Disconnected",
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
-    "tooltip-format-wifi": "{essid} ({signalStrength}%)
-{ipaddr}/{cidr}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
     "on-click": "xdg-terminal-exec gazelle"
   },
 
@@ -130,31 +124,7 @@
     "on-click": "$HOME/.config/waybar/scripts/battery-profile.sh cycle",
     "tooltip": true,
     "escape": true
-  },
-    "format": "{icon}  {capacity:3}%",
-    "format-charging": "  {capacity:3}%",
-    "format-icons": ["", "", "", "", ""],
-    "tooltip-format": "{timeTo}"
-  },
-
-  "custom/notification": {
-    "tooltip": false,
-    "format": "{icon}",
-    "format-icons": {
-      "notification": "<span foreground='#f38ba8'></span>",
-      "none": "",
-      "dnd-notification": "<span foreground='#a89984'></span>",
-      "dnd-none": "",
-      "inhibited-notification": "<span foreground='#f38ba8'></span>",
-      "inhibited-none": "",
-      "dnd-inhibited-notification": "<span foreground='#a89984'></span>",
-      "dnd-inhibited-none": ""
-    },
-    "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -d",
-    "on-click-right": "swaync-client -cp",
-    "escape": true
   }
+
+
 }
