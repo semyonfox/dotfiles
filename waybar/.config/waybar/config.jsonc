@@ -15,7 +15,7 @@
   
   "group/system": {
     "orientation": "horizontal",
-    "modules": ["cpu", "temperature", "memory", "battery", "network", "custom/bluetooth", "pulseaudio"]
+    "modules": ["cpu", "temperature", "memory", "custom/battery", "network", "custom/bluetooth", "pulseaudio"]
   },
   
   "group/notification": {
@@ -123,12 +123,14 @@
     "on-click": "xdg-terminal-exec wiremix"
   },
 
-  "battery": {
+  "custom/battery": {
+    "return-type": "json",
+    "exec": "$HOME/.config/waybar/scripts/battery-profile.sh",
     "interval": 10,
-    "states": {
-      "warning": 30,
-      "critical": 15
-    },
+    "on-click": "$HOME/.config/waybar/scripts/battery-profile.sh cycle",
+    "tooltip": true,
+    "escape": true
+  },
     "format": "{icon}  {capacity:3}%",
     "format-charging": "  {capacity:3}%",
     "format-icons": ["", "", "", "", ""],

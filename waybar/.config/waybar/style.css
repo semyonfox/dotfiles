@@ -56,7 +56,7 @@ tooltip {
 #cpu,
 #temperature,
 #memory,
-#battery,
+#custom-battery,
 #network,
 #custom-bluetooth,
 #pulseaudio {
@@ -72,11 +72,11 @@ tooltip {
   margin-left: 9px;
 }
 
-#battery.warning {
+#custom-battery.warning {
   color: #f9e2af;
 }
 
-#battery.critical {
+#custom-battery.critical {
   color: #f38ba8;
 }
 
