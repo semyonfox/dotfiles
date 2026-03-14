@@ -176,7 +176,13 @@ Version managers for programming languages:
 **When to install**:
 - **nvm**: If you do Node.js/JavaScript development
 - **pyenv**: If you do Python development
-- **rustup**: If you do Rust development
+- **rustup**: If you do Rust development (or install from [rustup.rs](https://rustup.rs) directly)
+
+**Note about Rust**: If the package manager version fails, install directly from [rustup.rs](https://rustup.rs):
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source ~/.cargo/env
+```
 
 **After installation**, manage versions:
 ```bash
@@ -394,6 +400,31 @@ sudo pacman -S lazygit      # Arch
 sudo apt install lazygit    # Ubuntu
 brew install lazygit        # macOS
 ```
+
+### Rustup Installation Failed (CachyOS Mirror Issue)
+
+**Symptom**: Rustup fails with signature error or 404 from CachyOS mirrors
+
+**Example**:
+```
+error: failed retrieving file 'rustup-1.28.2-5.1-x86_64_v3.pkg.tar.zst' from cdn77.cachyos.org : The requested URL returned error: 404
+error: rustup: signature from "CachyOS <admin@cachyos.org>" is invalid
+```
+
+**Solution**: Install Rust directly from the official rustup.rs source (recommended approach anyway):
+```bash
+# Install from official source
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# Source cargo environment
+source ~/.cargo/env
+
+# Verify installation
+rustc --version
+cargo --version
+```
+
+This is actually the **recommended installation method** for Rust, as it ensures you always get the latest toolchain with official support.
 
 ### Shell Not Switching to Zsh
 
