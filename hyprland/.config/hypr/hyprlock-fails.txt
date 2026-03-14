@@ -1,0 +1,44 @@
+Incorrect password.
+Authentication failed.
+Access denied.
+Credentials invalid.
+Password mismatch.
+Incorrect credentials.
+Authentication unsuccessful.
+Attempt failed.
+Try again.
+Access remains locked.
+Wrong password. Try debugging your memory.
+Authentication failed. Stack overflow in brain.
+Incorrect password. The compiler is judging you.
+Wrong password. Variable not defined.
+Authentication failed. Segmentation fault in memory.
+Access denied. Skill issue detected.
+Incorrect password. The bugs are laughing.
+Authentication failed. Missing semicolon in memory.
+Wrong password. Did you push the correct branch?
+Commit rejected. Credentials invalid.
+Build failed. Authentication required.
+Runtime error: password incorrect.
+Nope. Try again.
+Still wrong.
+That guess had confidence.
+Close, but not really.
+The laptop disagrees.
+Nice enthusiasm.
+Bold strategy.
+Guess harder.
+System unimpressed.
+Memory recall unsuccessful.
+The machine says no.
+Wrong password. Coffee recommended.
+Wrong password. Works on my machine.
+Authentication failed. The logs are laughing.
+Incorrect password. Please consult the README.
+Access denied. Nice try, hacker.
+Wrong password. Have you tried turning your brain off and on?
+Authentication failed. Skill issue.
+Wrong password. Future you forgot again.
+Incorrect password. The greatest technician would remember.
+Access denied. Coffee required before next attempt.
+Wrong password. The keyboard is disappointed.

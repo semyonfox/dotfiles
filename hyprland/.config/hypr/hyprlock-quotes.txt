@@ -1,0 +1,40 @@
+Talk is cheap. Show me the code. — Linus Torvalds
+Given enough eyeballs, all bugs are shallow. — Eric S. Raymond
+Programs must be written for people to read. — Harold Abelson
+Simplicity is prerequisite for reliability. — Edsger W. Dijkstra
+Premature optimization is the root of all evil. — Donald Knuth
+The best way to predict the future is to invent it. — Alan Kay
+First, solve the problem. Then, write the code. — John Johnson
+Measuring programming progress by lines of code is like measuring aircraft building progress by weight. — Bill Gates
+Innovation distinguishes between a leader and a follower. — Steve Jobs
+If it works, don't touch it. — Linus Sebastian
+Just because you can build it doesn't mean you should. — Linus Sebastian
+The best PC is the one you actually use. — Linus Sebastian
+You can't put a limit on anything. — Michael Phelps
+The more you dream, the further you get. — Michael Phelps
+If you want to be the best, you have to do things others aren't willing to do. — Michael Phelps
+Practice like you've never won. Perform like you've never lost. — Michael Phelps
+Champions keep playing until they get it right. — Billie Jean King
+One more commit.
+Progress beats perfection.
+Focus beats motivation.
+Consistency compounds.
+Small improvements every day.
+Solve the next problem.
+Build something today.
+Momentum wins.
+Make today count.
+Start before you feel ready.
+Write the next line.
+Future you is watching.
+There are only two kinds of code: working code and code that will break later.
+Works on my machine.
+Ship now. Fix later.
+Never underestimate a programmer with coffee.
+The best debugger is still a good night's sleep.
+The code compiles. Ship it.
+The greatest technician that's ever lived. — Linus Sebastian
+Trust the process. And the logs.
+Read the error message.
+The logs know everything.
+Simple code wins.

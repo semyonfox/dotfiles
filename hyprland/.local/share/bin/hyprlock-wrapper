@@ -1,0 +1,87 @@
+#!/bin/bash
+# hyprlock-wrapper: injects random fail message and launches hyprlock
+
+FAIL_MSG=$(shuf -n1 ~/.config/hypr/hyprlock-fails.txt)
+
+# Create temp config with random fail message
+cat > /tmp/hyprlock-config.tmp << 'EOF'
+general {
+    hide_cursor = true
+    grace = 0
+}
+
+auth {
+    pam:enabled = true
+}
+
+background {
+    path = screenshot
+    blur_passes = 3
+    blur_size = 2
+    noise = 0.006
+}
+
+# clock
+label {
+    text = cmd[update:1000] echo "$(date +"%H:%M")"
+    color = rgba(205, 214, 244, 0.95)
+    font_size = 120
+    font_family = JetBrains Mono Bold
+    position = 0, 200
+    halign = center
+    valign = center
+}
+
+# rotating quote
+label {
+    text = cmd[update:0] shuf -n1 ~/.config/hypr/hyprlock-quotes.txt
+    color = rgba(203, 166, 247, 0.7)
+    font_size = 15
+    font_family = JetBrains Mono
+    position = 0, 100
+    halign = center
+    valign = center
+}
+
+# rotating lock message
+label {
+    text = cmd[update:0] shuf -n1 ~/.config/hypr/hyprlock-messages.txt
+    color = rgba(166, 227, 161, 0.9)
+    font_size = 24
+    font_family = JetBrains Mono
+    position = 0, 30
+    halign = center
+    valign = center
+}
+
+input-field {
+    size = 300, 55
+    outline_thickness = 2
+    dots_size = 0.3
+    dots_spacing = 0.5
+    dots_center = true
+    inner_color = rgba(30, 30, 50, 0.6)
+    outer_color = rgba(137, 180, 250, 0.8)
+    font_color = rgba(205, 214, 244, 1.0)
+    fade_on_empty = false
+    placeholder_text = Enter password
+    check_color = rgba(166, 227, 161, 0.8)
+    fail_color = rgba(243, 139, 168, 1.0)
+EOF
+
+# Append fail message (escaped for pango)
+ESCAPED_MSG=$(echo "$FAIL_MSG" | sed "s/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g")
+cat >> /tmp/hyprlock-config.tmp << EOF
+    fail_text = $ESCAPED_MSG
+    hide_input = false
+    position = 0, -150
+    halign = center
+    valign = center
+}
+EOF
+
+# Launch hyprlock with temp config
+hyprlock -c /tmp/hyprlock-config.tmp
+
+# Cleanup
+rm /tmp/hyprlock-config.tmp
