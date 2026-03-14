@@ -19,6 +19,12 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Backup files (prevent accidental commits of editor backups)
+*.bak
+*.backup
+*.broken*
+*.old
+
 # Backups created by install.sh
 dotfiles_backup_*
 

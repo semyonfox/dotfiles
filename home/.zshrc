@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 # ~/.zshrc - Zsh configuration with Oh My Zsh integration
+# Configuration built on Oh My Zsh framework with community best practices
 
 # ======================================================================
 # OH MY ZSH CONFIGURATION
@@ -41,6 +42,7 @@ source $ZSH/oh-my-zsh.sh
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
+export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
 
 # ======================================================================
 # HISTORY CONFIGURATION
@@ -220,6 +222,19 @@ export PYENV_ROOT="$HOME/.pyenv"
 if command -v pyenv >/dev/null; then
     eval "$(pyenv init -)"
 fi
+
+# ======================================================================
+# GAMING & DEVELOPMENT ENVIRONMENT (Hyprland/Wayland)
+# ======================================================================
+# Steam/Proton fixes for Hyprland Wayland
+export PROTON_LOG=0                           # set to 1 for debug logs
+export WINE_CPU_TOPOLOGY=4:2                  # optimize for quad-core systems
+export STAGING_SHARED_MEMORY=1                # enable shared memory for Proton
+export STEAM_RUNTIME_LAUNCH_DEBUG=0           # set to 1 for Steam launch debug
+export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
+
+# PyCharm/JetBrains on Hyprland (uses QT_QPA_PLATFORM from Hyprland)
+# If PyCharm crashes, temporarily use: QT_QPA_PLATFORM=xcb pycharm
 
 # ======================================================================
 # ZSH SYNTAX HIGHLIGHTING (must be at the end)

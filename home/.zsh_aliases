@@ -65,18 +65,53 @@ alias dprune='docker system prune -af'  # Custom - aggressive prune
 # ======================================================================
 # ALIASES - GIT
 # ======================================================================
-# Note: oh-my-zsh git plugin provides most common git aliases
-# We keep only our custom/unique ones that differ from omz
+# Note: oh-my-zsh git plugin provides many common aliases
+# These custom aliases either complement or intentionally override omz for consistency with bash config
 
-# Custom aliases (not in omz or different)
-alias gap='git add -p'             # Conflicts with omz's 'git apply' - ours is interactive add
-alias gc='git commit -m'           # Quick commit with message
+# Basic operations (consistent with bash)
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gap='git add -p'             # Interactive add (our preference over omz)
+alias gb='git branch'
+alias gbr='git branch -r'
+alias gba='git branch -a'
+alias gc='git commit -m'           # Quick commit with message (shorthand)
 alias gca='git commit -am'         # Add all and commit
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gcp='git cherry-pick'
 alias gd='git diff'                # View changes
-alias gds='git diff --staged'      # View staged changes
-alias gs='git status -sb'          # Short status (omz has different version)
+alias gds='git diff --staged'      # View staged changes (omz has gdsb)
+alias gf='git fetch'
+alias gfa='git fetch --all --prune'
 alias gl='git log --oneline --graph --decorate'  # Pretty log
-alias gll='git log --graph --pretty=format:"%C(yellow)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(reset)"'  # Detailed pretty log
+alias gll='git log --graph --pretty=format:"%C(yellow)%h%C(reset) -%C(auto)%d%C(reset) %s %C(green)(%cr) %C(bold blue)<%an>%C(reset)"'  # Detailed log
+
+# Push/Pull operations
+alias gp='git push'
+alias gpf='git push --force-with-lease'  # Safer than force
+alias gpo='git push origin'
+alias gpu='git push --set-upstream origin'
+alias gr='git rebase'
+alias gri='git rebase -i'
+alias grs='git reset'
+alias grh='git reset --hard'
+
+# Status/Show
+alias gs='git status -sb'          # Short status with branch (our preference)
+alias gst='git status'             # Full status (omz has this)
+alias gsh='git show'
+
+# Stash operations
+alias gss='git stash'
+alias gsp='git stash pop'
+alias gsa='git stash apply'
+alias gsl='git stash list'
+
+# Submodules and Tags
+alias gsu='git submodule update --init --recursive'
+alias gt='git tag'
 
 # ======================================================================
 # ALIASES - NEOVIM/EDITOR
@@ -84,11 +119,14 @@ alias gll='git log --graph --pretty=format:"%C(yellow)%h%C(reset) -%C(auto)%d%C(
 alias v='nvim'
 alias vi='nvim'
 alias vim='nvim'
+alias e='$EDITOR'                  # Use configured editor
 
 # Quick config access
 alias vconf='nvim ~/.config/nvim'
 alias zshrc='nvim ~/.zshrc'
 alias zalias='nvim ~/.zsh_aliases'
+alias bashrc='nvim ~/.bashrc'      # For consistency when switching shells
+alias balias='nvim ~/.bash_aliases' # For consistency when switching shells
 alias tconf='nvim ~/.tmux.conf'
 
 # ======================================================================

@@ -100,3 +100,39 @@ alias gsa='git stash apply'
 alias gsl='git stash list'
 alias gsu='git submodule update --init --recursive'
 alias gt='git tag'
+
+# ======================================================================
+# ALIASES - NEOVIM/EDITOR
+# ======================================================================
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+alias e='$EDITOR'                  # Use configured editor
+
+# Quick config access
+alias vconf='nvim ~/.config/nvim'
+alias bashrc='nvim ~/.bashrc'
+alias balias='nvim ~/.bash_aliases'
+alias zshrc='nvim ~/.zshrc'
+alias zalias='nvim ~/.zsh_aliases'
+alias tconf='nvim ~/.tmux.conf'
+
+# ======================================================================
+# ALIASES - TMUX
+# ======================================================================
+alias t='tmux'
+alias ta='tmux attach'
+alias tat='tmux attach -t'
+alias tns='tmux new-session -s'
+alias tls='tmux list-sessions'
+alias tks='tmux kill-session -t'
+
+# ======================================================================
+# ALIASES - LAZYGIT
+# ======================================================================
+alias lg='lazygit'
+
+# ======================================================================
+# ALIASES - SHELL
+# ======================================================================
+alias reload='source ~/.bashrc'

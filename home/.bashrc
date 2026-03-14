@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # ~/.bashrc - Bash configuration for interactive shells
+# Configuration based on Oh My Bash patterns and community best practices
 
 # ======================================================================
 # INTERACTIVE SHELL CHECK
@@ -10,8 +11,9 @@
 # ENVIRONMENT VARIABLES
 # ======================================================================
 export PATH="$HOME/.local/bin:$PATH"
-export EDITOR='vim'
-export VISUAL='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
+export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
 
 # ======================================================================
 # HISTORY CONFIGURATION
@@ -156,7 +158,7 @@ else
 fi
 
 # ======================================================================
-# ALIASES
+# ALIASES - Bash git aliases adapted from Oh My Bash conventions
 # ======================================================================
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
@@ -164,7 +166,7 @@ fi
 
 
 # ======================================================================
-# FUNCTIONS
+# FUNCTIONS - Utility functions for daily workflows
 # ======================================================================
 if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
@@ -182,5 +184,19 @@ export PYENV_ROOT="$HOME/.pyenv"
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
+# ======================================================================
+# GAMING & DEVELOPMENT ENVIRONMENT (Hyprland/Wayland)
+# ======================================================================
+# Steam/Proton fixes for Hyprland Wayland
+export PROTON_LOG=0                           # set to 1 for debug logs
+export WINE_CPU_TOPOLOGY=4:2                  # optimize for quad-core systems
+export STAGING_SHARED_MEMORY=1                # enable shared memory for Proton
+export STEAM_RUNTIME_LAUNCH_DEBUG=0           # set to 1 for Steam launch debug
+export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
+
+# PyCharm/JetBrains on Hyprland (uses QT_QPA_PLATFORM from Hyprland)
+# If PyCharm crashes, temporarily use: QT_QPA_PLATFORM=xcb pycharm
+
 # Zed alias
 alias zed=zeditor
+. "$HOME/.cargo/env"
