@@ -13,3 +13,4 @@ default-timeout=5000
 anchor=top-right
 margin=15
 padding=12,16
+group-by=app-name
