@@ -2,21 +2,11 @@
   "layer": "top",
   "position": "top",
   "height": 36,
-  "spacing": 0,
+  "spacing": 4,
   
-  "modules-left": ["group/actions"],
+  "modules-left": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"],
   "modules-center": ["clock"],
-  "modules-right": ["group/system"],
-  
-  "group/actions": {
-    "orientation": "horizontal",
-    "modules": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"]
-  },
-  
-  "group/system": {
-    "orientation": "horizontal",
-    "modules": ["cpu", "temperature", "memory", "custom/battery", "network", "custom/bluetooth", "pulseaudio"]
-  },
+  "modules-right": ["cpu", "temperature", "memory", "network", "bluetooth", "pulseaudio"],
 
   "custom/power": {
     "format": "⏻",
@@ -25,19 +15,19 @@
   },
 
   "custom/terminal": {
-    "format": "\uf120",
+    "format": "",
     "on-click": "xdg-terminal-exec",
     "tooltip-format": "Terminal"
   },
 
   "custom/files": {
-    "format": "\uf07b",
-    "on-click": "thunar",
+    "format": "",
+    "on-click": "nautilus",
     "tooltip-format": "Files"
   },
 
   "custom/browser": {
-    "format": "\uf268",
+    "format": "",
     "on-click": "brave",
     "tooltip-format": "Browser"
   },
@@ -74,9 +64,9 @@
 
   "temperature": {
     "interval": 2,
-    "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
+    "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
     "critical-threshold": 80,
-    "format": "\uf2c9 {temperatureC:2}°C",
+    "format": " {temperatureC:2}°C",
     "on-click": "xdg-terminal-exec btop"
   },
 
@@ -94,18 +84,16 @@
     "format-disconnected": "冷  Disconnected",
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
-    "on-click": "xdg-terminal-exec gazelle"
+    "on-click": "xdg-terminal-exec impala"
   },
 
-  "custom/bluetooth": {
-    "format": "{text}",
-    "return-type": "json",
-    "exec": "$HOME/.config/waybar/scripts/bluetooth.sh",
-    "exec-if": "command -v bluetoothctl",
-    "interval": 2,
-    "on-click": "xdg-terminal-exec bluetui",
-    "tooltip": true,
-    "escape": true
+  "bluetooth": {
+    "format": "  {status}",
+    "format-disabled": "  Off",
+    "format-connected": "  {num_connections}",
+    "tooltip-format": "{status}",
+    "tooltip-format-connected": "{device_alias}",
+    "on-click": "xdg-terminal-exec bluetui"
   },
 
   "pulseaudio": {
@@ -115,16 +103,5 @@
       "default": ["", "", ""]
     },
     "on-click": "xdg-terminal-exec wiremix"
-  },
-
-  "custom/battery": {
-    "return-type": "json",
-    "exec": "$HOME/.config/waybar/scripts/battery-profile.sh",
-    "interval": 10,
-    "on-click": "$HOME/.config/waybar/scripts/battery-profile.sh cycle",
-    "tooltip": true,
-    "escape": true
   }
-
-
 }
