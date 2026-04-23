@@ -1,3 +1,5 @@
+@import "theme.css";
+
 * {
     border: none;
     border-radius: 0;
@@ -7,104 +9,88 @@
     min-height: 0;
 }
 
-@import "theme.css";
-
 window#waybar {
     background: @bar-bg;
+    color: @pill-fg;
 }
 
 tooltip {
-    background: @main-bg;
-    color: @main-fg;
+    background: @pill-bg;
+    color: @pill-fg;
     border-radius: 8px;
-    border-width: 0px;
 }
+tooltip label { padding: 4px 6px; }
 
+/* shared pill base — consistent vertical/horizontal rhythm */
 #custom-power,
 #idle_inhibitor,
-#workspaces {
-    color: @main-fg;
-    background: @main-bg;
-    opacity: 1;
-    margin: 4px 0px;
-    padding: 4px 8px;
-    font-size: 14px;
-}
-
-#custom-power {
-    border-radius: 21px 0px 0px 21px;
-    margin-left: 9px;
-}
-
-#workspaces {
-    border-radius: 0px 21px 21px 0px;
-}
-
-#workspaces button {
-    background: transparent;
-    color: @main-fg;
-    border-radius: 9px;
-    min-width: 16px;
-    margin: 0px 1px;
-    padding: 0px 4px;
-}
-
-#workspaces button.active {
-    background: @wb-act-bg;
-    color: @wb-act-fg;
-}
-
-#workspaces button:hover {
-    background: @wb-hvr-bg;
-    color: @wb-hvr-fg;
-}
-
-#clock {
-    color: @main-fg;
-    background: @main-bg;
-    opacity: 1;
-    font-weight: bold;
-    padding: 4px 16px;
-    margin: 4px 9px;
-    border-radius: 21px;
-}
-
+#workspaces,
+#clock,
 #cpu,
-#temperature,
 #memory,
-#custom-battery-profile,
+#battery,
 #network,
 #bluetooth,
 #custom-audio {
-    color: @main-fg;
-    background: @main-bg;
-    opacity: 1;
-    margin: 4px 0px;
-    padding: 4px 12px;
+    background: @pill-bg;
+    color: @pill-fg;
+    margin: 4px 0;
+    padding: 0 12px;
 }
 
-#custom-battery-profile.warning {
-    color: #f9e2af;
+/* group end caps — only the outer edges round, with one extra unit of padding for the curve */
+#custom-power { border-radius: 18px 0 0 18px; margin-left: 8px;  padding-left: 14px;  color: @red; }
+#workspaces   { border-radius: 0 18px 18px 0;                    padding-right: 14px; }
+#cpu          { border-radius: 18px 0 0 18px; margin-left: 8px;  padding-left: 14px;  color: @blue; }
+#custom-audio { border-radius: 0 18px 18px 0; margin-right: 8px; padding-right: 14px; color: @pink; }
+#clock        { border-radius: 18px;          padding: 0 16px;   color: @text; }
+
+/* left group inner items */
+#idle_inhibitor          { color: @overlay1; }
+#idle_inhibitor.activated { color: @yellow; }
+
+#workspaces button {
+    background: transparent;
+    color: @overlay1;
+    border-radius: 10px;
+    min-width: 14px;
+    margin: 4px 0;
+    padding: 0 3px;
+    transition: background 150ms ease, color 150ms ease;
+}
+#workspaces button.active {
+    background: @accent;
+    color: @accent-fg;
+}
+#workspaces button:hover {
+    background: @surface0;
+    color: @text;
+    box-shadow: none;
+    text-shadow: none;
 }
 
-#custom-battery-profile.critical {
-    color: #f38ba8;
+/* right group state colours */
+#memory                    { color: @mauve; }
+#memory.warning, #memory.h { color: @yellow; }
+#memory.critical, #memory.c { color: @red; }
+
+#battery               { color: @green; }
+#battery.warning       { color: @yellow; }
+#battery.critical      { color: @red; }
+#battery.charging      { color: @teal; }
+#battery.plugged       { color: @sapphire; }
+
+#network               { color: @teal; }
+#network.disconnected  { color: @red; }
+
+#bluetooth             { color: @lavender; padding: 0 8px; }
+/* collapse bluetooth pill entirely when nothing is connected */
+#bluetooth.disabled,
+#bluetooth.off,
+#bluetooth.on {
+    padding: 0;
+    margin: 0;
+    background: transparent;
 }
 
-#custom-battery-profile.charging {
-    color: #a6e3a1;
-}
-
-#cpu {
-    border-radius: 21px 0px 0px 21px;
-    margin-left: 9px;
-}
-
-#custom-audio {
-    border-radius: 0px 21px 21px 0px;
-    margin-right: 9px;
-}
-
-#custom-audio.muted {
-    color: #f38ba8;
-}
+#custom-audio.muted    { color: @red; }

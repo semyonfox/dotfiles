@@ -6,7 +6,7 @@
   
   "modules-left": ["custom/power", "idle_inhibitor", "hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "temperature", "memory", "custom/battery-profile", "network", "bluetooth", "custom/audio"],
+  "modules-right": ["cpu", "memory", "battery", "network", "bluetooth", "custom/audio"],
 
   "custom/power": {
     "format": "⏻",
@@ -67,14 +67,6 @@
     "on-click": "xdg-terminal-exec btop"
   },
 
-  "temperature": {
-    "interval": 2,
-    "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
-    "critical-threshold": 80,
-    "format": " {temperatureC:2}°C",
-    "on-click": "xdg-terminal-exec btop"
-  },
-
   "memory": {
     "interval": 2,
     "format": "󰾆 {percentage:2}%",
@@ -82,13 +74,15 @@
     "on-click": "xdg-terminal-exec btop"
   },
 
-  "custom/battery-profile": {
-    "exec": "~/.config/waybar/scripts/battery-profile.sh",
-    "return-type": "json",
-    "interval": 5,
-    "signal": 8,
-    "on-click": "~/.config/waybar/scripts/battery-profile.sh cycle && pkill -RTMIN+8 waybar",
-    "tooltip": true
+  "battery": {
+    "interval": 10,
+    "states": { "warning": 25, "critical": 15 },
+    "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-plugged": "󰚥 {capacity}%",
+    "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰂂", "󰁹"],
+    "tooltip-format": "{timeTo} · power-mode: right-click to cycle",
+    "on-click-right": "~/.local/bin/power-mode.sh cycle"
   },
 
   "network": {
@@ -102,9 +96,10 @@
   },
 
   "bluetooth": {
-    "format": "  {status}",
-    "format-disabled": "  Off",
-    "format-connected": "  {device_alias}",
+    "format-on": "",
+    "format-off": "",
+    "format-disabled": "",
+    "format-connected": "󰂱 {device_alias}",
     "tooltip-format": "{status}",
     "tooltip-format-connected": "{device_alias}",
     "on-click": "xdg-terminal-exec bluetui"
