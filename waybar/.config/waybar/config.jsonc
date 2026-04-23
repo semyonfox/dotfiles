@@ -2,11 +2,11 @@
   "layer": "top",
   "position": "top",
   "height": 36,
-  "spacing": 4,
+  "spacing": 0,
   
-  "modules-left": ["custom/power", "idle_inhibitor", "custom/terminal", "custom/files", "custom/browser"],
+  "modules-left": ["custom/power", "idle_inhibitor", "hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "temperature", "memory", "network", "bluetooth", "pulseaudio"],
+  "modules-right": ["cpu", "temperature", "memory", "custom/battery-profile", "network", "bluetooth", "custom/audio"],
 
   "custom/power": {
     "format": "⏻",
@@ -14,22 +14,27 @@
     "tooltip": false
   },
 
-  "custom/terminal": {
-    "format": "",
-    "on-click": "xdg-terminal-exec",
-    "tooltip-format": "Terminal"
-  },
-
-  "custom/files": {
-    "format": "",
-    "on-click": "nautilus",
-    "tooltip-format": "Files"
-  },
-
-  "custom/browser": {
-    "format": "",
-    "on-click": "brave",
-    "tooltip-format": "Browser"
+  "hyprland/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "0"
+    },
+    "all-outputs": true,
+    "disable-scroll": true,
+    "sort-by": "number",
+    "on-click": "activate",
+    "persistent-workspaces": {
+      "*": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    }
   },
 
   "clock": {
@@ -49,8 +54,8 @@
   "idle_inhibitor": {
     "format": "{icon}",
     "format-icons": {
-      "activated": "",
-      "deactivated": ""
+      "activated": "",
+      "deactivated": ""
     },
     "tooltip-format-activated": "Caffeine mode: ON (system will not sleep)",
     "tooltip-format-deactivated": "Caffeine mode: OFF (system can sleep)"
@@ -64,7 +69,7 @@
 
   "temperature": {
     "interval": 2,
-    "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+    "hwmon-path": "/sys/class/hwmon/hwmon5/temp1_input",
     "critical-threshold": 80,
     "format": " {temperatureC:2}°C",
     "on-click": "xdg-terminal-exec btop"
@@ -72,36 +77,48 @@
 
   "memory": {
     "interval": 2,
-    "format": "ￅ {percentage:2}%",
+    "format": "󰾆 {percentage:2}%",
     "tooltip-format": "{used:0.1f}G / {total:0.1f}G used",
     "on-click": "xdg-terminal-exec btop"
+  },
+
+  "custom/battery-profile": {
+    "exec": "~/.config/waybar/scripts/battery-profile.sh",
+    "return-type": "json",
+    "interval": 5,
+    "signal": 8,
+    "on-click": "~/.config/waybar/scripts/battery-profile.sh cycle && pkill -RTMIN+8 waybar",
+    "tooltip": true
   },
 
   "network": {
     "interval": 2,
     "format-wifi": "  {essid}",
-    "format-ethernet": "  {ipaddr}",
-    "format-disconnected": "冷  Disconnected",
+    "format-ethernet": "  {ipaddr}",
+    "format-disconnected": "  Disconnected",
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}/{cidr}",
-    "on-click": "xdg-terminal-exec impala"
+    "on-click": "xdg-terminal-exec gazelle"
   },
 
   "bluetooth": {
     "format": "  {status}",
-    "format-disabled": "  Off",
-    "format-connected": "  {num_connections}",
+    "format-disabled": "  Off",
+    "format-connected": "  {device_alias}",
     "tooltip-format": "{status}",
     "tooltip-format-connected": "{device_alias}",
     "on-click": "xdg-terminal-exec bluetui"
   },
 
-  "pulseaudio": {
-    "format": "{icon}  {volume:3}%",
-    "format-muted": "  {volume:3}%",
-    "format-icons": {
-      "default": ["", "", ""]
-    },
-    "on-click": "xdg-terminal-exec wiremix"
+  "custom/audio": {
+    "exec": "~/.config/waybar/scripts/audio-control.sh status",
+    "return-type": "json",
+    "interval": 2,
+    "signal": 9,
+    "on-click": "xdg-terminal-exec wiremix",
+    "on-click-right": "~/.config/waybar/scripts/audio-control.sh cycle && pkill -RTMIN+9 waybar",
+    "on-scroll-up": "~/.config/waybar/scripts/audio-control.sh up && pkill -RTMIN+9 waybar",
+    "on-scroll-down": "~/.config/waybar/scripts/audio-control.sh down && pkill -RTMIN+9 waybar",
+    "tooltip": true
   }
 }
