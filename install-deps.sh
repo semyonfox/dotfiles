@@ -20,6 +20,8 @@ INSTALL_NVM="false"
 INSTALL_PYENV="false"
 INSTALL_RUSTUP="false"
 INSTALL_HYPRLAND="false"
+INSTALL_GAMING="false"
+INSTALL_LUTRIS="false"
 
 PKG_MANAGER=""
 INSTALL_CMD=""
@@ -63,7 +65,7 @@ prompt_shell_choice() {
     echo "  [1] Bash (POSIX-compatible, lightweight)"
     echo "  [2] Zsh (modern shell with Oh My Zsh support)"
     echo ""
-    read -p "Choice [1/2]: " -n 1 choice
+    read -r -p "Choice [1/2]: " choice
     echo ""
     
     case "$choice" in
@@ -74,7 +76,7 @@ prompt_shell_choice() {
             
             # Offer Oh My Zsh if zsh being installed
             echo ""
-            read -p "Install Oh My Zsh framework? (y/n): " -n 1 omz_choice
+            read -r -p "Install Oh My Zsh framework? (y/n): " omz_choice
             echo ""
             if [[ $omz_choice =~ ^[Yy]$ ]]; then
                 INSTALL_OMZ="true"
@@ -103,7 +105,7 @@ prompt_optional_alias_tools() {
     echo "  • pomodoro-tui - Timer (pomodoro alias)"
     echo "  • thefuck - Command corrector (fuck alias)"
     echo ""
-    read -p "Install optional alias tools? (y/n): " -n 1 choice
+    read -r -p "Install optional alias tools? (y/n): " choice
     echo ""
     
     if [[ $choice =~ ^[Yy]$ ]]; then
@@ -128,7 +130,7 @@ prompt_development_tools() {
     echo "  • pyenv - Python version manager"
     echo "  • rustup - Rust toolchain"
     echo ""
-    read -p "Install development tools? (y/n): " -n 1 choice
+    read -r -p "Install development tools? (y/n): " choice
     echo ""
     
     if [[ $choice =~ ^[Yy]$ ]]; then
@@ -162,7 +164,7 @@ prompt_hyprland() {
     echo "  • Waybar - Status bar"
     echo "  • Swaync - Notification daemon"
     echo ""
-    read -p "Install Hyprland desktop? (y/n): " -n 1 choice
+    read -r -p "Install Hyprland desktop? (y/n): " choice
     echo ""
     
     if [[ $choice =~ ^[Yy]$ ]]; then
@@ -173,6 +175,94 @@ prompt_hyprland() {
     else
         warn "Skipped desktop environment"
         log "Skipped desktop environment"
+    fi
+}
+
+prompt_gaming() {
+    if is_wsl || [[ "$OSTYPE" == "darwin"* ]]; then
+        return 0
+    fi
+
+    case "$(get_base_os)" in
+        arch|cachyos|endeavouros|manjaro)
+            ;;
+        *)
+            warn "Skipped Linux gaming stack prompt on unsupported distro"
+            return 0
+            ;;
+    esac
+
+    if [[ -z "$PKG_MANAGER" ]]; then
+        return 0
+    fi
+
+    local pkg
+    local missing_pkg=""
+
+    case "$PKG_MANAGER" in
+        paru|yay)
+            for pkg in "${GAMING_PACKAGES[@]}"; do
+                if ! "$PKG_MANAGER" -Si "$pkg" &>/dev/null; then
+                    missing_pkg="$pkg"
+                    break
+                fi
+            done
+            ;;
+        pacman)
+            for pkg in "${GAMING_PACKAGES[@]}"; do
+                if ! pacman -Si "$pkg" &>/dev/null; then
+                    missing_pkg="$pkg"
+                    break
+                fi
+            done
+            ;;
+        *)
+            warn "Skipped Linux gaming stack prompt on unsupported package manager"
+            return 0
+            ;;
+    esac
+
+    if [[ -n "$missing_pkg" ]]; then
+        warn "Skipped Linux gaming stack prompt - $missing_pkg is unavailable with $PKG_MANAGER on this system"
+        return 0
+    fi
+
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🎮 LINUX GAMING (Optional)"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "Install a Proton-first gaming stack?"
+    echo ""
+    echo "  • steam - Steam client"
+    echo "  • heroic-games-launcher-bin - Epic launcher"
+    echo "  • protonplus - install Proton-GE and Wine-GE"
+    echo "  • umu-launcher - Proton outside Steam"
+    echo "  • gamescope - fullscreen and scaling wrapper"
+    echo "  • mangohud - FPS and frametime overlay"
+    echo "  • gamemode + lib32-gamemode - game performance hooks"
+    echo ""
+    read -r -p "Install Linux gaming stack? (y/n): " choice
+    echo ""
+
+    if [[ $choice =~ ^[Yy]$ ]]; then
+        PACKAGES_TO_INSTALL+=("${GAMING_PACKAGES[@]}")
+        INSTALL_GAMING="true"
+        info "Will install: Steam + Heroic Proton-first gaming stack"
+
+        echo ""
+        read -r -p "Also install Lutris for edge-case launchers? (y/n): " lutris_choice
+        echo ""
+
+        if [[ $lutris_choice =~ ^[Yy]$ ]]; then
+            PACKAGES_TO_INSTALL+=("${GAMING_OPTIONAL_PACKAGES[@]}")
+            INSTALL_LUTRIS="true"
+            info "Will install: Lutris"
+        else
+            warn "Skipping Lutris - Heroic + Steam remain the primary setup"
+        fi
+    else
+        warn "Skipped Linux gaming stack"
     fi
 }
 
@@ -242,6 +332,28 @@ show_pre_install_summary() {
             echo "[DEVELOPMENT]"
             for pkg in "${DEVELOPMENT_PACKAGES[@]}"; do
                 [[ " ${PACKAGES_TO_INSTALL[@]} " =~ " ${pkg} " ]] && echo "  ✓ $pkg"
+            done
+        fi
+
+        if [[ ${#GAMING_PACKAGES[@]} -gt 0 ]] && [[ " ${PACKAGES_TO_INSTALL[@]} " =~ " ${GAMING_PACKAGES[0]} " ]]; then
+            echo ""
+            echo "[GAMING - CORE]"
+            for pkg in "${GAMING_PACKAGES[@]}"; do
+                [[ " ${PACKAGES_TO_INSTALL[@]} " =~ " ${pkg} " ]] && echo "  ✓ $pkg"
+            done
+        fi
+
+        if [[ ${#GAMING_OPTIONAL_PACKAGES[@]} -gt 0 ]]; then
+            local printed_gaming_optional="false"
+            for pkg in "${GAMING_OPTIONAL_PACKAGES[@]}"; do
+                if [[ " ${PACKAGES_TO_INSTALL[@]} " =~ " ${pkg} " ]]; then
+                    [[ "$printed_gaming_optional" == "false" ]] && {
+                        echo ""
+                        echo "[GAMING - OPTIONAL]"
+                        printed_gaming_optional="true"
+                    }
+                    echo "  ✓ $pkg"
+                fi
             done
         fi
     } | less -R
@@ -365,6 +477,7 @@ main() {
     prompt_optional_alias_tools
     prompt_development_tools
     prompt_hyprland
+    prompt_gaming
     
     # Show what will be installed
     show_pre_install_summary
@@ -375,7 +488,7 @@ main() {
     echo "  Ready to install ${#PACKAGES_TO_INSTALL[@]} packages?"
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
-    read -p "Continue? (y/n): " -n 1 confirm
+    read -r -p "Continue? (y/n): " confirm
     echo ""
     
     if [[ ! $confirm =~ ^[Yy]$ ]]; then
@@ -415,9 +528,20 @@ main() {
     echo "   $ cat home/README.md"
     echo "   $ cat home/SHELL_GUIDE.md"
     echo ""
+
+    if [[ "$INSTALL_GAMING" == "true" ]]; then
+        echo "4. Finish gaming setup:"
+        echo "   $ protonplus"
+        echo "   # install the latest GE-Proton for Steam and Heroic"
+        echo ""
+    fi
     
     if [[ "$INSTALL_HYPRLAND" == "true" ]]; then
-        echo "4. Start Hyprland:"
+        if [[ "$INSTALL_GAMING" == "true" ]]; then
+            echo "5. Start Hyprland:"
+        else
+            echo "4. Start Hyprland:"
+        fi
         echo "   $ exec Hyprland"
         echo ""
     fi

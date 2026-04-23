@@ -50,6 +50,17 @@ declare -A PACKAGE_DESCRIPTIONS=(
     [nvm]="Node version manager"
     [pyenv]="Python version manager"
     [rustup]="Rust toolchain installer"
+
+    # Gaming - Optional
+    [steam]="Valve's digital software delivery system"
+    [heroic-games-launcher-bin]="Epic and GOG launcher with Proton and Wine runners"
+    [protonplus]="Compatibility tools manager for Proton-GE and Wine-GE"
+    [umu-launcher]="Run Proton outside Steam for Heroic and other launchers"
+    [gamescope]="Micro-compositor for fullscreen games and scaling"
+    [mangohud]="Performance overlay and frame limiter"
+    [gamemode]="Feral GameMode daemon and client"
+    [lib32-gamemode]="32-bit GameMode client libraries"
+    [lutris]="Universal game launcher for Wine, launchers, and emulators"
 )
 
 # ======================================================================
@@ -85,6 +96,15 @@ declare -A PACKAGE_NAMES_ARCH=(
     [nvm]="nvm"
     [pyenv]="pyenv"
     [rustup]="rustup"
+    [steam]="steam"
+    [heroic-games-launcher-bin]="heroic-games-launcher-bin"
+    [protonplus]="protonplus"
+    [umu-launcher]="umu-launcher"
+    [gamescope]="gamescope"
+    [mangohud]="mangohud"
+    [gamemode]="gamemode"
+    [lib32-gamemode]="lib32-gamemode"
+    [lutris]="lutris"
 )
 
 # ======================================================================
@@ -247,6 +267,21 @@ DEVELOPMENT_PACKAGES=(
     "rustup"
 )
 
+GAMING_PACKAGES=(
+    "steam"
+    "heroic-games-launcher-bin"
+    "protonplus"
+    "umu-launcher"
+    "gamescope"
+    "mangohud"
+    "gamemode"
+    "lib32-gamemode"
+)
+
+GAMING_OPTIONAL_PACKAGES=(
+    "lutris"
+)
+
 # ======================================================================
 # HELPER FUNCTIONS
 # ======================================================================
@@ -344,10 +379,22 @@ print_all_packages() {
             echo "💻 DEVELOPMENT (Optional)"
             format_package_list "DEVELOPMENT" "${DEVELOPMENT_PACKAGES[@]}"
         fi
+
+        if [[ ${#GAMING_PACKAGES[@]} -gt 0 ]]; then
+            echo ""
+            echo "🎮 GAMING - CORE (Optional)"
+            format_package_list "GAMING CORE" "${GAMING_PACKAGES[@]}"
+        fi
+
+        if [[ ${#GAMING_OPTIONAL_PACKAGES[@]} -gt 0 ]]; then
+            echo ""
+            echo "🕹️  GAMING - OPTIONAL"
+            format_package_list "GAMING OPTIONAL" "${GAMING_OPTIONAL_PACKAGES[@]}"
+        fi
         
         echo ""
         echo "╔════════════════════════════════════════════════════════════╗"
-        local total=$((${#CRITICAL_PACKAGES[@]} + ${#SHELL_CORE_PACKAGES[@]} + ${#SHELL_UTILITY_PACKAGES[@]} + ${#SHELL_OPTIONAL_PACKAGES[@]} + ${#HYPRLAND_PACKAGES[@]} + ${#WAYBAR_PACKAGES[@]} + ${#SWAYNC_PACKAGES[@]} + ${#DEVELOPMENT_PACKAGES[@]}))
+        local total=$((${#CRITICAL_PACKAGES[@]} + ${#SHELL_CORE_PACKAGES[@]} + ${#SHELL_UTILITY_PACKAGES[@]} + ${#SHELL_OPTIONAL_PACKAGES[@]} + ${#HYPRLAND_PACKAGES[@]} + ${#WAYBAR_PACKAGES[@]} + ${#SWAYNC_PACKAGES[@]} + ${#DEVELOPMENT_PACKAGES[@]} + ${#GAMING_PACKAGES[@]} + ${#GAMING_OPTIONAL_PACKAGES[@]}))
         echo "║  Total: $total packages                                              ║"
         echo "╚════════════════════════════════════════════════════════════╝"
         echo ""
