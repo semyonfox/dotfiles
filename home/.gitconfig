@@ -9,6 +9,7 @@
 [core]
 	autocrlf = input
 	diffAlgorithm = histogram
+	excludesFile = /home/semyon/.config/git/ignore
 [diff]
 	colorMoved = default
 [rerere]

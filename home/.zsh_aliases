@@ -49,6 +49,9 @@ alias rm='rm -i'
 # App shortcuts
 alias todo='dooit'
 alias pomodoro='pomodoro-tui'
+alias gcheck='gaming-check'
+alias gmodes='gaming-modes'
+alias pplus='protonplus'
 
 # ======================================================================
 # ALIASES - DOCKER
@@ -148,3 +151,10 @@ alias lg='lazygit'
 # ALIASES - SHELL
 # ======================================================================
 alias reload='source ~/.zshrc'
+
+# ======================================================================
+# ALIASES - AI TOOLS
+# ======================================================================
+alias cc='CLAUDE_CODE_NO_FLICKER=1 LS_DEMO=1 CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 CLAUDE_CODE_DISABLE_1M_CONTEXT=1 claude --dangerously-skip-permissions'
+alias cx='codex --yolo'
+alias oc='opencode'

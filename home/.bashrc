@@ -181,8 +181,10 @@ _welcome_bar
 # Source local bashrc if it exists (for machine-specific configs)
 [[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
 export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv >/dev/null; then
+    eval "$(pyenv init -)"
+fi
 
 # ======================================================================
 # GAMING & DEVELOPMENT ENVIRONMENT (Hyprland/Wayland)
@@ -199,4 +201,3 @@ export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
 
 # Zed alias
 alias zed=zeditor
-. "$HOME/.cargo/env"

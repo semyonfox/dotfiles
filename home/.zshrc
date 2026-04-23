@@ -40,6 +40,9 @@ source $ZSH/oh-my-zsh.sh
 # ENVIRONMENT VARIABLES
 # ======================================================================
 export PATH="$HOME/.local/bin:$PATH"
+export NPM_CONFIG_PREFIX="$HOME/.local"
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
 export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
@@ -258,3 +261,14 @@ export PATH=/home/semyon/.opencode/bin:$PATH
 
 # Zed alias
 alias zed=zeditor
+
+# pnpm
+export PNPM_HOME="/home/semyon/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"

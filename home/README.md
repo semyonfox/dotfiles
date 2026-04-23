@@ -5,6 +5,7 @@ This package contains comprehensive shell configurations for both **bash** and *
 ## Overview
 
 The `home/` package provides:
+
 - **Unified bash and zsh configurations** with feature parity
 - **102+ git aliases** for efficient version control workflows
 - **Comprehensive utility functions** for daily development tasks
@@ -36,18 +37,18 @@ chsh -s /usr/bin/zsh
 
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `.bashrc` | Bash main configuration |
-| `.bash_aliases` | Bash aliases (102 git + utilities) |
-| `.bash_functions` | Bash utility functions |
-| `.bash_profile` | Bash login shell config |
-| `.zshrc` | Zsh main config (uses Oh My Zsh) |
-| `.zsh_aliases` | Zsh aliases (mirrored from bash) |
-| `.zsh_functions` | Zsh utility functions |
-| `.config/starship.toml` | Starship prompt configuration |
-| `.tmux.conf` | Tmux configuration |
-| `.gitconfig` | Git configuration |
+| File                    | Purpose                            |
+| ----------------------- | ---------------------------------- |
+| `.bashrc`               | Bash main configuration            |
+| `.bash_aliases`         | Bash aliases (102 git + utilities) |
+| `.bash_functions`       | Bash utility functions             |
+| `.bash_profile`         | Bash login shell config            |
+| `.zshrc`                | Zsh main config (uses Oh My Zsh)   |
+| `.zsh_aliases`          | Zsh aliases (mirrored from bash)   |
+| `.zsh_functions`        | Zsh utility functions              |
+| `.config/starship.toml` | Starship prompt configuration      |
+| `.tmux.conf`            | Tmux configuration                 |
+| `.gitconfig`            | Git configuration                  |
 
 ## Key Features
 
@@ -56,24 +57,25 @@ chsh -s /usr/bin/zsh
 Both shells are fully configured with **feature parity**:
 
 - **Bash** (`~/.bashrc`)
-  - Traditional shell scripting language
-  - Direct git alias support (all 102 aliases)
-  - Custom welcome bar with CPU/RAM usage
-  - SSH agent auto-management
-  - Good for scripts and portability
+    - Traditional shell scripting language
+    - Direct git alias support (all 102 aliases)
+    - Custom welcome bar with CPU/RAM usage
+    - SSH agent auto-management
+    - Good for scripts and portability
 
 - **Zsh** (`~/.zshrc`)
-  - Modern shell with Oh My Zsh framework
-  - Better completion system and theming
-  - Time-aware welcome greeting
-  - Enhanced key bindings for navigation
-  - Recommended for interactive use
+    - Modern shell with Oh My Zsh framework
+    - Better completion system and theming
+    - Time-aware welcome greeting
+    - Enhanced key bindings for navigation
+    - Recommended for interactive use
 
 ### Shell Aliases
 
 All 102 aliases are organized by category:
 
 #### Navigation
+
 ```bash
 ..        # cd ..
 ...       # cd ../..
@@ -82,6 +84,7 @@ All 102 aliases are organized by category:
 ```
 
 #### File Listing
+
 ```bash
 ls        # Use eza if available, else ls with colors
 ll        # Long listing with hidden files
@@ -92,6 +95,7 @@ tree      # Tree view with colors
 ```
 
 #### Utilities
+
 ```bash
 c         # clear
 h         # history
@@ -104,6 +108,7 @@ update    # sudo pacman -Syu
 ```
 
 #### Safe Operations
+
 ```bash
 cp        # cp -i (interactive)
 mv        # mv -i (interactive)
@@ -111,6 +116,7 @@ rm        # rm -i (interactive - CAREFUL!)
 ```
 
 #### Docker
+
 ```bash
 dps       # docker ps
 dpsa      # docker ps -a
@@ -123,6 +129,7 @@ dprune    # docker system prune -af
 ```
 
 #### Git (102 aliases)
+
 ```bash
 # Basic operations
 g         # git
@@ -175,6 +182,7 @@ gsu       # git submodule update --init --recursive
 ```
 
 #### Neovim/Editor
+
 ```bash
 v         # nvim
 vi        # nvim
@@ -189,6 +197,7 @@ tconf     # Edit tmux config
 ```
 
 #### Tmux
+
 ```bash
 t         # tmux
 ta        # tmux attach
@@ -199,11 +208,13 @@ tks       # tmux kill-session -t <session>
 ```
 
 #### Lazygit
+
 ```bash
 lg        # lazygit (TUI git client)
 ```
 
 #### Shell
+
 ```bash
 reload    # source ~/.bashrc (bash) or ~/.zshrc (zsh)
 ```
@@ -211,6 +222,7 @@ reload    # source ~/.bashrc (bash) or ~/.zshrc (zsh)
 ### Utility Functions
 
 #### File Operations
+
 ```bash
 mkcd <dir>          # mkdir + cd in one command
 backup <file>       # Create timestamped .bak copy
@@ -220,11 +232,13 @@ extract <archive>   # Extract any archive format (tar, zip, 7z, etc.)
 ```
 
 #### SSH
+
 ```bash
 sssh <host>         # SSH with completion (see config for details)
 ```
 
 #### System
+
 ```bash
 cleanup             # 7-step Arch cleanup:
                     # 1. pacman cache cleanup
@@ -236,11 +250,18 @@ cleanup             # 7-step Arch cleanup:
                     # 7. Database cleanup
 ```
 
+#### Gaming Helpers
+
+- `gcheck` - show installed gaming packages and the Vulkan driver summary
+- `gmodes` - print suggested Steam and Heroic launch modes
+- `pplus` - open ProtonPlus to manage GE-Proton and Wine-GE
+
 ### Tool Integration
 
 The shell automatically initializes these tools (if installed):
 
 #### Node Version Manager (NVM)
+
 ```bash
 nvm list              # List installed Node versions
 nvm install 20.0.0    # Install specific version
@@ -248,30 +269,35 @@ nvm use 20.0.0        # Switch version
 ```
 
 #### Rust/Cargo
+
 ```bash
 cargo build          # Build Rust project
 cargo run            # Run Rust project
 ```
 
 #### Python (Pyenv)
+
 ```bash
 pyenv versions       # List Python versions
 pyenv local 3.12     # Use Python 3.12 in current dir
 ```
 
 #### Zoxide (Smarter cd)
+
 ```bash
 z <pattern>          # Jump to frequently visited directory
 zi                   # Interactive selection (alias: cdi)
 ```
 
 #### FZF (Fuzzy Finder)
+
 ```bash
 Ctrl+T               # Open file picker
 Ctrl+R               # Fuzzy history search
 ```
 
 #### TheFuck (Command Corrector)
+
 ```bash
 <mistyped command>
 fuck                 # Correct last command
@@ -279,7 +305,9 @@ f <query>            # Search for correction
 ```
 
 #### Starship Prompt
+
 Automatic prompt initialization with:
+
 - **Color scheme**: Catppuccin Mocha
 - **Git integration**: Branch, status icons
 - **Language detection**: Shows runtime versions when relevant
@@ -289,6 +317,7 @@ Automatic prompt initialization with:
 ### Theming
 
 #### Color Scheme: Catppuccin Mocha
+
 All tools are themed with **Catppuccin Mocha** for consistency:
 
 - **Base**: `#1e1e2e` (dark background)
@@ -301,6 +330,7 @@ All tools are themed with **Catppuccin Mocha** for consistency:
 ### Starship Configuration
 
 Located at `~/.config/starship.toml`:
+
 - Command execution time display
 - Git branch and status symbols
 - Language version detection
@@ -311,24 +341,29 @@ Located at `~/.config/starship.toml`:
 ## Development Environment
 
 ### Python
+
 - **Pyenv** integration for version management
 - **Pip** support with auto-completion
 - Python 3.13+ recommended
 
 ### Node.js
+
 - **NVM** (Node Version Manager)
 - Currently configured for Node.js 25.2.1 via **mise**
 - NPM/PNPM package managers
 
 ### Rust
+
 - **Cargo** auto-initialized
 - Full Rust toolchain support
 
 ### Docker
+
 - Pre-configured aliases for common operations
 - 8 docker aliases for faster workflows
 
 ### Java
+
 - OpenJDK 25 support
 - Configured for JVM development
 
@@ -337,6 +372,7 @@ Located at `~/.config/starship.toml`:
 For users on Hyprland (Wayland desktop):
 
 ### Proton/Steam Configuration
+
 ```bash
 export PROTON_LOG=0                      # Set to 1 for debug
 export WINE_CPU_TOPOLOGY=4:2             # Optimize for 4-core systems
@@ -345,6 +381,7 @@ export SDL_VIDEODRIVER=wayland           # Prefer Wayland for SDL2
 ```
 
 ### PyCharm on Hyprland
+
 - Handles QT_QPA_PLATFORM automatically from Hyprland session
 - If crashes occur: `QT_QPA_PLATFORM=xcb pycharm`
 
@@ -362,6 +399,7 @@ Both shells maintain comprehensive history:
 ## SSH Agent
 
 Automatic SSH agent management:
+
 - Starts agent on shell initialization
 - Persistent across sessions
 - Credentials stored in `~/.ssh/agent-environment`
@@ -370,11 +408,13 @@ Automatic SSH agent management:
 ## Completion Systems
 
 ### Bash
+
 - System bash completion framework
 - Git command completion via `.bash_aliases`
 - Custom SSH host completion
 
 ### Zsh
+
 - Oh My Zsh completion plugins
 - Fuzzy matching and case-insensitive completion
 - Custom styling with colors
@@ -382,7 +422,9 @@ Automatic SSH agent management:
 ## Extending Configuration
 
 ### Add Custom Aliases
+
 Create shell-specific files for local overrides:
+
 ```bash
 # Bash
 echo "alias myalias='my command'" >> ~/.bash_aliases.local
@@ -392,6 +434,7 @@ echo "alias myalias='my command'" >> ~/.zsh_aliases.local
 ```
 
 ### Add Custom Functions
+
 ```bash
 # Bash
 cat >> ~/.bash_functions.local << 'EOF'
@@ -409,7 +452,9 @@ EOF
 ```
 
 ### Local Machine Config
+
 Create `~/.bashrc.local` or `~/.zshrc.local` for machine-specific settings:
+
 ```bash
 # ~/.bashrc.local (sourced at end of .bashrc)
 export MY_VAR="value"
@@ -419,21 +464,25 @@ alias myalias="command"
 ## Troubleshooting
 
 ### Aliases not working
+
 - Ensure `~/.bash_aliases` or `~/.zsh_aliases` is sourced
 - Check file permissions: `ls -la ~/.bash_aliases`
 - Reload shell: `reload` alias or `source ~/.bashrc`
 
 ### Functions not working
+
 - Similar to aliases, check sourcing
 - Ensure `.bash_functions` or `.zsh_functions` exists
 - Reload shell and test: `mkcd test_dir`
 
 ### Git aliases conflicting
+
 - Zsh's Oh My Zsh git plugin provides common aliases
 - Our custom aliases override or complement omz (documented in `.zsh_aliases`)
 - Check `git <command> --help` if unsure
 
 ### Starship prompt not showing
+
 ```bash
 # Install Starship
 cargo install starship
@@ -443,6 +492,7 @@ sudo pacman -S starship
 ```
 
 ### FZF history search not working
+
 ```bash
 # Install FZF
 sudo pacman -S fzf
@@ -462,6 +512,7 @@ git clone https://github.com/junegunn/fzf.git ~/.fzf
 ## References & Attribution
 
 Configuration built on best practices from:
+
 - **Oh My Bash**: Common bash aliases and structure
 - **Oh My Zsh**: Framework and plugins
 - **Starship**: Prompt customization and appearance
@@ -472,6 +523,7 @@ Special thanks to the Arch Linux, Catppuccin, and Starship communities for inspi
 ## Platform Support
 
 Tested and working on:
+
 - ✅ Arch Linux (primary development environment)
 - ✅ Ubuntu 20.04+
 - ✅ Fedora 35+

@@ -135,11 +135,25 @@ cleanup() {
 # ====================================================================== 
 
 _welcome_bar() {
+    # time-based greeting (matches zsh version)
+    local greeting="Welcome back"
+    local hour=$(date +%H)
+
+    if [[ $hour -ge 5 && $hour -lt 12 ]]; then
+        greeting="Good morning"
+    elif [[ $hour -ge 12 && $hour -lt 17 ]]; then
+        greeting="Good afternoon"
+    elif [[ $hour -ge 17 && $hour -lt 22 ]]; then
+        greeting="Good evening"
+    else
+        greeting="Burning the midnight oil"
+    fi
+
     # Get CPU load (1-minute average)
     local cpu_load
     cpu_load=$(cut -d " " -f1 /proc/loadavg)
 
-    # Calculate CPU percentage (assuming 4 cores, adjust as needed)
+    # Calculate CPU percentage
     local cpu_cores
     cpu_cores=$(nproc)
     local cpu_pct
@@ -167,9 +181,10 @@ _welcome_bar() {
     mem_empty=$(printf "%0.s░" $(seq 1 $((20 - mem_filled))))
 
     # Display welcome message
+    local label="$greeting, $USER"
     echo
     echo -e "\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    printf "\e[96m│\e[0m  \e[1;97mWelcome back, %s\e[0m%*s\e[96m│\e[0m\n" "$USER" $((32 - ${#USER})) ""
+    printf "\e[96m│\e[0m  \e[1;97m%-45s\e[96m│\e[0m\n" "$label"
     echo -e "\e[96m├─────────────────────────────────────────────────┤\e[0m"
     printf "\e[96m│\e[0m  \e[97mCPU\e[0m  [%s%s\e[0m] \e[92m%-4s%%\e[0m       \e[96m│\e[0m\n" "$cpu_bar" "$cpu_empty" "$cpu_pct"
     printf "\e[96m│\e[0m  \e[97mRAM\e[0m  [%s%s\e[0m] \e[94m%-4s%%\e[0m       \e[96m│\e[0m\n" "$mem_bar" "$mem_empty" "$mem_pct"
@@ -180,3 +195,56 @@ _welcome_bar() {
 # ======================================================================
 # FUNCTIONS - GUI APPLICATIONS
 # ======================================================================
+
+gaming-check() {
+    local packages=(
+        steam
+        heroic-games-launcher-bin
+        protonplus
+        umu-launcher
+        gamescope
+        mangohud
+        gamemode
+        lib32-gamemode
+    )
+
+    if ! command -v pacman &>/dev/null; then
+        echo "pacman not available"
+        return 0
+    fi
+
+    echo "gaming stack"
+    for pkg in "${packages[@]}"; do
+        if pacman -Q "$pkg" &>/dev/null; then
+            pacman -Q "$pkg"
+        else
+            echo "$pkg not installed"
+        fi
+    done
+
+    echo ""
+    if command -v vulkaninfo &>/dev/null; then
+        vulkaninfo --summary | rg 'deviceName|driverName' || vulkaninfo --summary
+    else
+        echo "vulkaninfo not installed"
+    fi
+}
+
+gaming-modes() {
+    cat <<'EOF'
+normal
+  launch directly from Steam or Heroic with no wrapper
+
+gamescope mode
+  gamescope -f -- %command%
+  use when a game has fullscreen or focus issues
+
+performance mode
+  gamemoderun mangohud %command%
+  use when you want FPS and frametime stats or extra scheduling help
+
+battery-friendly mode
+  MANGOHUD_CONFIG=fps_limit=40,no_display mangohud %command%
+  use for lighter games on the Iris Xe iGPU
+EOF
+}

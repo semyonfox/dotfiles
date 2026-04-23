@@ -163,3 +163,56 @@ _welcome_bar() {
 # ======================================================================
 # FUNCTIONS - GUI APPLICATIONS
 # ======================================================================
+
+gaming-check() {
+    local packages=(
+        steam
+        heroic-games-launcher-bin
+        protonplus
+        umu-launcher
+        gamescope
+        mangohud
+        gamemode
+        lib32-gamemode
+    )
+
+    if ! command -v pacman &>/dev/null; then
+        echo "pacman not available"
+        return 0
+    fi
+
+    echo "gaming stack"
+    for pkg in "${packages[@]}"; do
+        if pacman -Q "$pkg" &>/dev/null; then
+            pacman -Q "$pkg"
+        else
+            echo "$pkg not installed"
+        fi
+    done
+
+    echo ""
+    if command -v vulkaninfo &>/dev/null; then
+        vulkaninfo --summary | rg 'deviceName|driverName' || vulkaninfo --summary
+    else
+        echo "vulkaninfo not installed"
+    fi
+}
+
+gaming-modes() {
+    cat <<'EOF'
+normal
+  launch directly from Steam or Heroic with no wrapper
+
+gamescope mode
+  gamescope -f -- %command%
+  use when a game has fullscreen or focus issues
+
+performance mode
+  gamemoderun mangohud %command%
+  use when you want FPS and frametime stats or extra scheduling help
+
+battery-friendly mode
+  MANGOHUD_CONFIG=fps_limit=40,no_display mangohud %command%
+  use for lighter games on the Iris Xe iGPU
+EOF
+}
