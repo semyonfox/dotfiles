@@ -1,3 +1,4 @@
 #!/bin/bash
-# get now playing from playerctl
-playerctl metadata --format "{{ artist }} - {{ title }}" 2>/dev/null | head -c 60 || echo ""
+# get now playing from playerctl with a hard 2s timeout
+# prevents hyprlock from hanging if dbus/playerctl is stuck
+timeout 2 playerctl metadata --format "{{ artist }} - {{ title }}" 2>/dev/null | head -c 60 || echo ""

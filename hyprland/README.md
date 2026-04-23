@@ -9,6 +9,7 @@ This is a fully functional Hyprland configuration using the HyDE framework as a 
 ### Prerequisites
 
 Ensure stow is installed:
+
 ```bash
 sudo pacman -S stow  # arch/cachyos
 sudo apt install stow  # ubuntu/debian
@@ -18,6 +19,7 @@ sudo dnf install stow  # fedora
 ### Deploy This Package
 
 From the dotfiles directory:
+
 ```bash
 cd ~/dotfiles
 stow hyprland
@@ -26,6 +28,7 @@ stow hyprland
 This creates symlinks from ~/.config/hypr/ to the configuration files in this package.
 
 Verify deployment:
+
 ```bash
 ls -la ~/.config/hypr/
 # should show symlinks pointing to ~/dotfiles/hyprland/.config/hypr/
@@ -34,12 +37,14 @@ ls -la ~/.config/hypr/
 ### Deploy with Related Packages
 
 Deploy hyprland along with waybar (status bar):
+
 ```bash
 cd ~/dotfiles
 stow hyprland waybar
 ```
 
 Or include shell configs:
+
 ```bash
 cd ~/dotfiles
 stow home hyprland waybar
@@ -48,6 +53,7 @@ stow home hyprland waybar
 ### Remove This Package
 
 To remove the symlinks:
+
 ```bash
 cd ~/dotfiles
 stow -D hyprland
@@ -95,6 +101,7 @@ After deploying with stow, Hyprland will auto-reload on configuration changes. N
 - `SUPER + Q` - Kill active window
 - `SUPER + F` - Fullscreen
 - `SUPER + T` - Tile mode toggle
+- `SUPER + ALT + G` - toggle a lightweight gaming mode that disables blur and animations until toggled off
 
 (See `keybindings.conf` for full list)
 

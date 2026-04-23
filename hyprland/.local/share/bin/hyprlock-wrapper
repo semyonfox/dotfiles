@@ -1,24 +1,22 @@
 #!/bin/bash
-# hyprlock-wrapper: injects fail message and now playing, launches hyprlock
+# hyprlock launcher with double-launch guard + random fail message injection
 
-FAIL_MSG=$(shuf -n1 ~/.config/hypr/hyprlock-fails.txt)
-NOW_PLAYING=$(playerctl metadata --format "{{ artist }} - {{ title }}" 2>/dev/null || echo "not playing")
+LOCKFILE="/tmp/hyprlock.lock"
+if [ -f "$LOCKFILE" ] && kill -0 "$(cat "$LOCKFILE" 2>/dev/null)" 2>/dev/null; then
+    exit 0
+fi
 
-# Escape for pango
-ESCAPED_FAIL=$(echo "$FAIL_MSG" | sed "s/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g")
-ESCAPED_PLAYING=$(echo "$NOW_PLAYING" | sed "s/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g")
+# pick a random fail message, pango-escape it
+FAIL_MSG=$(shuf -n1 ~/.config/hypr/hyprlock-fails.txt 2>/dev/null || echo "Wrong password")
+ESCAPED_FAIL=$(echo "$FAIL_MSG" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
 
-# Copy main config and inject dynamic values
-cp ~/.config/hypr/hyprlock.conf /tmp/hyprlock-config.tmp
+# inject into a per-run temp config (main config stays immutable)
+TMP_CONF=$(mktemp /tmp/hyprlock-config.XXXXXX)
+trap 'rm -f "$TMP_CONF" "$LOCKFILE"' EXIT
+cp ~/.config/hypr/hyprlock.conf "$TMP_CONF"
+sed -i "s|fail_text = Access denied. Skill issue detected.|fail_text = $ESCAPED_FAIL|" "$TMP_CONF"
 
-# Replace now playing placeholder
-sed -i "s|not playing|$ESCAPED_PLAYING|g" /tmp/hyprlock-config.tmp
-
-# Append fail message to input-field
-sed -i "s/fail_text = Access denied. Skill issue detected./fail_text = $ESCAPED_FAIL/" /tmp/hyprlock-config.tmp
-
-# Launch hyprlock with temp config
-hyprlock -c /tmp/hyprlock-config.tmp
-
-# Cleanup
-rm /tmp/hyprlock-config.tmp
+hyprlock -c "$TMP_CONF" &
+LOCK_PID=$!
+echo "$LOCK_PID" > "$LOCKFILE"
+wait "$LOCK_PID" 2>/dev/null
