@@ -28,7 +28,8 @@ tooltip label { padding: 4px 6px; }
 #clock,
 #cpu,
 #memory,
-#battery,
+#custom-battery,
+#custom-vpn,
 #network,
 #bluetooth,
 #custom-audio {
@@ -74,14 +75,23 @@ tooltip label { padding: 4px 6px; }
 #memory.warning, #memory.h { color: @yellow; }
 #memory.critical, #memory.c { color: @red; }
 
-#battery               { color: @green; }
-#battery.warning       { color: @yellow; }
-#battery.critical      { color: @red; }
-#battery.charging      { color: @teal; }
-#battery.plugged       { color: @sapphire; }
+/* battery pill coloured by current power-mode */
+#custom-battery        { color: @green; }
+#custom-battery.beast  { color: @red; }
+#custom-battery.ac     { color: @green; }
+#custom-battery.mobile { color: @teal; }
+#custom-battery.saver  { color: @blue; }
 
 #network               { color: @teal; }
 #network.disconnected  { color: @red; }
+
+#custom-vpn            { color: @green; padding: 0 8px; }
+/* collapse vpn pill entirely when nothing is connected */
+#custom-vpn.off {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+}
 
 #bluetooth             { color: @lavender; padding: 0 8px; }
 /* collapse bluetooth pill entirely when nothing is connected */

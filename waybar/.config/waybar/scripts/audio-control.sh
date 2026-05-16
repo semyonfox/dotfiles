@@ -79,16 +79,22 @@ move_inputs_to_sink() {
   done < <(pactl list short sink-inputs)
 }
 
+MAX_VOLUME=150
+
 adjust_volume() {
   local mode="$1"
-  local sink
+  local sink current new
   sink=$(get_target_sink)
   [[ -z "$sink" ]] && exit 0
 
   pactl set-default-sink "$sink" >/dev/null 2>&1 || true
 
   if [[ "$mode" == "up" ]]; then
-    pactl set-sink-volume "$sink" "+${STEP}%" >/dev/null 2>&1
+    current=$(get_sink_volume "$sink")
+    [[ -z "$current" ]] && current=0
+    new=$(( current + STEP ))
+    (( new > MAX_VOLUME )) && new=$MAX_VOLUME
+    pactl set-sink-volume "$sink" "${new}%" >/dev/null 2>&1
   else
     pactl set-sink-volume "$sink" "-${STEP}%" >/dev/null 2>&1
   fi
@@ -163,16 +169,16 @@ print_status() {
   fi
 
   if [[ "$muted" == "yes" ]]; then
-    icon=$'\uf6a9'
+    icon=$'\U000f075F'
     class="muted"
   elif (( volume == 0 )); then
-    icon=$'\uf026'
+    icon=$'\U000f057F'
     class="low"
   elif (( volume < 50 )); then
-    icon=$'\uf027'
+    icon=$'\U000f0580'
     class="medium"
   else
-    icon=$'\uf028'
+    icon=$'\U000f057E'
     class="high"
   fi
 
@@ -181,11 +187,11 @@ print_status() {
   fi
 
   text="$icon ${volume}%"
-  tooltip="Output: ${desc}\nType: ${kind}\nState: ${state}"
+  tooltip="Output: ${desc}"$'\n'"Type: ${kind}"$'\n'"State: ${state}"
   if [[ "$sink" == "$default_sink" ]]; then
-    tooltip+="\nDefault: yes"
+    tooltip+=$'\n'"Default: yes"
   else
-    tooltip+="\nDefault: no"
+    tooltip+=$'\n'"Default: no"
   fi
 
   printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' \
