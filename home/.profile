@@ -9,3 +9,5 @@ export PATH="$PATH:/home/semyon/.local/share/JetBrains/Toolbox/scripts"
 export NPM_CONFIG_PREFIX="$HOME/.local"
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$HOME/.local/bin:$PNPM_HOME:$PATH"
+
+. "$HOME/.local/share/../bin/env"

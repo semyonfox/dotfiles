@@ -39,7 +39,7 @@ alias myip='curl -s ifconfig.me'
 alias localip="ip -o -4 addr show | awk '{print \$4}' | cut -d/ -f1"
 alias df='df -h'
 alias du='du -h'
-alias update='sudo pacman -Syu'
+# update is defined as a function in .zsh_functions
 
 # Safe operations
 alias cp='cp -i'

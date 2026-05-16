@@ -201,3 +201,5 @@ export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
 
 # Zed alias
 alias zed=zeditor
+
+. "$HOME/.local/share/../bin/env"

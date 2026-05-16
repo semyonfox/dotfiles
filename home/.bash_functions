@@ -76,7 +76,7 @@ complete -F _sssh_complete sssh
 
 # Comprehensive system cleanup for Arch Linux
 cleanup() {
-    local before after freed
+    local before after freed step=0 total=17
 
     echo -e "\n\e[96m╭─────────────────────────────────────────────────╮\e[0m"
     echo -e "\e[96m│\e[0m  \e[1;97mSystem Cleanup\e[0m                              \e[96m│\e[0m"
@@ -84,34 +84,121 @@ cleanup() {
 
     before=$(df --output=used / | tail -1 | tr -d ' ')
 
-    echo -e "\e[93m[1/7]\e[0m Clearing pacman cache (keeping last 3)..."
-    sudo paccache -rk3 2>/dev/null || sudo pacman -Sc --noconfirm
+    # ── System ───────────────────────────────────────────────────────────
+    echo -e "\e[96m── System ──────────────────────────────────────────\e[0m"
 
-    echo -e "\e[93m[2/7]\e[0m Removing orphaned packages..."
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing pacman cache (keeping last 3)..."
+    if command -v paccache &>/dev/null; then
+        sudo paccache -rk3 2>/dev/null
+    else
+        sudo pacman -Sc --noconfirm
+    fi
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Removing orphaned packages..."
     if orphans=$(pacman -Qtdq 2>/dev/null); then
         echo "$orphans" | sudo pacman -Rns --noconfirm -
     else
         echo "      No orphaned packages found"
     fi
 
-    echo -e "\e[93m[3/7]\e[0m Clearing yay cache..."
-    if command -v yay &>/dev/null; then
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing AUR helper cache..."
+    if command -v paru &>/dev/null; then
+        paru -Sc --noconfirm 2>/dev/null
+    elif command -v yay &>/dev/null; then
         yay -Sc --noconfirm 2>/dev/null
+    elif command -v pikaur &>/dev/null; then
+        pikaur -Sc --noconfirm 2>/dev/null
     else
-        echo "      yay not installed, skipping"
+        echo "      No AUR helper found, skipping"
     fi
 
-    echo -e "\e[93m[4/7]\e[0m Clearing user cache..."
-    rm -rf ~/.cache/* 2>/dev/null
+    echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused Flatpak runtimes..."
+    if command -v flatpak &>/dev/null; then
+        flatpak uninstall --unused --noninteractive 2>/dev/null
+    else
+        echo "      flatpak not installed, skipping"
+    fi
 
-    echo -e "\e[93m[5/7]\e[0m Clearing systemd journal (keeping 3 days)..."
+    echo -e "\e[93m[$((++step))/$total]\e[0m Pruning snapper snapshots (keeping last 3)..."
+    if command -v snapper &>/dev/null; then
+        for cfg in root home; do
+            to_delete=$(snapper -c "$cfg" list --columns number 2>/dev/null \
+                | tail -n +2 \
+                | grep -Ev '^\s*$|^0$' \
+                | sort -n \
+                | head -n -3)
+            if [[ -n "$to_delete" ]]; then
+                echo "      $cfg: removing $(echo "$to_delete" | wc -l | tr -d ' ') snapshot(s)"
+                echo "$to_delete" | xargs -r sudo snapper -c "$cfg" delete
+            else
+                echo "      $cfg: nothing to prune"
+            fi
+        done
+    else
+        echo "      snapper not installed, skipping"
+    fi
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing systemd journal (keeping 3 days)..."
     sudo journalctl --vacuum-time=3d 2>/dev/null
 
-    echo -e "\e[93m[6/7]\e[0m Clearing temporary files..."
-    sudo rm -rf /tmp/* 2>/dev/null
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing temporary files..."
+    sudo systemd-tmpfiles --clean 2>/dev/null
 
-    echo -e "\e[93m[7/7]\e[0m Clearing thumbnails and trash..."
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing user cache..."
+    rm -rf ~/.cache/* 2>/dev/null
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing thumbnails and trash..."
     rm -rf ~/.thumbnails/* ~/.local/share/Trash/* 2>/dev/null
+
+    # ── Docker ───────────────────────────────────────────────────────────
+    echo -e "\n\e[96m── Docker ──────────────────────────────────────────\e[0m"
+
+    if command -v docker &>/dev/null; then
+        echo -e "\e[93m[$((++step))/$total]\e[0m Removing stopped containers..."
+        docker container prune -f 2>/dev/null
+
+        echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused images..."
+        docker image prune -af 2>/dev/null
+
+        echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused volumes..."
+        docker volume prune -f 2>/dev/null
+
+        echo -e "\e[93m[$((++step))/$total]\e[0m Clearing build cache..."
+        docker builder prune -af 2>/dev/null
+    else
+        step=$((step + 4))
+        echo "      docker not installed, skipping"
+    fi
+
+    # ── Dev tools ────────────────────────────────────────────────────────
+    echo -e "\n\e[96m── Dev tools ───────────────────────────────────────\e[0m"
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing npm cache..."
+    if command -v npm &>/dev/null; then
+        npm cache clean --force 2>/dev/null
+    else
+        echo "      npm not installed, skipping"
+    fi
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Pruning pnpm store..."
+    if command -v pnpm &>/dev/null; then
+        pnpm store prune 2>/dev/null
+    else
+        echo "      pnpm not installed, skipping"
+    fi
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing uv cache..."
+    if command -v uv &>/dev/null; then
+        uv cache clean 2>/dev/null
+    else
+        echo "      uv not installed, skipping"
+    fi
+
+    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing pip cache and Python user packages..."
+    if command -v pip3 &>/dev/null; then
+        pip3 cache purge 2>/dev/null
+    fi
+    rm -rf ~/.local/lib/python*/site-packages 2>/dev/null
 
     after=$(df --output=used / | tail -1 | tr -d ' ')
     freed=$((before - after))
@@ -126,7 +213,7 @@ cleanup() {
     echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m\n"
 
     echo -e "\e[93mTop 10 largest directories:\e[0m\n"
-    du -h --max-depth=2 ~/ 2>/dev/null | sort -rh | head -11 | tail -10 | nl -w2 -s'. ' 
+    du -h --max-depth=1 ~/ 2>/dev/null | sort -rh | sed -n '2,11p' | nl -w2 -s'. '
     echo
 }
 
@@ -228,6 +315,37 @@ gaming-check() {
     else
         echo "vulkaninfo not installed"
     fi
+}
+
+update() {
+    echo "==> system (paru)"
+    paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || echo "!!paru failed"
+
+    echo ""
+    echo "==> flatpak"
+    flatpak update -y || echo "!!flatpak failed"
+
+    echo ""
+    echo "==> rustup"
+    rustup update || echo "!!rustup failed"
+
+    echo ""
+    echo "==> mise"
+    mise self-update -y 2>/dev/null || true
+    mise upgrade || echo "!!mise failed"
+
+    echo ""
+    echo "==> pnpm globals"
+    pnpm update -g || echo "!!pnpm failed"
+
+    echo ""
+    echo "==> pipx"
+    pipx upgrade-all || echo "!!pipx failed"
+
+    echo ""
+    echo "==> uv tools"
+    uv self update 2>/dev/null || true
+    uv tool upgrade --all || echo "!!uv failed"
 }
 
 gaming-modes() {

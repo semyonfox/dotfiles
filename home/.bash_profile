@@ -9,3 +9,5 @@
 export PATH="$PATH:/home/semyon/.local/share/JetBrains/Toolbox/scripts"
 
 . "$HOME/.cargo/env"
+
+. "$HOME/.local/share/../bin/env"
