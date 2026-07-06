@@ -247,6 +247,7 @@ Examples:
   ./setup.sh --profile pc
   ./setup.sh --profile laptop
   ./setup.sh --packages "home claude"
+  ./setup.sh --packages "codex"
 EOF
 }
 

@@ -37,6 +37,23 @@ __pycache__/
 # Claude Code local files (should not be tracked)
 home/.claude/
 
+# Codex local runtime/private files (the codex package tracks source-like files only)
+codex/.codex/auth.json
+codex/.codex/config.toml
+codex/.codex/history.jsonl
+codex/.codex/log/
+codex/.codex/sessions/
+codex/.codex/tasks/
+codex/.codex/plugins/
+codex/.codex/.sandbox-*
+codex/.codex/*.sqlite*
+codex/.codex/*.db
+codex/.codex/memories/
+codex/.codex/generated_images/
+codex/.codex/skills/.system/
+codex/.codex/skills/device-fleet/references/computers.md
+codex/.codex/skills/device-fleet/references/t3-code.md
+
 # Private local config
 .env
 .env.*

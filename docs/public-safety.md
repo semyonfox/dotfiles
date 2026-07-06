@@ -9,6 +9,7 @@ Do not track:
 - Real `.env` files, systemd units with inline secrets, or Cloudflare tunnel credentials
 - Local caches, histories, generated auth state, or downloaded binary installs
 - Machine-private files from `~/.ssh`, `~/.gnupg`, browser config dirs, or password stores
+- Codex auth/session/task state, plugin caches, sqlite databases, memories, generated images, and private `device-fleet` references
 
 Safe to track:
 
@@ -17,6 +18,7 @@ Safe to track:
 - Example env files with obvious placeholder values
 - Systemd unit templates that call local scripts and contain no secrets
 - Host-specific display, Waybar, Hyprland, and public helper config
+- Claude/Codex agent or skill markdown when it contains reusable instructions only
 
 Useful checks:
 

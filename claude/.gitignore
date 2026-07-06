@@ -1,18 +1,26 @@
-# Claude Code - sensitive files
-.claude.json
-.claude.json.backup*
-.credentials.json
-cache/
-history.jsonl
-debug/
-file-history/
-shell-snapshots/
-stats-cache.json
-telemetry/
-statsig/
-todos/
+# Claude Code sensitive/runtime files inside this stow package.
+.claude/.claude.json
+.claude/.claude.json.backup*
+.claude/.credentials.json
+.claude/settings.json
+.claude/mcp.json
+.claude/cache/
+.claude/history.jsonl
+.claude/debug/
+.claude/file-history/
+.claude/shell-snapshots/
+.claude/stats-cache.json
+.claude/telemetry/
+.claude/statsig/
+.claude/todos/
 
-# These directories are placeholders and can be populated locally
-agents/*
-plugins/*
-!.gitkeep
+# Track source-like custom agents and their public references only.
+.claude/agents/*
+!.claude/agents/*.md
+!.claude/agents/references/
+!.claude/agents/references/*.md
+.claude/agents/*.log
+
+# Plugin installs/caches are local runtime state.
+.claude/plugins/*
+!.claude/plugins/.gitkeep

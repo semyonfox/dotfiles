@@ -1,0 +1,20 @@
+# Codex package safety guard.
+#
+# Track source-like global guidance and user skills only. Do not commit local
+# runtime state, auth material, generated artifacts, plugin caches, or private
+# fleet inventory.
+.codex/auth.json
+.codex/config.toml
+.codex/history.jsonl
+.codex/log/
+.codex/sessions/
+.codex/tasks/
+.codex/plugins/
+.codex/.sandbox-*
+.codex/*.sqlite*
+.codex/*.db
+.codex/memories/
+.codex/generated_images/
+.codex/skills/.system/
+.codex/skills/device-fleet/references/computers.md
+.codex/skills/device-fleet/references/t3-code.md

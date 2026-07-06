@@ -21,6 +21,7 @@ cd ~/dotfiles
 ./setup.sh --profile pc
 ./setup.sh --profile laptop
 ./setup.sh --packages "home claude"
+./setup.sh --packages "codex"      # Optional Codex globals/skills
 ```
 
 Manual Stow commands are still fine:
@@ -29,6 +30,7 @@ Manual Stow commands are still fine:
 stow --no-folding home claude server
 stow --no-folding home claude hyprland waybar swaync rofi pc
 stow --no-folding home claude hyprland waybar swaync rofi laptop
+stow --no-folding codex
 ```
 
 ## Package Model
@@ -36,7 +38,8 @@ stow --no-folding home claude hyprland waybar swaync rofi laptop
 | Package | Purpose |
 | --- | --- |
 | `home` | Shared shell, git, tmux, terminal, Neovim, Starship, and user bin helpers |
-| `claude` | Tracked Claude global guidance files |
+| `claude` | Tracked Claude global guidance files, custom agents, and public agent references |
+| `codex` | Optional Codex global guidance and non-system user skills |
 | `hyprland` | Shared Hyprland config: keybindings, theme, scripts, window rules |
 | `waybar` | Shared Waybar scripts and styling |
 | `swaync` | Shared notification center config and styling |
@@ -54,13 +57,16 @@ Profiles:
 | `laptop` | `home claude hyprland waybar swaync rofi laptop` |
 | `nas` / `minimal` | `home claude` |
 
+`codex` is intentionally omitted from the default profiles. Deploy it explicitly
+on devices where the same Codex global defaults and custom skills are wanted.
+
 ## Important Layout Rules
 
 - Shared files go in shared packages only when they work on every target that deploys them.
 - Machine-specific files go in `server/`, `pc/`, or `laptop/`.
 - `hyprland` deliberately does not own `monitors.conf`, `monitors.json`, `hypridle.conf`, or `userprefs.conf`; host overlays own those.
 - `waybar` deliberately does not own `config.jsonc`; host overlays own the layout while the shared package owns scripts and CSS.
-- Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; it does not install Codex global Fable routing.
+- Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; the optional `codex/` package tracks Codex defaults and skills only, with no Codex global Fable routing.
 
 ## Public Safety
 
@@ -74,7 +80,7 @@ Tracked examples may use placeholders only. See [docs/public-safety.md](docs/pub
 ./setup.sh --dry-run --profile pc
 ./setup.sh --profile server
 
-stow --no-folding -n -v home claude
+stow --no-folding -n -v home claude codex
 stow --no-folding -D hyprland waybar swaync rofi pc
 
 ./install-deps.sh

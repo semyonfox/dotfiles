@@ -1,0 +1,4 @@
+interface:
+  display_name: "Device Fleet"
+  short_description: "SSH/Tailscale map for Semyon's devices"
+  default_prompt: "Use $device-fleet to inspect reachability and work safely on my fleet."

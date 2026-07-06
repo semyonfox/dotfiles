@@ -14,6 +14,8 @@ This creates:
 ~/.claude/AGENTS.md -> ~/dotfiles/claude/.claude/AGENTS.md
 ~/.claude/CLAUDE.md -> ~/dotfiles/claude/.claude/CLAUDE.md
 ~/.claude/fable-codex-orchestration.md -> ~/dotfiles/claude/.claude/fable-codex-orchestration.md
+~/.claude/agents/*.md -> ~/dotfiles/claude/.claude/agents/*.md
+~/.claude/agents/references/university-metadata-standard.md -> ~/dotfiles/claude/.claude/agents/references/university-metadata-standard.md
 ```
 
 Local Claude runtime state is intentionally not tracked:
@@ -25,8 +27,13 @@ Local Claude runtime state is intentionally not tracked:
 ~/.claude/cache/
 ~/.claude/history.jsonl
 ~/.claude/todos/
-~/.claude/agents/
 ~/.claude/plugins/
 ```
 
-Keep Claude and Codex global config split. This package is the source of truth for Claude/Fable guidance only; Codex defaults stay under `~/.codex` unless a dedicated Codex package is added later.
+Tracked agent markdowns are source-like Claude subagents. Do not commit agent
+crash logs, generated outputs, plugin caches, `mcp.json`, `settings.json`, or
+credential files.
+
+Keep Claude and Codex global config split. This package is the source of truth
+for Claude/Fable guidance and Claude subagents only; Codex defaults live in the
+optional `codex/` package.
