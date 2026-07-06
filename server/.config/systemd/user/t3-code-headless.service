@@ -1,0 +1,25 @@
+[Unit]
+Description=T3 Code headless backend (single instance)
+Documentation=https://github.com/pingdotgg/t3code/blob/main/docs/user/remote-access.md
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=/home/semyon
+Environment=HOME=/home/semyon
+Environment=PATH=/home/semyon/.local/bin:/home/semyon/.nvm/versions/node/v24.16.0/bin:/usr/local/bin:/usr/bin:/bin
+Environment=T3CODE_NO_BROWSER=1
+Environment=T3CODE_HOST=0.0.0.0
+Environment=T3CODE_PORT=3773
+ExecStartPre=/home/semyon/bin/t3-headless-preflight
+ExecStart=/home/semyon/bin/t3-headless-run
+Restart=on-failure
+RestartSec=10
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

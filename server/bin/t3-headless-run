@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export HOME=/home/semyon
+export T3CODE_NO_BROWSER=1
+export T3CODE_PORT=3773
+export T3CODE_HOST=0.0.0.0
+
+LOCK=/home/semyon/.t3/t3-headless.lock
+mkdir -p /home/semyon/.t3
+
+exec /usr/bin/flock -n "$LOCK" \
+  /home/semyon/.local/bin/t3 serve \
+    --host 0.0.0.0 \
+    --port 3773 \
+    --no-browser \
+    /home/semyon

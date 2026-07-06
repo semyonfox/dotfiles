@@ -1,46 +1,64 @@
 # CLAUDE.md
 
-global guidance. prefer running commands over trusting this file for anything derivable.
+guidance for claude code across all projects
 
-## user
+## git
 
-Semyon Fox <semyon.fox@gmail.com>, Arch Linux, Hyprland/Wayland, Neovim (LazyVim), ghostty primary terminal. shells: bash (login), zsh. runtimes: Node via mise (use pnpm), Python via pyenv, Rust, Java 25.
+- never mention ai, claude, or co-authorship in commit messages
+- rebase workflow preferred (pull --rebase, auto-stash enabled)
+- line endings: `autocrlf = input` (LF in repo)
 
-## rules
+## comments & documentation
 
-- **git commits**: never mention ai, claude, or co-authorship. rebase workflow (pull --rebase, auto-stash on).
-- **comments/docs/commits**: lowercase start, minimal, conversational, no emoji unless asked. identifiers keep their case (e.g. className).
-- **dotfiles**: edit inside `~/dotfiles/{package}/`, never in `~` directly. remind me to run `stow <package>` after changes.
-- **parallel agents**: one file per agent, no shared writes. spawn deliberately — each runs its own requests. use haiku/sonnet for simple subagents.
-- **prefer editing existing files** over creating new ones.
-- **token discipline**: `/compact` mid-task, `/clear` when switching tasks (long sessions cost even when cached). avoid 4+ concurrent sessions — they share one limit.
-- **fast path**: for simple edits, inspect relevant files and implement directly. plan only for ambiguous, destructive, high-risk, or broad multi-file work. verify before claiming done. ask only when requirements are unclear or action is destructive. do not create implementation docs, staged confirmations, or checkpoint loops unless explicitly requested.
+- keep comments minimal and conversational, no unnecessary punctuation
+- lowercase at start unless referring to identifiers (e.g. className)
+- avoid emoji unless specifically requested
+- this applies to code comments, commit messages, and documentation
 
-## where things live
+## agent behaviour
 
-- `~/dotfiles/` — stow-managed. packages mirror `$HOME`. run `stow <pkg>` to deploy. `lib/common.sh` has shared installer helpers. shell config split across `.bashrc`/`.zshrc` + `_aliases` + `_functions` — keep bash/zsh at parity.
-- `~/code/{personal,university,compsoc,templates}/` — projects
-- `~/obsidian/` — notes vault (Git + LFS). module dirs kebab-case. has its own CLAUDE.md when relevant.
-- `~/projects/` — active workspace
-- `~/Scripts/` — custom scripts
+- each parallel processing agent must only work on one file at a time
+- when a problem repeats, propose the smallest durable instruction change that would prevent it, then trim it down
 
-## derive, don't recite
+## model routing
 
-to get current info, run commands instead of trusting embedded lists:
+- use this section only when Claude Code is running on Fable 5 (`fable` / `claude-fable-5`) or the user explicitly asks for Fable-style orchestration.
+- Fable is the scarce lead model for broad end-to-end coding work where planning, taste, API design, UI judgment, security review, and final implementation quality matter.
+- keep Fable reasoning at `high` by default. avoid `x-high`, `max`, and `ultra code` unless there is a specific reason.
+- glossary: `intelligence` = how hard a problem a model can handle unsupervised; `taste` = judgment for UI/UX, copy, API design, SDK shape, code quality, and product-facing details; `cost` = cost-efficiency/availability for Semyon's actual usage, not list price.
+- current rankings, higher is better:
 
-| need | command |
-|---|---|
-| aliases (70+ git, docker, etc.) | `alias \| grep <prefix>` or `cat ~/dotfiles/home/.zsh_aliases` |
-| shell functions (mkcd, backup, extract, cleanup) | `cat ~/dotfiles/home/.zsh_functions` |
-| directory tree | `ls ~` or `eza -T ~/code --level=2` |
-| dotfiles install targets | `cat ~/dotfiles/setup.sh` |
-| MCP servers / permissions | `cat ~/.claude/mcp.json ~/.claude/settings.json` |
-| installed plugins | `ls ~/.claude/plugins/cache/` |
-| OS/kernel/versions | `uname -a`, `node -v`, `python --version` |
+| model | cost | intelligence | taste |
+|---|---:|---:|---:|
+| gpt-5.5 | 9 | 8 | 5 |
+| sonnet-5 | 5 | 5 | 7 |
+| opus-4.8 | 4 | 7 | 8 |
+| fable-5 | 2 | 9 | 9 |
 
-## formatting defaults
+- use `cost` only as a tiebreaker after intelligence and taste needs are met. OpenAI may rank high on cost because it is near-free for this account.
+- use cheaper or more plentiful models as support workers for bulk investigation, log reading, data analysis, spec digestion, mechanical edits, and independent review.
+- prefer Codex/GPT-5.5 for token-heavy or computer-use-heavy support work: large logs, big PDFs/specs, screenshots, browser/app verification, simulator work, local machine interaction, bounded implementation, refactors, tests, and codebase search.
+- Fable should feed Codex compact task cards with repo path, constraints, relevant knowledge, required verification, and expected return format. if a cheaper pass is below the bar, escalate or redo the work without asking.
+- Codex output is a patch candidate. Fable/Claude must inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
+- detailed playbook with exact commands: @~/.claude/fable-codex-orchestration.md
 
-- prettier + eslint for JS/TS
-- 2-space indent: shell, json, yaml, toml, lua
-- 4-space indent: everything else
-- UTF-8, LF, trim trailing whitespace
+## environment
+
+- os targets: Ubuntu server/headless, CachyOS desktop/laptop, WSL2, Fedora, macOS
+- package managers: pnpm/npm (Node.js), pip/uv (Python), cargo (Rust), apt/pacman depending on host
+- shell: Bash and Zsh (parallel configs maintained via GNU Stow dotfiles)
+- editors: Neovim, Zed, VSCode/Cursor, JetBrains tools
+
+## languages & runtimes
+
+- Node.js 24+ / TypeScript (primary — pnpm workspaces for monorepos)
+- Python 3.13+
+- Rust 1.91+
+- Java (JDK available)
+
+## formatting & style
+
+- Prettier and ESLint for JS/TS projects
+- 2-space indent for shell, JSON, YAML, TOML, Lua
+- 4-space indent default for everything else
+- UTF-8, LF line endings, trim trailing whitespace

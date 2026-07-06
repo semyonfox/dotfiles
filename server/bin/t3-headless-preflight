@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PORT="${T3CODE_PORT:-3773}"
+BASE_DIR="/home/semyon/.t3"
+BASE_REAL="$(readlink -f "$BASE_DIR")"
+
+# Refuse to start if any other t3 server is already running. This prevents the
+# old 3773/3774 duplicate-writer mess against the same T3 state.
+found=0
+while read -r pid comm args; do
+  [[ "$pid" == "$$" ]] && continue
+
+  # Only consider likely real T3 owners. Full-shell command lines from
+  # diagnostics can contain the literal text "t3 serve" and must not trip this.
+  case "$comm" in
+    node|t3|flock) ;;
+    *) continue ;;
+  esac
+
+  [[ "$args" == *"t3 serve"* ]] || continue
+  echo "Refusing to start: existing t3 serve process found: $pid $comm $args" >&2
+  found=1
+done < <(ps -eo pid=,comm=,args=)
+
+if [[ "$found" -ne 0 ]]; then
+  exit 1
+fi
+
+# Refuse if the intended port is already held by something else.
+if ss -ltn "sport = :$PORT" | grep -q LISTEN; then
+  echo "Refusing to start: TCP port $PORT is already listening" >&2
+  ss -ltnp "sport = :$PORT" >&2 || true
+  exit 1
+fi
+
+mkdir -p "$BASE_REAL"
+exit 0

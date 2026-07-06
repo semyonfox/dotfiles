@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Non-interactive Hyprland XDPH share picker for RustDesk.
+Selects the currently-focused monitor (or DP-2/first active monitor as fallback)
+so RustDesk does not throw the useless "select screen on peer side" Wayland dialog.
+"""
+import json, os, subprocess, sys, time
+from pathlib import Path
+
+LOG = Path.home() / ".local/state/hyprland-rustdesk-autopicker.log"
+
+def log(msg: str) -> None:
+    try:
+        LOG.parent.mkdir(parents=True, exist_ok=True)
+        with LOG.open("a") as f:
+            f.write(time.strftime("%Y-%m-%dT%H:%M:%S%z ") + msg + "\n")
+    except Exception:
+        pass
+
+def ensure_hypr_env() -> None:
+    os.environ.setdefault("XDG_RUNTIME_DIR", f"/run/user/{os.getuid()}")
+    if not os.environ.get("HYPRLAND_INSTANCE_SIGNATURE"):
+        hypr_dir = Path(os.environ["XDG_RUNTIME_DIR"]) / "hypr"
+        try:
+            candidates = sorted(hypr_dir.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)
+            if candidates:
+                os.environ["HYPRLAND_INSTANCE_SIGNATURE"] = candidates[0].name
+        except Exception as e:
+            log(f"failed to infer Hyprland instance: {e}")
+
+def monitors():
+    ensure_hypr_env()
+    out = subprocess.check_output(["hyprctl", "monitors", "-j"], text=True, stderr=subprocess.STDOUT, timeout=2)
+    return json.loads(out)
+
+def choose_monitor(ms):
+    active = [m for m in ms if not m.get("disabled") and m.get("dpmsStatus", True)] or ms
+    for m in active:
+        if m.get("focused"):
+            return m.get("name")
+    for preferred in ("DP-2", "HDMI-A-2"):
+        for m in active:
+            if m.get("name") == preferred:
+                return preferred
+    return active[0].get("name") if active else "DP-2"
+
+try:
+    name = choose_monitor(monitors())
+except Exception as e:
+    name = "DP-2"
+    log(f"fallback to {name}: {e!r}; argv={sys.argv!r}")
+
+# XDPH/hyprland-share-picker stdout contract:
+# [SELECTION]<flags>/<type>:<value>; flag r grants restore token when caller allows it.
+flags = "r" if "--allow-token" in sys.argv else ""
+print(f"[SELECTION]{flags}/screen:{name}", flush=True)
+log(f"selected screen:{name} flags={flags!r} argv={sys.argv!r}")

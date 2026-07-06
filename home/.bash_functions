@@ -1,6 +1,6 @@
 # ======================================================================
 # FUNCTIONS - FILE OPERATIONS
-# ======================================================================\n
+# ======================================================================
 # Create directory and enter it
 mkcd() {
     [[ $# -eq 0 ]] && { echo "Usage: mkcd <directory>"; return 1; }
@@ -10,7 +10,7 @@ mkcd() {
 # Create backup of file
 backup() {
     [[ $# -eq 0 ]] && { echo "Usage: backup <file>"; return 1; }
-    cp "$1"{,.bak} && echo "Backed up: $1 → $1.bak"
+    cp "$1"{,.bak} && echo "Backed up: $1 -> $1.bak"
 }
 
 # Find files by name
@@ -54,8 +54,10 @@ extract() {
 # Quick SSH connections
 sssh() {
     case "$1" in
-        server) ssh semyon@server ;;
-        nas)     ssh server@nas ;;
+        server) ssh server ;;
+        nas)     ssh nas ;;
+        pc)      ssh pc ;;
+        laptop)  ssh laptop ;;
         "" )      echo "Usage: sssh <server|hostname>"; return 1 ;; 
         *)       ssh "$1" ;;
     esac
@@ -64,7 +66,7 @@ sssh() {
 # Completion for sssh
 _sssh_complete() {
     local hosts custom_hosts
-    custom_hosts="server1 server2 nas"
+    custom_hosts="server nas pc laptop"
     hosts=$(grep "^Host" ~/.ssh/config 2>/dev/null | grep -v "[?*]" | awk '{print $2}')
     COMPREPLY=($(compgen -W "$hosts $custom_hosts" -- "${COMP_WORDS[COMP_CWORD]}"))
 }
@@ -318,8 +320,25 @@ gaming-check() {
 }
 
 update() {
+    local npm_prefix="${NPM_CONFIG_PREFIX:-$HOME/.local}"
+
     echo "==> system (paru)"
     paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || echo "!!paru failed"
+
+    echo ""
+    echo "==> Claude Code"
+    npm install -g @anthropic-ai/claude-code@latest || echo "!!Claude Code npm update failed"
+    if [[ -x "$npm_prefix/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe" ]]; then
+        ln -sf "$npm_prefix/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe" "$HOME/.local/bin/claude"
+    fi
+
+    echo ""
+    echo "==> Codex CLI"
+    npm install -g @openai/codex@latest || echo "!!Codex npm update failed"
+    if [[ -x "$npm_prefix/lib/node_modules/@openai/codex/bin/codex.js" ]]; then
+        ln -sf "$npm_prefix/lib/node_modules/@openai/codex/bin/codex.js" "$HOME/.local/bin/codex"
+    fi
+    hash -r
 
     echo ""
     echo "==> flatpak"
@@ -330,12 +349,8 @@ update() {
     rustup update || echo "!!rustup failed"
 
     echo ""
-    echo "==> mise"
-    mise self-update -y 2>/dev/null || true
-    mise upgrade || echo "!!mise failed"
-
-    echo ""
-    echo "==> pnpm globals"
+    echo "==> pnpm"
+    pnpm self-update || echo "!!pnpm self-update failed"
     pnpm update -g || echo "!!pnpm failed"
 
     echo ""

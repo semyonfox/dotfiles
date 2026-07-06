@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+on_external_power() {
+    local supply type online
+
+    for supply in /sys/class/power_supply/*; do
+        [[ -r "$supply/type" && -r "$supply/online" ]] || continue
+
+        type="$(<"$supply/type")"
+        online="$(<"$supply/online")"
+
+        if [[ "$type" != "Battery" && "$online" == "1" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+if on_external_power; then
+    exit 0
+fi
+
+exec "$@"

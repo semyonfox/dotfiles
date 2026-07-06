@@ -33,7 +33,7 @@ home/
 │   └── ...                # Other tool configs
 ├── .gitconfig             # Git configuration
 ├── README.md              # Main documentation
-└── SHELL_GUIDE.md         # This file
+└── docs/SHELL_GUIDE.md    # This file
 ```
 
 ### Sourcing Order
@@ -653,4 +653,3 @@ Then source them in `.bashrc`/`.zshrc`:
 - **Starship**: https://starship.rs/
 - **FZF**: https://github.com/junegunn/fzf
 - **Catppuccin**: https://catppuccin.com/
-

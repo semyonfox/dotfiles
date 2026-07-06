@@ -1,11 +1,29 @@
 add_newline = false
 command_timeout = 1000
 
-# Catppuccin Mocha themed, 2-line prompt
-# Top: dir + git + tech stack + duration ─── user@host
-# Bottom: ╰─> with vertical loop connector
+# Catppuccin Mocha themed prompt
+# First line: working context. Second line: input.
 
 palette = "catppuccin_mocha"
+
+format = """
+[╭─](bold lavender) \
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$nodejs\
+$python\
+$rust\
+$golang\
+$status\
+$cmd_duration\
+$username\
+$hostname\
+$line_break\
+$character"""
+
+right_format = "$aws$kubernetes$docker_context"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
@@ -35,31 +53,10 @@ base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
 
-format = """
-[╭](bold text)\
-$directory\
-$git_branch\
-$git_state\
-$git_status\
-$docker_context\
-$kubernetes\
-$aws\
-$nodejs\
-$python\
-$rust\
-$golang\
-$fill\
-$cmd_duration\
-$username\
-$hostname\
-$line_break\
-[│](bold surface1)\
-$character"""
-
 # Directory
 [directory]
-style = "bold blue"
-format = "[](bold blue) $path"
+style = "bold lavender"
+format = "[$path]($style)[$read_only]($read_only_style) "
 truncation_length = 3
 truncate_to_repo = true
 truncation_symbol = "…/"
@@ -74,109 +71,117 @@ read_only_style = "bold red"
 
 # Git branch
 [git_branch]
-style = "bold yellow"
-symbol = " "
-format = "( on [$symbol$branch]($style))"
+style = "bold peach"
+symbol = " "
+format = "[$symbol$branch]($style) "
 
 # Git state (merge, rebase, etc)
 [git_state]
 style = "bold red"
-format = '( [$state( $progress_current/$progress_total)]($style))'
+format = '[$state( $progress_current/$progress_total)]($style) '
 
 # Git status
 [git_status]
 style = "bold red"
-format = '([\[$all_status$ahead_behind\]]($style))'
+format = '[\[$all_status$ahead_behind\]]($style) '
 conflicted = "="
 untracked = "?"
-modified = "!"
+modified = "~"
 staged = "+"
 renamed = "»"
-deleted = "✘"
+deleted = "-"
 
 # Docker
 [docker_context]
-style = "bold sky"
-symbol = " "
-format = "( via [$symbol$context]($style))"
+style = "subtext0"
+symbol = "docker "
+format = "[$symbol$context]($style)"
 only_with_files = true
 detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
 
 # Kubernetes
 [kubernetes]
-style = "bold yellow"
-symbol = "󱃾 "
-format = "( in [$symbol$context]($style))"
+style = "peach"
+symbol = "k8s "
+format = "[$symbol$context]($style) "
 disabled = false
 detect_files = ["k8s"]
 detect_folders = ["k8s", ".kube"]
 
 # AWS
 [aws]
-style = "bold yellow"
-symbol = " "
-format = "( via [$symbol($profile)(\\($region\\))]($style))"
+style = "subtext0"
+symbol = "aws "
+format = "[$symbol($profile )($region)]($style) "
 disabled = false
+
+[aws.region_aliases]
+eu-west-1 = "ireland"
+eu-west-2 = "london"
+eu-north-1 = "stockholm"
+us-east-1 = "virginia"
 
 # Node.js
 [nodejs]
 style = "bold green"
-symbol = " "
-format = "( via [$symbol$version]($style))"
+symbol = "node "
+format = "( [$symbol$version]($style))"
 detect_files = ["package.json", ".node-version", ".nvmrc"]
 detect_folders = ["node_modules"]
 
 # Python
 [python]
-style = "bold yellow"
-symbol = " "
-format = "( via [$symbol$version]($style))"
+style = "bold peach"
+symbol = "py "
+format = "( [$symbol$version]($style))"
 detect_extensions = ["py"]
 detect_files = [".python-version", "Pipfile", "pyproject.toml", "requirements.txt", "setup.py", "poetry.lock"]
 
 # Rust
 [rust]
 style = "bold peach"
-symbol = " "
-format = "( via [$symbol$version]($style))"
+symbol = "rs "
+format = "( [$symbol$version]($style))"
 detect_files = ["Cargo.toml", "Cargo.lock"]
 
 # Go
 [golang]
 style = "bold sky"
-symbol = " "
-format = "( via [$symbol$version]($style))"
+symbol = "go "
+format = "( [$symbol$version]($style))"
 detect_files = ["go.mod", "go.sum"]
 
-# Fill with line
-[fill]
-symbol = "─"
-style = "surface1"
+# Failed command status
+[status]
+disabled = false
+style = "bold red"
+symbol = "✘ "
+format = "[$symbol$status]($style) "
 
 # Command duration
 [cmd_duration]
 min_time = 1000
-style = "bold yellow"
-format = "(took [$duration]($style))"
+style = "subtext1"
+format = "took [$duration]($style) "
 show_milliseconds = false
 
 # Username
 [username]
-show_always = true
+show_always = false
 style_user = "bold lavender"
 style_root = "bold red"
-format = "[@$user]($style)"
+format = " [@$user]($style)"
 
 # Hostname
 [hostname]
-ssh_only = false
+ssh_only = true
 style = "bold green"
-format = "on [@$hostname]($style)"
+format = " on [@$hostname]($style)"
 
 # Prompt character
 [character]
 format = "$symbol "
-success_symbol = "[╰─>](bold green)"
+success_symbol = "[╰─>](bold lavender)"
 error_symbol = "[╰─>](bold red)"
 vimcmd_symbol = "[╰─<](bold mauve)"
 vimcmd_replace_one_symbol = "[╰─<](bold peach)"

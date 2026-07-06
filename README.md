@@ -1,609 +1,89 @@
 # semyon's dotfiles
 
-hey there! welcome to my personal configuration files. this is where i keep my linux setup tidy, organized, and ready to roll.
+Public GNU Stow dotfiles for a small mixed fleet: Ubuntu headless server, CachyOS desktop PC, CachyOS laptop, and minimal/NAS-style installs.
 
-## table of contents
-- [quick start deployment](#quick-start-deployment)
-- [what's inside](#whats-inside)
-- [getting started](#getting-started)
-- [structure and usage](#structure-and-usage)
-- [packages overview](#packages-overview)
-- [dependencies](#dependencies)
-- [switching to zsh](#switching-to-zsh)
-- [hyprland setup](#hyprland-setup-optional)
-- [managing dotfiles](#managing-dotfiles)
-- [claude code configuration](#claude-code-configuration)
-- [troubleshooting](#troubleshooting)
-- [wsl2 compatibility](#wsl2-compatibility)
-- [license](#license)
+Each top-level directory is a Stow package that mirrors `$HOME`. Shared packages stay generic; machine-specific deviations live in host overlays.
 
-## quick start deployment
-
-this repo uses stow for selective package deployment. deploy only what you need.
-
-### install stow
+## Quick Start
 
 ```bash
-sudo pacman -S stow  # arch/cachyos
-sudo apt install stow  # ubuntu/debian
-sudo dnf install stow  # fedora
-sudo zypper install stow  # opensuse
-brew install stow  # macos
-```
-
-### deployment options
-
-deploy individual packages based on your needs:
-
-```bash
+git clone git@github.com:semyonfox/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
-# option 1: shell configs only
-stow home
-
-# option 2: desktop setup (window manager + status bar)
-stow hyprland waybar
-
-# option 3: complete setup (all three)
-stow home hyprland waybar
-
-# option 4: just editor config
-stow claude
+./setup.sh --dry-run
+./setup.sh
 ```
 
-### verify deployment
+`setup.sh` detects the host name and deploys the matching profile. You can also be explicit:
 
-check that symlinks were created:
 ```bash
-ls -la ~/.bashrc ~/.config/hypr ~/.config/waybar ~/.gitconfig
-# all should be symlinks pointing to ~/dotfiles/
+./setup.sh --profile server
+./setup.sh --profile pc
+./setup.sh --profile laptop
+./setup.sh --packages "home claude"
 ```
 
-### remove/update packages
+Manual Stow commands are still fine:
 
 ```bash
-stow -D hyprland  # unlink a package
-stow -R home      # recreate symlinks for a package
+stow --no-folding home claude server
+stow --no-folding home claude hyprland waybar swaync rofi pc
+stow --no-folding home claude hyprland waybar swaync rofi laptop
 ```
 
-for complete deployment guide, see [managing dotfiles](#managing-dotfiles) section.
+## Package Model
 
-## what's inside
+| Package | Purpose |
+| --- | --- |
+| `home` | Shared shell, git, tmux, terminal, Neovim, Starship, and user bin helpers |
+| `claude` | Tracked Claude global guidance files |
+| `hyprland` | Shared Hyprland config: keybindings, theme, scripts, window rules |
+| `waybar` | Shared Waybar scripts and styling |
+| `swaync` | Shared notification center config and styling |
+| `rofi` | Shared Rofi menu/theme files |
+| `server` | Ubuntu/headless server overlay and T3 Code user service |
+| `pc` | Desktop monitor, Waybar layout, RustDesk XDPH picker, and GPU notes |
+| `laptop` | Mobile monitor, idle, and Waybar layout |
 
-*   **shell** - bash and zsh with custom aliases, functions, and history handling
-*   **terminal** - configurations for wezterm, ghostty, kitty, and alacritty
-*   **editor** - neovim setup using lazy.nvim
-*   **system tools** - git, tmux, htop, btop, neofetch, starship prompt
-*   **hyprland** - wayland window manager configuration (HyDE Catppuccin Mocha theme)
-*   **waybar** - status bar configuration (HyDE-generated)
-*   **claude** - claude code editor global configuration
+Profiles:
 
-## packages overview
+| Profile | Packages |
+| --- | --- |
+| `server` | `home claude server` |
+| `pc` | `home claude hyprland waybar swaync rofi pc` |
+| `laptop` | `home claude hyprland waybar swaync rofi laptop` |
+| `nas` / `minimal` | `home claude` |
 
-here's what each stow package provides and when to deploy it:
+## Important Layout Rules
 
-| Package | Contents | Deploy If | Command |
-|---------|----------|-----------|---------|
-| home | bash, zsh, git, tmux, starship, aliases, functions | using shell configs | stow home |
-| hyprland | window manager, keybindings, animations, themes | using hyprland wm | stow hyprland |
-| waybar | status bar, modules, styling | using waybar bar | stow waybar |
-| claude | claude code global config | using claude code | stow claude |
+- Shared files go in shared packages only when they work on every target that deploys them.
+- Machine-specific files go in `server/`, `pc/`, or `laptop/`.
+- `hyprland` deliberately does not own `monitors.conf`, `monitors.json`, `hypridle.conf`, or `userprefs.conf`; host overlays own those.
+- `waybar` deliberately does not own `config.jsonc`; host overlays own the layout while the shared package owns scripts and CSS.
+- Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; it does not install Codex global Fable routing.
 
-### package details
+## Public Safety
 
-**home/** - shell and system tool configs
-- bashrc, zsh config with tool integrations (starship, zoxide, fzf)
-- git config with user and aliases
-- tmux configuration
-- wezterm and terminal emulator configs
-- 70+ shell aliases and helper functions
-- starship prompt configuration
-- history optimization and ssh agent management
+This repo is public. Do not commit secrets, private keys, credentials, tokens, local service env files, browser stores, or generated auth/cache directories.
 
-**hyprland/** - window manager and desktop environment
-- hyprland.conf - main window manager configuration
-- keybindings.conf - all keyboard shortcuts
-- animations - multiple preset animation styles
-- themes - colors and appearance (catppuccin mocha)
-- window rules and layout configuration
-- monitor configuration template
-- works with omarchy theme system for notifications
+Tracked examples may use placeholders only. See [docs/public-safety.md](docs/public-safety.md).
 
-**waybar/** - system status bar
-- config.jsonc - bar layout and enabled modules
-- style.css and theme.css - styling and colors
-- 25+ modules - clock, battery, network, audio, workspace, etc.
-- auto-generated by HyDE wbarconfgen.sh
-- restart required after configuration changes
+## Useful Commands
 
-**claude/** - editor configuration
-- CLAUDE.md - global instructions for claude code
-- agent configurations
-- plugin configurations
-- sensitive files managed locally (not synced)
-
-## getting started
-
-### one-command install (recommended)
 ```bash
-git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
-cd ~/dotfiles
+./setup.sh --dry-run --profile pc
+./setup.sh --profile server
+
+stow --no-folding -n -v home claude
+stow --no-folding -D hyprland waybar swaync rofi pc
+
+./install-deps.sh
 ./install.sh
+./switch-to-zsh.sh
 ```
 
-the installer will:
-- detect your OS (arch, ubuntu, fedora, macos, wsl2)
-- prompt you for each step:
-  1. install dependencies? (core tools + CLI tools)
-  2. install optional CLI tools? (thefuck, pyenv)
-  3. deploy dotfiles with stow?
-  4. switch to zsh?
-  5. install zsh enhancements? (oh-my-zsh - asked when switching to zsh)
-- backup any conflicting files automatically
-- safe to re-run if something fails
-
-**installation flow:**
-```
-1. Install dependencies? (y/n)
-   -> installs: zsh, git, tmux, neovim, stow, eza, bat, fd, ripgrep, etc.
-2. Install optional CLI tools? (y/n)
-   -> thefuck, pyenv
-3. Deploy dotfiles? (y/n)
-   -> creates symlinks with stow
-4. Switch to zsh? (y/n)
-   -> if yes, asks: install oh-my-zsh? (y/n) [y]
-   -> changes default shell
-```
-
-### alternative: individual scripts
-if you prefer to run things separately:
-```bash
-./install-deps.sh  # just install packages
-./setup.sh         # just deploy dotfiles
-./switch-to-zsh.sh # just switch shell
-```
-
-### manual install
-```bash
-# install stow first, then:
-git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
-cd ~/dotfiles
-stow home
-```
-
-### what gets installed
-
-when you run `./install.sh` or `stow home`, these configs are symlinked:
-
-**shell configs:**
-- bash: `.bashrc`, `.bash_aliases`, `.bash_functions`, `.bash_profile`, `.profile`
-- zsh: `.zshrc`, `.zsh_aliases`, `.zsh_functions`, `.zprofile`
-
-**application configs:**
-- git: `.gitconfig`
-- tmux: `.tmux.conf`
-- terminal: `.wezterm.lua`
-- hyprland: `.config/hypr/` (window manager)
-- waybar: `.config/waybar/` (status bar)
-- other: `.config/btop`, `.config/ghostty`, `.config/htop`, `.config/kitty`, `.config/neofetch`, `.config/starship.toml`
-
-## structure and usage
-
-this repo uses [GNU Stow](https://www.gnu.org/software/stow/) for symlink management:
-
-*   **home/** - package containing all dotfiles (`.bashrc`, `.config/nvim`, etc.)
-*   when you run `stow home`, it creates symlinks in `~` that point to files in `home/`
-*   **example**: `home/.bashrc` → `~/.bashrc`
-
-## dependencies
-
-### what install-deps.sh installs
-
-**core tools (always installed):**
-- `zsh` - modern shell with powerful features
-- `git` - version control
-- `tmux` - terminal multiplexer
-- `neovim` - modern vim-based editor
-- `stow` - symlink manager for dotfiles
-- `curl`, `wget` - download tools
-
-**modern cli tools (always installed):**
-- `eza` - modern replacement for ls
-- `bat` - cat with syntax highlighting
-- `fd` - modern find alternative
-- `ripgrep` - faster grep
-- `fzf` - fuzzy finder
-- `zoxide` - smarter cd command
-- `starship` - customizable prompt
-
-**optional (prompted during install):**
-- `oh-my-zsh` - zsh plugin framework
-- `thefuck` - command correction tool
-- `pyenv` - python version manager
-- `tpm` - tmux plugin manager (auto-installed)
-
-**terminal emulators (configs included, manual install):**
-- wezterm - config: `.wezterm.lua`
-- ghostty - config: `.config/ghostty/`
-- kitty - config: `.config/kitty/`
-- note: these are skipped in wsl2 (use windows terminal)
-
-### manual installations needed
-
-after running the setup scripts, you may want to install:
-
-1. **terminal emulator** (if not using wsl2)
-   - [wezterm](https://wezfurlong.org/wezterm/) - recommended
-   - [ghostty](https://ghostty.org/) - fast and minimal
-   - [kitty](https://sw.kovidgoyal.net/kitty/) - gpu-accelerated
-
-2. **nerd font** for icons in terminal
-   ```bash
-   # arch
-   sudo pacman -S ttf-jetbrains-mono-nerd
-
-   # ubuntu/debian
-   mkdir -p ~/.local/share/fonts
-   cd ~/.local/share/fonts
-   curl -fLO https://github.com/ryanoasis/nerd-fonts/releases/download/v3.1.1/JetBrainsMono.zip
-   unzip JetBrainsMono.zip && rm JetBrainsMono.zip
-   fc-cache -fv
-   ```
-
-3. **tmux plugins** (after setup)
-   - open tmux and press `prefix + I` (ctrl-b then I)
-   - tpm will install configured plugins automatically
-
-## switching to zsh
-
-want to use zsh instead of bash? we've got you covered:
-
-1. **install zsh**
-   ```bash
-   sudo pacman -S zsh zsh-completions
-   ```
-
-2. **switch your default shell**
-   ```bash
-   ./switch-to-zsh.sh
-   ```
-   or manually:
-   ```bash
-   chsh -s $(which zsh)
-   ```
-
-3. **log out and log back in** for the changes to take effect
-
-the zsh configs mirror all the bash functionality with zsh-specific improvements like better completion and shared history across sessions.
-
-## hyprland setup (optional)
-
-if you're on omarchy or using hyprland, these dotfiles include a complete hyprland + waybar configuration based on the HyDE framework with Catppuccin Mocha theme.
-
-### available packages for deployment
-
-you can deploy any combination of packages independently:
-
-```bash
-cd ~/dotfiles
-
-# deploy individual packages
-stow home              # shell configs (bash, zsh, git, tmux, etc.)
-stow hyprland          # hyprland window manager configuration
-stow waybar            # waybar status bar configuration
-stow claude            # claude code global configuration
-
-# deploy multiple packages at once
-stow home hyprland waybar
-
-# remove deployments if needed
-stow -D hyprland       # unlink just hyprland
-stow -R hyprland       # recreate hyprland symlinks
-```
-
-### what each desktop package contains
-
-**hyprland/** - window manager and related configs
-- hyprland.conf - main window manager configuration
-- keybindings.conf - all keyboard shortcuts
-- animations.conf and animations/ - animation presets
-- windowrules.conf - window-specific behavior rules
-- themes/ - color and appearance settings
-- monitors.conf - display configuration (initially empty for user setup)
-- userprefs.conf - user customization overrides
-
-**waybar/** - system status bar
-- config.jsonc - bar layout, modules, and settings
-- style.css and theme.css - bar appearance
-- modules/ - individual module configurations
-
-### omarchy integration
-
-the mako notification daemon uses a symlink to omarchy's theme system:
-```
-~/.config/mako/config -> ~/.config/omarchy/current/theme/mako.ini
-```
-
-this is intentional. notifications stay in sync with your system theme through omarchy, while hyprland configuration is managed independently through these dotfiles. they work together without conflict.
-
-### deployment instructions
-
-1. ensure stow is installed:
-   ```bash
-   sudo pacman -S stow  # or use your distro's package manager
-   ```
-
-2. decide which packages you need:
-   - shell configs only: `stow home`
-   - full desktop setup: `stow home hyprland waybar`
-   - just window manager: `stow hyprland`
-   - just status bar: `stow waybar`
-
-3. deploy from dotfiles directory:
-   ```bash
-   cd ~/dotfiles
-   stow home hyprland waybar  # example: deploy all three
-   ```
-
-4. verify symlinks were created:
-   ```bash
-   ls -la ~/.bashrc ~/.config/hypr ~/.config/waybar
-   # should show symlinks pointing to ~/dotfiles/
-   ```
-
-5. for hyprland, reload config (auto-reloads on save, or):
-   ```bash
-   hyprctl reload
-   ```
-
-6. for waybar, restart after any changes:
-   ```bash
-   killall waybar
-   waybar &
-   ```
-
-### credits
-
-- [HyDE (HyprDots)](https://github.com/prasanthrangan/hyprdots) - hyprland framework and catppuccin mocha theme
-- [Omarchy](https://omarchy.org/) - theme management system integration
-
-for detailed configuration information, see [hyprland/README.md](hyprland/README.md) and [waybar/README.md](waybar/README.md).
-
-## managing dotfiles
-
-### available stow packages
-
-list all packages in this repo:
-```bash
-cd ~/dotfiles
-ls -d */  # shows: home/ hyprland/ waybar/ claude/ lib/
-```
-
-### selective deployment
-
-deploy only what you need:
-```bash
-cd ~/dotfiles
-
-# deploy just home (shell configs)
-stow home
-
-# deploy just hyprland and waybar (desktop)
-stow hyprland waybar
-
-# deploy everything
-stow home hyprland waybar claude
-
-# remove a package (unstow)
-stow -D hyprland
-
-# verify what would be deployed (dry-run)
-stow -n home  # show what would be symlinked
-stow -n -v home  # show with details
-```
-
-### adding new configs
-
-to add a new configuration file:
-
-```bash
-# 1. copy file into package directory (maintaining directory structure)
-cp ~/.newconfig home/.newconfig
-# or for hyprland:
-cp ~/.config/hypr/newfile.conf hyprland/.config/hypr/newfile.conf
-
-# 2. deploy the package (creates symlink)
-cd ~/dotfiles
-stow home
-
-# 3. verify symlink was created
-ls -la ~/.newconfig  # should show it's a symlink to home/.newconfig
-```
-
-### updating existing configs
-
-just edit files directly. changes take effect immediately since they're symlinked:
-
-```bash
-nano ~/dotfiles/home/.bashrc
-# the file at ~/.bashrc is also updated (it's a symlink)
-```
-
-### removing packages
-
-```bash
-# unstow (remove symlinks) for a package
-stow -D home           # removes home package symlinks
-stow -D hyprland       # removes hyprland package symlinks
-
-# restow (recreate symlinks)
-stow -R home           # delete and recreate all symlinks for home
-```
-
-### troubleshooting stow
-
-```bash
-# see what conflicts exist
-stow -n home 2>&1 | grep conflict
-
-# check existing symlinks
-ls -la ~/.bashrc ~/.config/hypr ~/.config/waybar
-
-# verify stow installation
-stow --version
-```
-
-### helper scripts
-
-these scripts automate common tasks:
-
-- `install.sh` - unified installer (recommended first-time setup)
-- `install-deps.sh` - standalone dependency installer
-- `setup.sh` - standalone stow deployment with backups
-- `switch-to-zsh.sh` - switch default shell to zsh
-
-## claude code configuration
-
-if you use [claude code](https://claude.ai/code), there's a separate `claude/` package with global instructions and configuration:
-
-```bash
-stow claude
-```
-
-this creates symlinks for:
-- `~/.claude/CLAUDE.md` - global instructions for claude code
-- `~/.claude/agents/` - agent configurations (local)
-- `~/.claude/plugins/` - plugin configurations (local)
-
-sensitive files (`.claude.json`, `.credentials.json`, cache, history) are gitignored and managed locally.
-
-each project can override the global instructions by adding a `CLAUDE.md` at its root. see [claude/README.md](claude/README.md) for details.
-
-## troubleshooting
-
-**conflict errors when stowing?**
-```bash
-# backup existing configs first
-mkdir -p ~/backup
-mv ~/.bashrc ~/.gitconfig ~/.tmux.conf ~/backup/
-
-# then try stowing again
-stow home
-```
-
-**check if symlinks are working:**
-```bash
-# verify all symlinks are valid
-for file in .bashrc .gitconfig .tmux.conf .wezterm.lua; do
-  if [ -L ~/"$file" ]; then
-    echo "$file: symlinked to $(readlink ~/$file)"
-  else
-    echo "$file: not a symlink"
-  fi
-done
-```
-
-**restore original configs:**
-```bash
-cd ~/dotfiles
-stow -D home  # remove all symlinks
-cp ~/backup/* ~/  # restore from backup
-```
-
-## wsl2 compatibility
-
-these dotfiles are **fully compatible with wsl2** (windows subsystem for linux). the setup scripts automatically detect wsl2 and adjust accordingly.
-
-### wsl2 setup guide
-
-1. **install wsl2 with ubuntu/debian/arch**
-   ```powershell
-   # in powershell (windows)
-   wsl --install -d Ubuntu
-   # or for arch: wsl --install -d Arch
-   ```
-
-2. **install dotfiles in wsl**
-   ```bash
-   # inside wsl terminal
-   git clone https://github.com/semyonfox/dotfiles.git ~/dotfiles
-   cd ~/dotfiles
-   ./install.sh  # automatically detects wsl2 and adjusts
-   ```
-
-### wsl2 specific notes
-
-**what works:**
-- all shell configurations (bash/zsh)
-- all cli tools (eza, bat, fd, zoxide, starship, etc.)
-- tmux with full functionality
-- neovim and all editor configs
-- git configurations
-
-**what's different in wsl2:**
-- **terminal emulators**: use windows terminal instead of wezterm/ghostty/kitty
-  - install from microsoft store: `winget install Microsoft.WindowsTerminal`
-  - configs for linux terminal emulators are skipped automatically
-- **gui applications**: require x server (vcxsrv/x410) or use wslg (built-in on windows 11)
-- **systemd**: available on ubuntu 22.04+ in wsl2, may need enabling
-
-**wsl2 optimizations:**
-
-1. **configure .wslconfig** (optional, on windows side)
-   create `C:\Users\YourName\.wslconfig`:
-   ```ini
-   [wsl2]
-   memory=8GB           # limit memory usage
-   processors=4         # limit cpu cores
-   swap=2GB
-   localhostForwarding=true
-   ```
-
-2. **configure wsl.conf** (optional, in wsl)
-   edit `/etc/wsl.conf`:
-   ```ini
-   [boot]
-   systemd=true         # enable systemd (ubuntu 22.04+)
-
-   [interop]
-   appendWindowsPath=false  # optional: don't pollute PATH with windows dirs
-
-   [network]
-   generateResolvConf=true
-   ```
-
-3. **windows terminal integration**
-   - configs are symlinked and work immediately
-   - starship prompt works perfectly in windows terminal
-   - font recommendation: install a nerd font (jetbrains mono nf, fira code nf)
-
-4. **performance tips**
-   - keep project files in linux filesystem (`~/projects`) not windows (`/mnt/c/`)
-   - use git from linux, not windows
-   - wsl2 has near-native linux performance when files are in `~`
-
-**known issues:**
-- clipboard integration: install `xclip` or use windows terminal's native clipboard
-- some aliases reference `pacman` (arch-specific) - they'll error on ubuntu/debian (harmless)
-- `.wezterm.lua` config exists but wezterm should be run on windows side, not in wsl
-
-**recommended setup:**
-```bash
-# 1. install windows terminal
-# 2. set default profile to your wsl distro
-# 3. install a nerd font in windows
-# 4. run the dotfiles setup as shown above
-# 5. configure windows terminal to use installed font
-```
-
-for more wsl2 help: https://learn.microsoft.com/en-us/windows/wsl/
-
-## license
-
-mit - feel free to fork this, steal code, or learn from my messy experiments.
-
-## acknowledgements
-
-big thanks to these folks for some great inspiration:
-*   [omerxx](https://github.com/omerxx/dotfiles) for dotfiles inspiration
-*   [axenide](https://github.com/starship/starship/discussions/1107#discussioncomment-13953875) for starship config ideas
+## Notes
+
+- Host packages install `~/.config/dotfiles/machine-profile`; shared helpers read it when behavior differs by device.
+- Server T3 Code is managed by `server/.config/systemd/user/t3-code-headless.service`.
+- PC and laptop desktop configs assume the shared `home`, `hyprland`, `waybar`, `swaync`, and `rofi` packages are deployed with the host overlay.

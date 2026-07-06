@@ -21,6 +21,8 @@ Desktop.ini
 
 # Backup files (prevent accidental commits of editor backups)
 *.bak
+*.bak-*
+*.bak.*
 *.backup
 *.broken*
 *.old
@@ -28,5 +30,26 @@ Desktop.ini
 # Backups created by install.sh
 dotfiles_backup_*
 
+# Python generated files
+__pycache__/
+*.pyc
+
 # Claude Code local files (should not be tracked)
 home/.claude/
+
+# Private local config
+.env
+.env.*
+*.secret
+*.secrets
+*.key
+*.pem
+*.p12
+*.pfx
+id_*
+home/.ssh/
+home/.gnupg/
+home/.cloudflared/
+home/.config/cloudflared/
+!*.env.example
+!.env.example

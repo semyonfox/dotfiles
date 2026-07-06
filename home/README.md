@@ -47,6 +47,7 @@ chsh -s /usr/bin/zsh
 | `.zsh_aliases`          | Zsh aliases (mirrored from bash)   |
 | `.zsh_functions`        | Zsh utility functions              |
 | `.config/starship.toml` | Starship prompt configuration      |
+| `.config/nvim`          | LazyVim-based Neovim configuration |
 | `.tmux.conf`            | Tmux configuration                 |
 | `.gitconfig`            | Git configuration                  |
 
@@ -195,6 +196,8 @@ bashrc    # Edit ~/.bashrc
 balias    # Edit ~/.bash_aliases
 tconf     # Edit tmux config
 ```
+
+The Neovim config is a slim LazyVim setup using Catppuccin Mocha, neo-tree, transparent backgrounds, and optional Molten/Jupyter support. See `.config/nvim/README.md` for editor-specific notes.
 
 #### Tmux
 
@@ -348,9 +351,9 @@ Located at `~/.config/starship.toml`:
 
 ### Node.js
 
-- **NVM** (Node Version Manager)
-- Currently configured for Node.js 25.2.1 via **mise**
+- System Node.js from pacman
 - NPM/PNPM package managers
+- PNPM_HOME globals in `~/.local/share/pnpm`
 
 ### Rust
 
@@ -532,6 +535,6 @@ Tested and working on:
 
 ## Next Steps
 
-For more detailed information on shell-specific features and comparison, see [SHELL_GUIDE.md](./SHELL_GUIDE.md).
+For more detailed information on shell-specific features and comparison, see [SHELL_GUIDE.md](../docs/SHELL_GUIDE.md).
 
 For full dotfiles deployment and setup instructions, see the root [README.md](../README.md).

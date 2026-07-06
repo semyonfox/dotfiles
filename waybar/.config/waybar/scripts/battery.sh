@@ -28,5 +28,5 @@ esac
 
 state_lc=$(echo "$state" | tr '[:upper:]' '[:lower:]')
 
-printf '{"text":"%s %s%%","tooltip":"%s · %s · %s","class":"%s","alt":"%s"}\n' \
+printf '{"text":"%s  %s%%","tooltip":"%s · %s · %s","class":"%s","alt":"%s"}\n' \
     "$icon" "$pct" "$name" "$detail" "$state_lc" "$mode" "$mode"

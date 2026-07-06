@@ -18,19 +18,35 @@ FAILED_OPTIONAL_PACKAGES=()
 # ======================================================================
 
 info() {
-    echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "${BLUE}[INFO]${NC} $1" | tee -a "$LOG_FILE"
+    else
+        echo -e "${BLUE}[INFO]${NC} $1"
+    fi
 }
 
 success() {
-    echo -e "${GREEN}[OK]${NC} $1" | tee -a "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "${GREEN}[OK]${NC} $1" | tee -a "$LOG_FILE"
+    else
+        echo -e "${GREEN}[OK]${NC} $1"
+    fi
 }
 
 warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "${YELLOW}[WARN]${NC} $1" | tee -a "$LOG_FILE"
+    else
+        echo -e "${YELLOW}[WARN]${NC} $1"
+    fi
 }
 
 error() {
-    echo -e "${RED}[ERROR]${NC} $1" | tee -a "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo -e "${RED}[ERROR]${NC} $1" | tee -a "$LOG_FILE"
+    else
+        echo -e "${RED}[ERROR]${NC} $1"
+    fi
     exit 1
 }
 

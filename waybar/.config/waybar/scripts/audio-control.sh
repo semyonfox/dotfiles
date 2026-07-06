@@ -186,7 +186,7 @@ print_status() {
     class="${class} bluetooth"
   fi
 
-  text="$icon ${volume}%"
+  text="$icon  ${volume}%"
   tooltip="Output: ${desc}"$'\n'"Type: ${kind}"$'\n'"State: ${state}"
   if [[ "$sink" == "$default_sink" ]]; then
     tooltip+=$'\n'"Default: yes"

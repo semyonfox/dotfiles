@@ -1,0 +1,11 @@
+[Unit]
+Description=Apply RX 6600 XT performance undervolt profile
+After=multi-user.target lactd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/apply-gpu-profile
+TimeoutStartSec=45
+
+[Install]
+WantedBy=multi-user.target

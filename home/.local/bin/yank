@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+wayland_lib=/usr/lib/libwayland-client.so
+
+if [ -r "$wayland_lib" ]; then
+  if [ -n "${LD_PRELOAD:-}" ]; then
+    export LD_PRELOAD="$wayland_lib $LD_PRELOAD"
+  else
+    export LD_PRELOAD="$wayland_lib"
+  fi
+fi
+
+exec /home/semyon/Applications/Yank/Yank.AppImage "$@"

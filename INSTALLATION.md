@@ -665,7 +665,7 @@ After installation, customize your shell:
 2. **Custom aliases**: Create `~/.bash_aliases.local` or `~/.zsh_aliases.local`
 3. **Custom functions**: Add to `.bash_functions.local` or `.zsh_functions.local`
 
-See `home/SHELL_GUIDE.md` for detailed customization instructions.
+See `docs/SHELL_GUIDE.md` for detailed customization instructions.
 
 ### Development Environment Setup
 
@@ -690,7 +690,7 @@ cargo --version
 ### Further Reading
 
 For detailed information:
-- **Shell configuration**: See `home/README.md` and `home/SHELL_GUIDE.md`
+- **Shell configuration**: See `home/README.md` and `docs/SHELL_GUIDE.md`
 - **Aliases reference**: Check `home/.bash_aliases` (or `.zsh_aliases`)
 - **Functions reference**: Check `home/.bash_functions` (or `.zsh_functions`)
 - **Git setup**: See `home/.gitconfig` and `home/.config/git/`
@@ -699,7 +699,7 @@ For detailed information:
 
 1. **Check the log file**: `~/.dotfiles-install-YYYYMMDD_HHMMSS.log`
 2. **Read troubleshooting section** above
-3. **Check shell guide**: `home/SHELL_GUIDE.md` in the repository
+3. **Check shell guide**: `docs/SHELL_GUIDE.md` in the repository
 4. **Report issues**: Open an issue on the repository
 
 ---

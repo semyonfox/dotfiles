@@ -42,7 +42,7 @@ source $ZSH/oh-my-zsh.sh
 export PATH="$HOME/.local/bin:$PATH"
 export NPM_CONFIG_PREFIX="$HOME/.local"
 export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
+export PATH="$PNPM_HOME/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
 export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
@@ -218,6 +218,7 @@ _welcome_bar
 # ======================================================================
 # Source local zshrc if it exists (for machine-specific configs)
 [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+[[ -f "$HOME/.config/dotfiles/host.zsh" ]] && source "$HOME/.config/dotfiles/host.zsh"
 
 # Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -271,6 +272,6 @@ esac
 # pnpm end
 
 # Vite+ bin (https://viteplus.dev)
-. "$HOME/.vite-plus/env"
+[[ -f "$HOME/.vite-plus/env" ]] && . "$HOME/.vite-plus/env"
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/share/../bin/env" ]] && . "$HOME/.local/share/../bin/env"

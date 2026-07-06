@@ -4,12 +4,12 @@ Programs must be written for people to read. — Harold Abelson
 Simplicity is prerequisite for reliability. — Edsger W. Dijkstra
 Premature optimization is the root of all evil. — Donald Knuth
 The best way to predict the future is to invent it. — Alan Kay
-First, solve the problem. Then, write the code. — John Johnson
+First, solve the problem. Then, write the code. — Programming maxim (widely shared; common attribution to John Johnson)
 Measuring programming progress by lines of code is like measuring aircraft building progress by weight. — Bill Gates
 Innovation distinguishes between a leader and a follower. — Steve Jobs
-If it works, don't touch it. — Linus Sebastian
-Just because you can build it doesn't mean you should. — Linus Sebastian
-The best PC is the one you actually use. — Linus Sebastian
+If it works, don't touch it. — IT meme trope; popularized by 'The First Commandment of IT' and similar community posts
+Just because you can build it doesn't mean you should. — Internet engineering humor; no single credited author
+The best PC is the one you actually use. — /r/pcmasterrace-era community meme
 You can't put a limit on anything. — Michael Phelps
 The more you dream, the further you get. — Michael Phelps
 If you want to be the best, you have to do things others aren't willing to do. — Michael Phelps
@@ -33,8 +33,142 @@ Ship now. Fix later.
 Never underestimate a programmer with coffee.
 The best debugger is still a good night's sleep.
 The code compiles. Ship it.
-The greatest technician that's ever lived. — Linus Sebastian
+The greatest technician that's ever lived. — Andy / Salem Techsperts (YouTube catchphrase)
 Trust the process. And the logs.
 Read the error message.
 The logs know everything.
 Simple code wins.
+If your monitor is too clean, your branch is probably clean because you didn't run tests.
+Never merge on a full moon.
+A working workaround beats a perfect feature in production.
+If it compiles in bash, try it in prod, maybe.
+Premature refactors are just expensive mistakes in drag.
+Comments are for future-me, not for your future-co-workers.
+Debugging is like archaeology: patient digging, ugly surprises, and fewer treasures.
+The only thing slower than a 5ms query is waiting for one architect to answer a Slack.
+Your TODO list is a commitment from your future self.
+If it has an error message, it's trying to be helpful.
+Measure twice, deploy once.
+Any architecture can be made simpler with enough warnings.
+You can't optimize uncertainty, only probability.
+The best profiler is the one that doesn't disappear after midnight.
+A clean diff is nice; a clean incident postmortem is better.
+The best part of an incident is when you can explain it in one sentence.
+If the alert sounds loud, maybe the bug was just loud too.
+A feature is never fully done, only less wrong.
+The best shortcut is to be boring.
+When in doubt, add a test and remove blame.
+Never trust defaults unless you wrote them yourself.
+Every failed build is a tiny onboarding doc.
+If there is no log line, the code is probably not real.
+If it's Friday and deployable, it's probably Tuesday in code.
+Use the time you save by avoiding overengineering to review one more PR.
+You can make a system robust by making boring choices.
+Never ship panic; ship a clear explanation too.
+Good docs beat good vibes.
+If your code has no TODOs, it has hidden TODOs in your future.
+Every ticket is solved in one of three ways: fix it, postpone it, or explain it.
+The cleanest fix is the one with the smallest number of files and largest amount of panic.
+Always trust your linter, but trust prod logs a little more.
+The shortest path to genius is usually the longest one with fewer commits.
+A backlog with zero items usually means someone forgot to save it.
+When you copy-paste, ask your future self if they gave permission.
+The first draft is where most production bugs are born.
+Never merge while standing. Gravity ruins judgment.
+The right thing is often hidden behind the quickest workaround.
+If it feels done, it probably has one undocumented edge case.
+Version control is the only place your ego can be safely reset.
+If you don't benchmark it, it has already optimized itself into nonsense.
+A TODO without a date is just a modern haiku.
+The fastest way to learn a new tool is to forget why you needed it.
+Code comments should reduce uncertainty, not create philosophy.
+Production is just a very opinionated staging environment.
+An undocumented shortcut is just hidden debt.
+A clean UI with ugly internals is still called a feature.
+If the API contract changed, your peace of mind changed too.
+Treat flaky tests as advice from the universe.
+Your monitor time is your best profiling metric.
+The build passes at lunch and fails at dinner.
+If there is no fallback, that's just a one-way ticket.
+The strongest code is the one your team can read in two coffees.
+Refactoring is romance with a changelog.
+A crash report is a love letter from your edge case.
+If your architecture diagram has more arrows than boxes, pause.
+Feature flags are like seat belts—use them before the crash.
+One integration test can save three weekends.
+The bug report is usually more honest than the meeting.
+If your branch is green, ask your future rollback plan.
+The fastest deployment is the one you can reverse quickly.
+There is no legacy code, only code with unresolved trust issues.
+Your keyboard knows when you are pretending to understand the stack.
+A dead code path is just a silent museum piece.
+You learn more from a 404 than from a perfect dashboard.
+Every security alert is a reminder that assumptions age.
+If you can delete it, ask why you kept it.
+Never argue with the incident timeline.
+The difference between a hack and architecture is only comments.
+If the PR template is long, the change is probably longer.
+The loudest error is often the least important.
+Good defaults reduce heroics and pager fatigue.
+The first line of the postmortem is written while it hurts.
+If the data disagrees with the graph, trust the data.
+A deployment without observability is a dare.
+If your incident has a catchy title, fix the process.
+The best rollback is the one you practiced yesterday.
+Never call it a hotfix if it skipped the kitchen.
+If it works in your branch, it works in 97% of universes. — /r/ProgrammerHumor
+Never trust a clean code review from someone with tunnel vision. — coding lore
+Every ticket has a hidden requirement called documentation.
+A feature is just a bug with better marketing.
+Every diagram has one more box than reality permits.
+There is no test that can save a vague requirement.
+Your first migration should not be your last disaster.
+A timeout is not a strategy; it is a prayer with milliseconds.
+You can’t optimize a process you can’t reproduce.
+If it’s in production, it’s suddenly your personal project.
+A perfect plan is just a bug-free fantasy.
+Never skip a backup, unless you enjoy chaos engineering.
+There is no such thing as a one-line fix.
+Your future code reviewer is currently in a better mood than you.
+If logs are missing, the bug is doing improv theater.
+A CI failure at noon means your coffee broke at 11:55.
+No merge is too small to deserve good commit context.
+If the architecture looks simple, your assumptions are probably not.
+Your backlog grows when your confidence grows.
+You don’t need more automation, you need better naming.
+Every API has a hidden clause: `works_until_monitors_offline`.
+Never build at 3 AM if you can build at 3:05 PM.
+The fastest way to lose an argument is to call it an edge case.
+If a warning seems harmless, that’s your warning.
+The best design starts as a question, not a framework.
+A clean code style guide won’t save a messy thought.
+There are only two versions of a deployment: not yet and maybe.
+If your task estimate has four digits, reduce scope.
+You can’t debug fear, but you can delete unused files.
+Every dashboard is a story about the past quarter.
+Your branch can be green and still emotionally unstable.
+A dependency added for convenience is maintenance in disguise.
+If production says yes, staging should ask why.
+You don’t need a better language, you need better constraints.
+A failed test is not failure; it’s a test that did its job.
+If the issue is intermittent, congratulations, you invented quantum behavior.
+Your most precious resource is not speed, it’s reversibility.
+One tiny config change can outrun your full architecture review.
+There is no magic fix button, only more visibility.
+The best time to add a comment is when your team is already confused.
+No amount of dashboards replaces one good repro case.
+If you can’t restart the problem in ten minutes, it’s not reproducible.
+Good observability means your system talks in complete sentences.
+Any service with a smiley icon has a hidden queue.
+Trust checks, but let the monitor decide the final argument.
+If your patch is short, keep checking the blast radius.
+Refactors should sound boring. If they sound exciting, re-check.
+The shortest fix is often the one nobody wants to maintain.
+Every cron job is secretly a tiny time machine.
+If your pager is silent, your assumptions may be broken.
+The cleanest migration is also the one nobody remembers.
+Write less clever code and more recoverable code.
+If it feels complete, there are at least two forgotten steps.
+A good fallback is not a hack; it is kindness.
+Your architecture review is not over until the on-call person agrees.
+Ship the boring version first, then the fun one.

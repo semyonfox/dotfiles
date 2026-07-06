@@ -2,11 +2,20 @@
   "layer": "top",
   "position": "top",
   "height": 36,
+  "exclusive": true,
+  "fixed-center": true,
+  "reload_style_on_change": true,
   "spacing": 0,
-  
+
   "modules-left": ["custom/power", "idle_inhibitor", "hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "memory", "custom/battery", "custom/vpn", "network", "bluetooth", "custom/audio"],
+  "modules-right": ["cpu", "memory", "custom/battery", "custom/vpn", "custom/wifi", "custom/bluetooth", "custom/audio", "tray", "custom/swaync"],
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8,
+    "show-passive-items": true
+  },
 
   "custom/power": {
     "format": "⏻",
@@ -15,7 +24,7 @@
   },
 
   "hyprland/workspaces": {
-    "format": "{icon}",
+    "format": "{icon}{windows}",
     "format-icons": {
       "1": "1",
       "2": "2",
@@ -32,13 +41,21 @@
     "disable-scroll": true,
     "sort-by": "number",
     "on-click": "activate",
-    "persistent-workspaces": {
-      "*": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    "show-special": false,
+    "workspace-taskbar": {
+      "enable": true,
+      "format": "{icon}",
+      "icon-size": 16,
+      "orientation": "horizontal",
+      "update-active-window": true,
+      "active-window-position": "none",
+      "on-click-window": "hyprctl dispatch focuswindow address:{address}",
+      "ignore-list": []
     }
   },
 
   "clock": {
-    "format": "{:%A %B %d, %Y  %H:%M}",
+    "format": "{:%H:%M  %A %B %d}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
       "mode": "month",
@@ -63,13 +80,13 @@
 
   "cpu": {
     "interval": 2,
-    "format": " {usage}%",
+    "format": "  {usage}%",
     "on-click": "xdg-terminal-exec btop"
   },
 
   "memory": {
     "interval": 2,
-    "format": "󰾆 {percentage}%",
+    "format": "󰾆  {percentage}%",
     "tooltip-format": "{used:0.1f}G / {total:0.1f}G used",
     "on-click": "xdg-terminal-exec btop"
   },
@@ -92,10 +109,11 @@
 
   "network": {
     "interval": 2,
-    "format-wifi": " {essid}",
-    "format-ethernet": " {ifname}",
-    "format-linked": " {ifname} (no ip)",
-    "format-disconnected": " offline",
+    "max-length": 24,
+    "format-wifi": "  {essid}",
+    "format-ethernet": "  {ifname}",
+    "format-linked": "  {ifname} (no ip)",
+    "format-disconnected": "  offline",
     "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
     "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
@@ -103,13 +121,17 @@
     "on-click": "xdg-terminal-exec gazelle"
   },
 
-  "bluetooth": {
-    "format-on": "",
-    "format-off": "",
-    "format-disabled": "",
-    "format-connected": "󰂱 {device_alias}",
-    "tooltip-format": "{status}",
-    "tooltip-format-connected": "{device_alias}",
+  "custom/wifi": {
+    "exec": "~/.config/waybar/scripts/wifi-marquee.sh --stream",
+    "return-type": "json",
+    "tooltip": true,
+    "on-click": "xdg-terminal-exec gazelle"
+  },
+
+  "custom/bluetooth": {
+    "exec": "~/.config/waybar/scripts/bluetooth-marquee.sh --stream",
+    "return-type": "json",
+    "tooltip": true,
     "on-click": "xdg-terminal-exec bluetui"
   },
 
@@ -122,6 +144,17 @@
     "on-click-right": "~/.config/waybar/scripts/audio-control.sh cycle && pkill -RTMIN+9 waybar",
     "on-scroll-up": "~/.config/waybar/scripts/audio-control.sh up && pkill -RTMIN+9 waybar",
     "on-scroll-down": "~/.config/waybar/scripts/audio-control.sh down && pkill -RTMIN+9 waybar",
+    "tooltip": true
+  },
+
+  "custom/swaync": {
+    "exec": "~/.config/waybar/scripts/swaync.sh status",
+    "return-type": "json",
+    "interval": 2,
+    "signal": 10,
+    "on-click": "~/.config/waybar/scripts/swaync.sh open",
+    "on-click-right": "~/.config/waybar/scripts/swaync.sh clear",
+    "on-click-middle": "~/.config/waybar/scripts/swaync.sh dnd",
     "tooltip": true
   }
 }

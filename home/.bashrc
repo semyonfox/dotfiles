@@ -10,7 +10,10 @@
 # ======================================================================
 # ENVIRONMENT VARIABLES
 # ======================================================================
+export NPM_CONFIG_PREFIX="$HOME/.local"
 export PATH="$HOME/.local/bin:$PATH"
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$PNPM_HOME/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
 export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
@@ -180,6 +183,7 @@ _welcome_bar
 # ======================================================================
 # Source local bashrc if it exists (for machine-specific configs)
 [[ -f ~/.bashrc.local ]] && source ~/.bashrc.local
+[[ -f "$HOME/.config/dotfiles/host.bash" ]] && source "$HOME/.config/dotfiles/host.bash"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 if command -v pyenv >/dev/null; then
@@ -202,4 +206,4 @@ export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
 # Zed alias
 alias zed=zeditor
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/share/../bin/env" ]] && . "$HOME/.local/share/../bin/env"

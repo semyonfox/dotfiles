@@ -1,0 +1,151 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 36,
+  "exclusive": true,
+  "fixed-center": true,
+  "reload_style_on_change": true,
+  "spacing": 0,
+
+  "modules-left": ["custom/power", "idle_inhibitor", "hyprland/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right": ["cpu", "memory", "custom/vpn", "custom/wifi", "custom/bluetooth", "custom/audio", "tray", "custom/swaync"],
+
+  "tray": {
+    "icon-size": 18,
+    "spacing": 8,
+    "show-passive-items": true
+  },
+
+  "custom/power": {
+    "format": "⏻",
+    "on-click": "wlogout",
+    "tooltip": false
+  },
+
+  "hyprland/workspaces": {
+    "format": "{icon}{windows}",
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "0"
+    },
+    "all-outputs": true,
+    "disable-scroll": true,
+    "sort-by": "number",
+    "on-click": "activate",
+    "show-special": false,
+    "workspace-taskbar": {
+      "enable": true,
+      "format": "{icon}",
+      "icon-size": 16,
+      "orientation": "horizontal",
+      "update-active-window": true,
+      "active-window-position": "none",
+      "on-click-window": "hyprctl dispatch focuswindow address:{address}",
+      "ignore-list": []
+    }
+  },
+
+  "clock": {
+    "format": "{:%H:%M  %A %B %d}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'>{}</span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    }
+  },
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "",
+      "deactivated": ""
+    },
+    "tooltip-format-activated": "Caffeine mode: ON (system will not sleep)",
+    "tooltip-format-deactivated": "Caffeine mode: OFF (system can sleep)"
+  },
+
+  "cpu": {
+    "interval": 2,
+    "format": "  {usage}%",
+    "on-click": "xdg-terminal-exec btop"
+  },
+
+  "memory": {
+    "interval": 2,
+    "format": "󰾆  {percentage}%",
+    "tooltip-format": "{used:0.1f}G / {total:0.1f}G used",
+    "on-click": "xdg-terminal-exec btop"
+  },
+
+  "custom/vpn": {
+    "exec": "~/.config/waybar/scripts/vpn-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true
+  },
+
+  "network": {
+    "interval": 2,
+    "max-length": 24,
+    "format-wifi": "  {essid}",
+    "format-ethernet": "  {ifname}",
+    "format-linked": "  {ifname} (no ip)",
+    "format-disconnected": "  offline",
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
+    "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr}\n {bandwidthDownBits}   {bandwidthUpBits}",
+    "tooltip-format-disconnected": "no network",
+    "on-click": "xdg-terminal-exec gazelle"
+  },
+
+  "custom/wifi": {
+    "exec": "~/.config/waybar/scripts/wifi-marquee.sh --stream",
+    "return-type": "json",
+    "tooltip": true,
+    "on-click": "xdg-terminal-exec gazelle"
+  },
+
+  "custom/bluetooth": {
+    "exec": "~/.config/waybar/scripts/bluetooth-marquee.sh --stream",
+    "return-type": "json",
+    "tooltip": true,
+    "on-click": "xdg-terminal-exec bluetui"
+  },
+
+  "custom/audio": {
+    "exec": "~/.config/waybar/scripts/audio-control.sh status",
+    "return-type": "json",
+    "interval": 2,
+    "signal": 9,
+    "on-click": "xdg-terminal-exec wiremix",
+    "on-click-right": "~/.config/waybar/scripts/audio-control.sh cycle && pkill -RTMIN+9 waybar",
+    "on-scroll-up": "~/.config/waybar/scripts/audio-control.sh up && pkill -RTMIN+9 waybar",
+    "on-scroll-down": "~/.config/waybar/scripts/audio-control.sh down && pkill -RTMIN+9 waybar",
+    "tooltip": true
+  },
+
+  "custom/swaync": {
+    "exec": "~/.config/waybar/scripts/swaync.sh status",
+    "return-type": "json",
+    "interval": 2,
+    "signal": 10,
+    "on-click": "~/.config/waybar/scripts/swaync.sh open",
+    "on-click-right": "~/.config/waybar/scripts/swaync.sh clear",
+    "on-click-middle": "~/.config/waybar/scripts/swaync.sh dnd",
+    "tooltip": true
+  }
+}

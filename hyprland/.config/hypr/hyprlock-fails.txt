@@ -28,6 +28,59 @@ The laptop disagrees.
 Nice enthusiasm.
 Bold strategy.
 Guess harder.
+Wrong password. The stack trace is in your head.
+Attempt failed. That password had commitment issues.
+Password incorrect. Retry like a startup pitch.
+Try again. Confidence is a stateful process.
+Authentication failed. The bug is on your side.
+Wrong password. Even the keycaps are judging you.
+Nope. Try uppercase and some humility.
+Access denied. This is fine.
+Incorrect password. Error 418: I'm a teapot.
+You had one job. Re-run it.
+Invalid credentials. Your keyboard is still in training mode.
+Guess rejected. Add more context next time.
+Auth failed. Maybe this is a feature, not a problem.
+The login token took the day off.
+Wrong password. It hears you, but doesn’t trust you.
+Try again with fewer emotions.
+Credential mismatch. Did you copy-paste from a meme?
+Nope. No amount of tabs will fix this.
+Access denied. Your password and this machine are not friends.
+Attempt failed. It passed in your head.
+Invalid password. Restart your certainty.
+Wrong password. Error says `need more caffeine`.
+Authentication failed. The key had options.
+Incorrect credentials. That’s a valid response.
+Try again. Even brute force has manners.
+Oops. Wrong password and very wrong timing.
+No access. You forgot the human in human-readable.
+Failed attempt. Good news: no permanent ban.
+Wrong password. Your future self just sent a warning.
+Attempt rejected. Could be a typo, could be destiny.
+Authentication failed. Password entered. Brains not.
+Wrong password. The keyboard says no.
+Nope. The universe heard you and said nope.
+Incorrect credentials. Please try not to cry.
+Try again. Greats aren't made on first try.
+Failed login. Error: still in pre-commit review.
+Wrong password. Your password manager is laughing quietly.
+Authentication denied. Maybe you left caps lock in the cloud.
+Wrong pass. The lockscreen is your accountability coach.
+Invalid password. Not even a hotfix can fix this.
+Access failed. This is a very polite firewall.
+Try again. Even your shell needs a retry loop.
+Wrong password. Could be the most secure joke today.
+Incorrect password. No, really, no.
+Authentication failed. Credentials look suspiciously unserious.
+Try again. Stack overflow in your memory buffer.
+Wrong password. The computer said no, not the boss.
+Nope. Password rejected due to low drama budget.
+Incorrect password. You might be using the wrong keyboard layout.
+Attempt failed. This is not a bug, it is a boundary.
+Invalid credential. If it feels close, it’s still wrong.
+Authentication denied. Error: confidence=NaN.
+Wrong password. Try again with your left brain.
 System unimpressed.
 Memory recall unsuccessful.
 The machine says no.
@@ -42,3 +95,55 @@ Wrong password. Future you forgot again.
 Incorrect password. The greatest technician would remember.
 Access denied. Coffee required before next attempt.
 Wrong password. The keyboard is disappointed.
+Incorrect password.
+Authentication failed. Try again with a calmer mind.
+Access denied. Your confidence was noted.
+Wrong password. Retry with a valid human.
+Credentials invalid. Maybe it is not the right Tuesday.
+Wrong answer. Passwords don't share.
+Authentication unsuccessful.
+Try again.
+Access remains locked.
+Wrong password. The compiler is judging you.
+Incorrect password. The bugs are laughing.
+Authentication failed. Missing semicolon in memory.
+Wrong password. Did you mean to enter code?
+Access denied. A fresh tab helped nothing.
+Wrong password. The keyboard is still buffering.
+Access denied. Nice enthusiasm.
+Access denied. Bold strategy.
+Guess harder.
+Still wrong.
+That guess had confidence.
+Close, but not really.
+The laptop disagrees.
+Nice enthusiasm.
+Wrong password. Try again.
+Nice try, hero.
+Wrong password. Wrong confidence.
+Access denied. Try a different angle.
+Wrong password. Consult the README.
+Authentication failed. Password is in another commit.
+Wrong password. Variable not defined.
+Access denied. No stack trace for this.
+Wrong password. Wrong branch selected.
+Authentication failed. You are under revision.
+Wrong password. This is not the one you used three months ago.
+Access denied. Error 403: Not this universe.
+Wrong password. Debug your recall.
+Credentials invalid. The vault has standards.
+Wrong password. Try one less genius line.
+Authentication failed. This room is not for ghosts.
+Wrong password. The cat hid the right one.
+Access denied. Retry after a 10 second think.
+Wrong password. Keep trying.
+Incorrect credentials.
+Wrong password. Too many symbols, no context.
+Authentication failed. This is not your browser key.
+Wrong password. Try spelling with intent.
+Access denied. Security takes its job seriously.
+Wrong password. Caffeine does not equal auth.
+Authentication failed. Stack overflow in memory.
+Wrong password. Keyboard clacks are loud tonight.
+Access denied. Better credentials maybe.
+Incorrect password. Password and pride are both optional.

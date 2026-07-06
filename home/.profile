@@ -3,11 +3,11 @@
 # Added by Toolbox App
 export PATH="$PATH:/home/semyon/.local/share/JetBrains/Toolbox/scripts"
 
-. "$HOME/.cargo/env"
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
 # User-owned Node global install locations
 export NPM_CONFIG_PREFIX="$HOME/.local"
 export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="$HOME/.local/bin:$PNPM_HOME:$PATH"
+export PATH="$HOME/.local/bin:$PNPM_HOME/bin:$PATH"
 
-. "$HOME/.local/share/../bin/env"
+[[ -f "$HOME/.local/share/../bin/env" ]] && . "$HOME/.local/share/../bin/env"

@@ -526,7 +526,7 @@ main() {
     
     echo "3. Read documentation:"
     echo "   $ cat home/README.md"
-    echo "   $ cat home/SHELL_GUIDE.md"
+    echo "   $ cat docs/SHELL_GUIDE.md"
     echo ""
 
     if [[ "$INSTALL_GAMING" == "true" ]]; then

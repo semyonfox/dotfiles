@@ -1,0 +1,28 @@
+{
+  "workspaces": [
+    {
+      "name": "Default",
+      "monitors": {
+        "desc:AOC CU34G2XP 1Q1S4HA000685": {
+          "resolution": "3440x1440",
+          "refresh_rate": 180.0,
+          "scale": 1.0,
+          "rotation": 0,
+          "position_x": 0,
+          "position_y": 0,
+          "is_primary": true
+        },
+        "desc:Microstep MSI G241 0x000002A7": {
+          "resolution": "1920x1080",
+          "refresh_rate": 60.0,
+          "scale": 1.0,
+          "rotation": 0,
+          "position_x": 3440,
+          "position_y": 0,
+          "is_primary": false
+        }
+      }
+    }
+  ],
+  "active_workspace": 0
+}
