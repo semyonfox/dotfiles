@@ -108,11 +108,56 @@ notificationwindow, blankwindow {
 .notification-group {
   background: transparent;
   border: none;
+  transition: opacity 200ms ease-in-out;
+}
+
+.notification-group:focus {
+  background: var(--noti-bg-focus);
+  border-radius: var(--border-radius);
 }
 
 .notification-group .notification-group-headers {
   background: transparent;
   color: var(--text-color);
+  margin: 0 16px 2px;
+  min-height: 24px;
+}
+
+.notification-group .notification-group-buttons {
+  margin: 0 16px;
+  color: var(--text-color);
+}
+
+.notification-group .notification-group-headers .notification-group-icon {
+  color: var(--accent);
+  -gtk-icon-size: var(--notification-group-icon-size);
+}
+
+.notification-group .notification-group-headers .notification-group-header {
+  color: var(--text-color);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.notification-group .notification-group-close-button .close-button {
+  margin: 8px 14px;
+}
+
+.notification-group.collapsed.not-expanded {
+  opacity: 0.45;
+}
+
+.notification-group.collapsed .notification-row .notification {
+  background-color: rgba(var(--noti-bg), 0.96);
+}
+
+.notification-group.collapsed .notification-row:not(:last-child) .notification-action,
+.notification-group.collapsed .notification-row:not(:last-child) .notification-default-action {
+  opacity: 0;
+}
+
+.notification-group.collapsed:hover .notification-row:not(:only-child) .notification {
+  background-color: var(--noti-bg-hover);
 }
 
 .notification-row .notification-background .notification .notification-default-action {
