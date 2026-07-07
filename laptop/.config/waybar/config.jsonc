@@ -9,13 +9,7 @@
 
   "modules-left": ["custom/power", "idle_inhibitor", "hyprland/workspaces"],
   "modules-center": ["clock"],
-  "modules-right": ["cpu", "memory", "custom/battery", "custom/vpn", "custom/wifi", "custom/bluetooth", "custom/audio", "tray", "custom/swaync"],
-
-  "tray": {
-    "icon-size": 18,
-    "spacing": 8,
-    "show-passive-items": true
-  },
+  "modules-right": ["cpu", "memory", "custom/battery", "custom/vpn", "custom/wifi", "custom/bluetooth", "custom/audio", "custom/swaync"],
 
   "custom/power": {
     "format": "⏻",
