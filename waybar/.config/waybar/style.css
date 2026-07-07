@@ -54,7 +54,13 @@ tooltip label { padding: 4px 6px; }
 #workspaces   { border-radius: 0 18px 18px 0;                    padding: 0 10px 0 8px; }
 #cpu          { border-radius: 18px 0 0 18px; margin-left: 8px;  padding-left: 14px;  color: @blue; }
 #custom-audio { border-radius: 0 18px 18px 0; margin-right: 8px; padding: 0 14px 0 12px; color: @pink; }
-#tray         { border-radius: 18px; margin: 4px 8px 4px 0; padding: 0 10px; color: @text; }
+#tray {
+    background-color: @pill-bg;
+    border-radius: 18px;
+    margin: 4px 8px 4px 0;
+    padding: 0 10px;
+    color: @text;
+}
 #custom-swaync { border-radius: 18px; margin: 4px 8px 4px 0; padding: 0 14px; color: @lavender; min-width: 10px; }
 #clock        { border-radius: 18px;          padding: 0 16px;   color: @text; }
 
@@ -158,6 +164,17 @@ tooltip label { padding: 4px 6px; }
 }
 
 #custom-audio.muted    { color: @red; }
+
+#tray > .passive,
+#tray > .active,
+#tray > .needs-attention {
+    background: transparent;
+    margin: 0 2px;
+    padding: 0 1px;
+}
+#tray > .needs-attention {
+    color: @yellow;
+}
 
 #custom-swaync.read,
 #custom-swaync.read-dnd      { color: @lavender; }
