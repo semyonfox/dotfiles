@@ -1,6 +1,6 @@
 ---
 name: device-fleet
-description: Semyon's personal device fleet operations, documentation, and safe remote-access workflow. Use when Codex needs to inspect, SSH into, configure, troubleshoot, or choose among Semyon's server, NAS, PC, laptop, phones, router, Tailscale setup, T3 Code remote environments, or home-network/agent-workflow inventory.
+description: "Use when semyon's personal device fleet operations, documentation, and safe remote-access workflow. Use when Codex needs to inspect, SSH into, configure, troubleshoot, or choose among Semyon's server, NAS, PC, laptop, phones, router, Tailscale setup, T3 Code remote environments, or home-network/agent-workflow inventory."
 
 metadata:
   harness: [codex]

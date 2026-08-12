@@ -1,6 +1,6 @@
 ---
 name: editor-mcp-integration
-description: "Use for Blender, Unity, or Unreal MCP setup."
+description: "Use when use for Blender, Unity, or Unreal MCP setup."
 version: 1.0.0
 created_by: agent
 

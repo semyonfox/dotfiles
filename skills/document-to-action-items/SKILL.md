@@ -1,6 +1,6 @@
 ---
 name: document-to-action-items
-description: "Extract cited obligations, deadlines, tasks from documents."
+description: "Use when extract cited obligations, deadlines, tasks from documents."
 version: 0.1.0
 author: Ben Barclay (benbarclay), Hermes Agent
 license: MIT

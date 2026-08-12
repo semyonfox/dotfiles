@@ -1,6 +1,6 @@
 ---
 name: docker-maintenance
-description: Safely refresh, recover, and verify a multi-stack Docker host, including Watchtower maintenance and zombie-container recovery.
+description: "Use when safely refresh, recover, and verify a multi-stack Docker host, including Watchtower maintenance and zombie-container recovery."
 version: 1.0.0
 created_by: agent
 

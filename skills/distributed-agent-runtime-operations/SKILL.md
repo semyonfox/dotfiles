@@ -1,6 +1,6 @@
 ---
 name: distributed-agent-runtime-operations
-description: Diagnose and recover persistent agent backends with desktop/mobile clients, reverse proxies, tunnels, pairing, and split-horizon routing.
+description: "Use when diagnose and recover persistent agent backends with desktop/mobile clients, reverse proxies, tunnels, pairing, and split-horizon routing."
 version: 1.0.0
 created_by: agent
 

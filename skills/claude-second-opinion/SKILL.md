@@ -1,6 +1,6 @@
 ---
 name: claude-second-opinion
-description: "Ask Claude Code's Fable model for a non-interactive second opinion through the local `claude --model fable -p` CLI. Use when the user explicitly asks for Claude/Fable/a second opinion, or when Codex has already inspected the issue and still has material uncertainty, a repeated failed fix, a high-risk diagnosis, or a need to sanity-check a proposed remediation."
+description: "Use when ask Claude Code's Fable model for a non-interactive second opinion through the local `claude --model fable -p` CLI. Use when the user explicitly asks for Claude/Fable/a second opinion, or when Codex has already inspected the issue and still has material uncertainty, a repeated failed fix, a high-risk diagnosis, or a need to sanity-check a proposed remediation."
 
 metadata:
   harness: [codex]
