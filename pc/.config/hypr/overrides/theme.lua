@@ -1,0 +1,2 @@
+-- Generated theme overrides are written here by hyprland-theme-to-lua.
+-- The stable Catppuccin defaults remain in hyprland.lua.

@@ -1,0 +1,2 @@
+-- Generated animation overrides are written here by hyprland-animation-to-lua.
+-- The stable PC animation defaults remain in hyprland.lua.
