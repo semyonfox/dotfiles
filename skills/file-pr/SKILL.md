@@ -5,30 +5,15 @@ description: "Use when the user asks to file, open, or create a PR."
 
 # File PR
 
-<!-- Body transcribed/adapted only from the video passage at 00:15:04–00:17:45. Frontmatter is structural metadata, not spoken video text. -->
+Open a concise PR that explains the user-facing problem and why the change matters.
 
-Before filing, check whether a PR for this branch already exists. Review the diff locally against `origin/main` to make sure its contents match the goal.
+1. Confirm the branch, intended base, and whether a PR already exists. Inspect the diff against the current remote base.
+2. Run the relevant checks and collect real verification evidence before filing.
+3. Follow the repository’s recent title conventions. Use a short human-readable title that explains the outcome, not an implementation inventory.
+4. Start the body with the problem in the user’s terms, then give the small solution summary and verification evidence. Include a reviewable artifact URL only when one exists and helps review.
+5. Open a real PR rather than a draft unless the user explicitly requests a draft. If ongoing review/CI monitoring is requested, continue with `babysit-pr`.
+6. Add the project’s required model/harness disclosure when its contribution rules call for it.
 
-PR titles usually become commit messages, so follow the repository's title conventions. Look at recently merged PRs and Git histories. Prefer a concise, human-readable title that explains why the changes matter.
+## Done
 
-Bad:
-
-> Perf server negotiate per message deflate on the WebSocket
-
-Good:
-
-> Perf server cut WebSocket frame size by 70% with gzipping
-
-Open the description with a simple explanation of the problem based on the user's original prompt, then briefly explain the solution. Do not lead with an implementation inventory.
-
-Bad:
-
-> Removed implicit workspace carryover from every new thread entry point. New threads inherit only the project from context. Branch, work tree, ...
-
-Good:
-
-> My new work tree default was ignored when starting new threads on existing work trees. Super unintuitive. Now your preferences always apply.
-
-Stop opening draft PRs. Open a real PR rather than a draft so review bots run. If the user also has to babysit it, continue with the `babysit-pr` skill.
-
-Add a blurb to the end of the PR description about what model and harness made the changes.
+Return the PR URL, checks run, and any remaining caveat. Do not merge it unless the user explicitly asks.
