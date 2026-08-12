@@ -1,6 +1,6 @@
 ---
 name: technical-presentation-workflows
-description: "Use when create, refine, verify, and hand off technical presentation decks for Semyon, especially Slidev/demo decks with architecture stories and restrained styling."
+description: "Create, refine, verify, and hand off technical presentation decks for Semyon, especially Slidev/demo decks with architecture stories and restrained styling."
 
 metadata:
   harness: [hermes]

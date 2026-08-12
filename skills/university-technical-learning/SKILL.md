@@ -1,6 +1,6 @@
 ---
 name: university-technical-learning
-description: "Use when coach technically experienced university students by translating real project work into exam-ready theory and practical drills."
+description: "Coach technically experienced university students by translating real project work into exam-ready theory and practical drills."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

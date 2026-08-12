@@ -1,6 +1,6 @@
 ---
 name: ship-changes
-description: "Use when validate, commit, push, open or update pull requests, select a base branch, inspect and repair CI, mark a PR ready, or merge changes. Use before the first commit, push, PR, CI-repair, ready-for-review, or merge action. Do not use for local implementation that will not be committed or published."
+description: Validate, commit, push, open or update pull requests, select a base branch, inspect and repair CI, mark a PR ready, or merge changes. Use before the first commit, push, PR, CI-repair, ready-for-review, or merge action. Do not use for local implementation that will not be committed or published.
 
 metadata:
   harness: [claude, codex]

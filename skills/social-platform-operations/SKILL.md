@@ -1,6 +1,6 @@
 ---
 name: social-platform-operations
-description: "Use when operate social and messaging platforms from Hermes: X/Twitter via xurl and Yuanbao group/DM workflows."
+description: "Operate social and messaging platforms from Hermes: X/Twitter via xurl and Yuanbao group/DM workflows."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

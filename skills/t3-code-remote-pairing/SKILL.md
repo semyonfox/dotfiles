@@ -1,6 +1,6 @@
 ---
 name: t3-code-remote-pairing
-description: "Use when generate and verify T3 Code headless remote pairing links for Semyon's server setup, especially the Cloudflare Tunnel at t3.semyon.ie."
+description: Generate and verify T3 Code headless remote pairing links for Semyon's server setup, especially the Cloudflare Tunnel at t3.semyon.ie.
 version: 1.0.0
 created_by: agent
 

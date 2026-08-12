@@ -1,6 +1,6 @@
 ---
 name: technical-writing-verification
-description: "Use when verify technical product-writing claims against source code, history, tests, and domain rules before drafting or publishing."
+description: "Verify technical product-writing claims against source code, history, tests, and domain rules before drafting or publishing."
 version: 1.0.0
 
 metadata:

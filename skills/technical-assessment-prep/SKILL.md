@@ -1,6 +1,6 @@
 ---
 name: technical-assessment-prep
-description: "Use when prepare for timed technical recruiting assessments using invitation-grounded facts, language-aware drills, and small runnable practice repositories."
+description: "Prepare for timed technical recruiting assessments using invitation-grounded facts, language-aware drills, and small runnable practice repositories."
 version: 1.0.0
 created_by: agent
 

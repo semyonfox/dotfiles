@@ -1,6 +1,6 @@
 ---
 name: remote-service-client-connectivity
-description: "Use when diagnose client connection failures to remotely exposed self-hosted services without mistaking HTTP reachability for an authenticated realtime connection."
+description: Diagnose client connection failures to remotely exposed self-hosted services without mistaking HTTP reachability for an authenticated realtime connection.
 version: 1.0.0
 created_by: agent
 

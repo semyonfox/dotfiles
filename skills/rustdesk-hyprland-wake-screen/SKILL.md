@@ -1,6 +1,6 @@
 ---
 name: rustdesk-hyprland-wake-screen
-description: "Use when wake/check Semyon's Hyprland PC displays over SSH when RustDesk has no image because the screen/DPMS is off; handle hyprlock still being locked."
+description: Wake/check Semyon's Hyprland PC displays over SSH when RustDesk has no image because the screen/DPMS is off; handle hyprlock still being locked.
 version: 1.0.0
 created_by: agent
 

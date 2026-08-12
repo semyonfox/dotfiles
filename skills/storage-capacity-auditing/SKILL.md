@@ -1,6 +1,6 @@
 ---
 name: storage-capacity-auditing
-description: "Use when audit local disk usage, explain df-versus-du gaps, classify reclaimable/offload candidates, and publish safe visual storage maps."
+description: "Audit local disk usage, explain df-versus-du gaps, classify reclaimable/offload candidates, and publish safe visual storage maps."
 version: 1.0.0
 created_by: agent
 
