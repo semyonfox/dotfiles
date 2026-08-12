@@ -69,7 +69,7 @@ MEDIA:/absolute/path/to/file
 
 4. If upload fails with HTTP 413 or the file is clearly too large:
    - Do **not** keep retrying the attachment.
-   - For Semyon's own large artifacts, prefer the self-hosted Erugo fileshare (`https://fileshare.semyon.ie`) before public temporary hosts. The detailed Erugo workflow lives in `personal-infrastructure-operations` → `references/erugo-fileshare-artifact-delivery.md`.
+   - For Semyon's own large artifacts, prefer the self-hosted Erugo fileshare (`https://fileshare.semyon.ie`) before public temporary hosts. The detailed Erugo workflow lives in `personal-infrastructure-operations` → the local supporting file.
    - Upload to a public temporary/direct file host only if the user requested upload/delivery, Erugo/self-hosted delivery is unavailable, and the artifact is not sensitive.
    - Verify the download URL with `curl -I` and include the SHA256.
    - Tell the user Discord rejected the native upload because of size.
