@@ -1,6 +1,6 @@
 ---
 name: staging-content-dedupe-migration-review
-description: Deduplicate a staging/import tree by file contents, remove staging copies already present in canonical state, then produce a dry-run migration plan without modifying live files.
+description: "Use when deduplicate a staging/import tree by file contents, remove staging copies already present in canonical state, then produce a dry-run migration plan without modifying live files."
 version: 1.0.0
 created_by: agent
 

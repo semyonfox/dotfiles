@@ -1,6 +1,6 @@
 ---
 name: seol
-description: Publish HTML files, ZIP archives, or static-site directories to temporary public URLs with Seol. Use when asked to host, publish, upload, deploy, or share generated reports, dashboards, diagrams, documentation, demos, webpages, or other static artifacts.
+description: "Use when publish HTML files, ZIP archives, or static-site directories to temporary public URLs with Seol. Use when asked to host, publish, upload, deploy, or share generated reports, dashboards, diagrams, documentation, demos, webpages, or other static artifacts."
 
 metadata:
   harness: [codex]

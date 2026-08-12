@@ -1,6 +1,6 @@
 ---
 name: self-hosted-photo-library-operations
-description: Use when importing to self-hosted photo libraries.
+description: "Use when importing to self-hosted photo libraries."
 version: 1.0.0
 
 metadata:

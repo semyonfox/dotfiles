@@ -1,6 +1,6 @@
 ---
 name: software-development-workflows
-description: "Class-level software workflow guide for inspecting codebases, validating ideas, debugging, writing tests, reviewing diffs, and simplifying changes."
+description: "Use when class-level software workflow guide for inspecting codebases, validating ideas, debugging, writing tests, reviewing diffs, and simplifying changes."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

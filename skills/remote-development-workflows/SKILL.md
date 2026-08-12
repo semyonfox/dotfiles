@@ -1,6 +1,6 @@
 ---
 name: remote-development-workflows
-description: "Open, inspect, and support remote development workspaces through SSH and a user's graphical editor."
+description: "Use when open, inspect, and support remote development workspaces through SSH and a user's graphical editor."
 version: 1.0.0
 created_by: agent
 

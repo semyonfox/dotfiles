@@ -1,6 +1,6 @@
 ---
 name: static-artifact-publishing
-description: Publish reviewable static pages, reports, galleries, and generated artifacts to temporary or lightweight hosting safely.
+description: "Use when publish reviewable static pages, reports, galleries, and generated artifacts to temporary or lightweight hosting safely."
 version: 1.0.0
 
 metadata:

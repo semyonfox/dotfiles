@@ -1,6 +1,6 @@
 ---
 name: remote-desktop-service-recovery
-description: Diagnose and recover a remote desktop app connection to a self-hosted backend without resetting state or confusing server and client runtimes.
+description: "Use when diagnose and recover a remote desktop app connection to a self-hosted backend without resetting state or confusing server and client runtimes."
 version: 1.0.0
 created_by: agent
 
