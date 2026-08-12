@@ -1,6 +1,6 @@
 ---
 name: seol
-description: Publish HTML files, ZIP archives, or static-site directories to temporary public URLs with Seol. Use when asked to host, publish, upload, deploy, or share generated reports, dashboards, diagrams, documentation, demos, webpages, or other static artifacts.
+description: "Use when publish HTML files, ZIP archives, or static-site directories to temporary public URLs with Seol. Use when asked to host, publish, upload, deploy, or share generated reports, dashboards, diagrams, documentation, demos, webpages, or other static artifacts."
 
 metadata:
   harness: [codex]
@@ -12,7 +12,7 @@ Publish only when requested; this is an external side effect.
 
 1. Require `seol` on `PATH`.
 2. Accept one `.html`/`.htm` file, or a directory/ZIP with root `index.html`.
-3. For framework source, inspect its scripts/docs; when useful, run its existing
+3. For framework source, inspect its the local supporting file; when useful, run its existing
    production build and upload the static output (`dist/`, `build/`, etc.). Never
    invent an unknown build command.
 4. Check text for obvious credentials or sensitive data; stop and warn if found.

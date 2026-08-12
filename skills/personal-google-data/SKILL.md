@@ -1,6 +1,6 @@
 ---
 name: personal-google-data
-description: "Use Semyon's Google Calendar, Contacts/People API, and Drive metadata access from personal OAuth tokens."
+description: "Use when use Semyon's Google Calendar, Contacts/People API, and Drive metadata access from personal OAuth tokens."
 version: 1.0.0
 created_by: agent
 related_skills:
@@ -178,7 +178,7 @@ Remember: with `drive.metadata.readonly`, you can list names/metadata/links but 
 
 ### Calendar reminders
 
-Use `~/.hermes/scripts/google_calendar_reminders.py` with the `Google Calendar reminders` 15-minute script-only cron. It is read-only and sends one reminder at 09:00 Dublin time the day before each event plus another two hours before timed events. Calendar events stay events; do not create personal-task cards unless Semyon explicitly turns an event into an action.
+Use `~/.hermes/the local supporting file` with the `Google Calendar reminders` 15-minute script-only cron. It is read-only and sends one reminder at 09:00 Dublin time the day before each event plus another two hours before timed events. Calendar events stay events; do not create personal-task cards unless Semyon explicitly turns an event into an action.
 
 ### Find a contact
 

@@ -1,6 +1,6 @@
 ---
 name: personal-task-system
-description: Maintain Semyon's canonical Personal Tasks Kanban board and task-linked reminders. Use whenever an email creates a commitment or Semyon asks to track, remind, defer, or complete personal work.
+description: "Use when maintain Semyon's canonical Personal Tasks Kanban board and task-linked reminders. Use whenever an email creates a commitment or Semyon asks to track, remind, defer, or complete personal work."
 
 metadata:
   harness: [hermes]
@@ -43,7 +43,7 @@ metadata:
 Only add a timer for an explicit deadline, explicitly requested reminder, or deliberate review/follow-up. Do not invent timing. Use ISO-8601 with timezone and a stable reminder ID:
 
 ```bash
-python3 ~/.hermes/scripts/personal_task_reminder_add.py \
+python3 ~/.hermes/the local supporting file \
   --id '<task-key>-YYYY-MM-DD' --task-id <task-id> \
   --at 'YYYY-MM-DDTHH:MM:SS+01:00' --message '<short reminder>'
 ```
