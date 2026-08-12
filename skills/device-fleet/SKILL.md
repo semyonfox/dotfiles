@@ -1,83 +1,27 @@
 ---
 name: device-fleet
-description: Semyon's personal device fleet operations, documentation, and safe remote-access workflow. Use when Codex needs to inspect, SSH into, configure, troubleshoot, or choose among Semyon's server, NAS, PC, laptop, phones, router, Tailscale setup, T3 Code remote environments, or home-network/agent-workflow inventory.
+description: "Use when working with Semyon's server, NAS, PC, laptop, phones, router, LAN, Tailscale, SSH, or home-network inventory."
 ---
 
-# Device Fleet
+# Device fleet
 
-## Overview
+Use the private local inventory in `references/computers.md` before choosing a host. It is the source of truth for current LAN and Tailscale addresses; refresh it with read-only probes when reachability may have changed.
 
-Use this skill to work safely across Semyon's personal machines. Keep durable facts in the local-only `references/computers.md`, refresh them with non-secret discovery, and treat device changes as higher-risk than normal repo edits.
+## Core roles
 
-## First Steps
+- `server`: always-on control/services host.
+- `nas`: storage host; treat storage and shares as high-risk.
+- `pc`: CachyOS desktop/GPU host; use for GUI work.
+- Router: LAN gateway only; do not change it without explicit approval.
 
-1. Read local-only `references/computers.md` before choosing a target device or access path. If this public skill package has just been stowed on a new machine, create or restore that private file first.
-2. If reachability might have changed, run `scripts/fleet-scout.sh` from this skill directory. Set `FLEET_SSH_PROBE=1` only when remote read-only probes are useful.
-3. For T3 Code, read local-only `references/t3-code.md` and run `scripts/t3-audit.sh` before giving instructions or changing services.
-4. Prefer existing SSH aliases in `~/.ssh/config`; fall back to documented LAN IPs, then documented Tailscale IPs or MagicDNS names.
-5. Use `ssh -o BatchMode=yes -o ConnectTimeout=8 <target> '<read-only command>'` for probes so missing keys or passwords fail quickly.
-6. Update `references/computers.md` after discovering new durable facts. Mark facts as verified, inferred, or stale, and include the date.
+## Workflow
 
-## Safety Rules
+1. Prefer the SSH aliases in `~/.ssh/config`; use LAN on-site, then Tailscale/MagicDNS remotely.
+2. Probe first: `ssh -o BatchMode=yes -o ConnectTimeout=8 <alias> 'hostname; ip -4 -o addr show scope global'`.
+3. For Tailscale facts, use `tailscale status --json`; record only device name, address, state, and last verified date—never keys or tokens.
+4. Mark unreachable devices as unverified, not failed. Do not guess an address from old documentation.
+5. Before changing a remote host, inspect its active work/services and preserve unrelated work.
 
-- Never read private key contents, tokens, browser stores, password managers, recovery codes, or saved secrets while documenting the fleet.
-- Do not record sudo passwords. If a task needs sudo, ask once in the current conversation and explain the exact command and reason.
-- Do not reboot, power-cycle, reimage, repartition, modify storage pools, alter router settings, expose services publicly, or change firewall/VPN/Tailscale ACLs without explicit user approval.
-- Avoid destructive discovery. Use `hostnamectl`, `uname`, `ip`, `ss`, `systemctl is-active/status`, `docker ps`, `tailscale status`, and SSH connectivity checks before using heavier tools.
-- Separate LAN-only, Tailscale-only, and stale access paths. Do not assume MagicDNS works; test it with `getent hosts <name>` first.
-- Preserve user work on remote machines. Check for running sessions, active jobs, or dirty repositories before stopping services or changing directories.
+## Safety
 
-## Remote Work Pattern
-
-Use the machine best suited to the task:
-
-- `server`: default control node and always-on agent/T3 Code host.
-- `nas`: storage and Docker/NAS work; treat disks and shares as high risk.
-- `pc`: desktop/GPU/GUI-adjacent work on the LAN.
-- `laptop`: mobile CachyOS machine, currently best documented over Tailscale; T3 Code is already listening on port `3773`.
-
-For long-running shell work, use tmux when available:
-
-```bash
-ssh <target>
-tmux new -As agent-<short-task-name>
-```
-
-When running noninteractive commands through SSH, keep them read-only unless the user asked for a change:
-
-```bash
-ssh -o BatchMode=yes -o ConnectTimeout=8 <target> 'hostname; uname -a; ip -brief addr'
-```
-
-## T3 Code And Tailscale
-
-Do not default to `npx t3@nightly serve` for Semyon's fleet. The verified server setup uses an installed global `t3` binary plus an enabled user systemd service. Read `references/t3-code.md` for the exact unit, wrapper scripts, ports, and safe management commands.
-
-Safe read-only checks:
-
-```bash
-systemctl --user status t3-code-headless.service --no-pager -l
-systemctl --user cat t3-code-headless.service --no-pager
-journalctl --user -u t3-code-headless.service -n 80 --no-pager
-```
-
-Only restart, enable, disable, or alter the service when the user asks for that change. Do not use Tailscale Funnel or public internet exposure unless the user explicitly asks for it.
-
-## Inventory Maintenance
-
-Use `references/computers.md` as the canonical fleet inventory. Keep it practical:
-
-- Identity: hostname, aliases, role, OS, model, owner/user if needed.
-- Access: SSH alias, LAN IP, Tailscale IP/DNS, proxy/jump host, known caveats.
-- Agent readiness: Codex, Node/npm/npx, tmux, Docker, T3 Code, Ollama, browser/GUI availability.
-- Risk notes: storage, router, power, service exposure, stale DNS, offline devices.
-- Evidence: command/source and last-verified date.
-
-Do not copy transient command dumps into the inventory unless they will help future agents. Summarize the durable parts and leave one-line evidence.
-
-## Resources
-
-- `references/computers.md`: local-only canonical device inventory and access matrix; do not commit it to public dotfiles.
-- `references/t3-code.md`: local-only verified T3 Code installation and startup details; do not commit it to public dotfiles.
-- `scripts/fleet-scout.sh`: safe non-sudo discovery report for refreshing the inventory.
-- `scripts/t3-audit.sh`: local or SSH T3 Code service/install audit.
+Never reboot, alter router/firewall/Tailscale ACLs, repartition, modify NAS storage, or expose a service publicly without explicit approval.
