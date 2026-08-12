@@ -1,6 +1,6 @@
 ---
 name: t3-code-remote-pairing
-description: "Use when generate and verify T3 Code headless remote pairing links for Semyon's server setup, especially the Cloudflare Tunnel at t3.semyon.ie."
+description: Generate and verify T3 Code headless remote pairing links for Semyon's server setup, especially the Cloudflare Tunnel at t3.semyon.ie.
 version: 1.0.0
 created_by: agent
 
@@ -234,7 +234,7 @@ When he says “actual real install” or “latest”, distinguish the surfaces
 
 ## T3 Code Android preview build watcher
 
-Cron job `cb444c2a287d` (`T3 Code Android version build watcher`) runs script-only/no-agent wrapper `~/.hermes/the local supporting file`. It watches the live mobile development branch (`T3_WATCH_SOURCE=mobile-branch`, default `T3_WATCH_BRANCH=main`), validating that `apps/mobile/package.json` still identifies `@t3tools/mobile` before building. Release tags are deliberately refused: they can lag the Android development line and are not a safe mobile-artifact source. The script will reconcile to the PR #3514 base/default/remote-HEAD branch only if the configured mobile branch disappears.
+Cron job `cb444c2a287d` (`T3 Code Android version build watcher`) runs script-only/no-agent wrapper `~/.hermes/scripts/t3code-mobile-watch.sh`. It watches the live mobile development branch (`T3_WATCH_SOURCE=mobile-branch`, default `T3_WATCH_BRANCH=main`), validating that `apps/mobile/package.json` still identifies `@t3tools/mobile` before building. Release tags are deliberately refused: they can lag the Android development line and are not a safe mobile-artifact source. The script will reconcile to the PR #3514 base/default/remote-HEAD branch only if the configured mobile branch disappears.
 
 When Semyon asks whether mobile is "being served built" or whether he still needs to build from source, first clarify the surface mentally: the fileshare APK endpoint is Semyon's self-built cron artifact, not proof that upstream officially ships public mobile builds. Upstream releases/nightlies can ship desktop binaries while mobile remains early-alpha/internal EAS/source-build territory. Verify GitHub release assets and mobile EAS workflows before answering; see `references/mobile-upstream-shipping-vs-self-builds.md`.
 
@@ -255,13 +255,13 @@ After a successful publish it retains exactly one canonical APK at the endpoint 
 If it alerts after a reboot or toolchain failure, check these first and rerun the script manually before declaring it unrecoverable:
 
 ```bash
-bash -n ~/.hermes/the local supporting file
+bash -n ~/.hermes/scripts/t3code-mobile-watch.sh
 /home/semyon/android-build-tools/jdk-21/bin/java -version
 /home/semyon/android-sdk/cmdline-tools/latest/bin/sdkmanager --list_installed
 cat ~/.hermes/t3code-mobile-watch/last_success_sha
 git ls-remote https://github.com/pingdotgg/t3code.git refs/heads/main
 tail -120 /home/semyon/t3code-mobile-builds/t3code-mobile-build-*.log
-~/.hermes/the local supporting file
+~/.hermes/scripts/t3code-mobile-watch.sh
 ```
 
 Known failure signatures:
@@ -273,7 +273,7 @@ Known failure signatures:
 Verification after a fix:
 
 ```bash
-~/.hermes/the local supporting file
+~/.hermes/scripts/t3code-mobile-watch.sh
 sha256sum /home/semyon/t3code-mobile-builds/t3-code-preview-arm64-android-<short>.apk \
   /home/semyon/server-stacks/fileshare/public-apk/t3-code-preview.apk \
   /home/semyon/server-stacks/fileshare/erugo-storage/app/public/apk/t3-code-preview.apk

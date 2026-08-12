@@ -1,6 +1,6 @@
 ---
 name: hermes-agent
-description: "Use when configure, extend, or contribute to Hermes Agent."
+description: "Configure, extend, or contribute to Hermes Agent."
 version: 2.1.0
 author: Hermes Agent + Teknium
 license: MIT
@@ -33,7 +33,7 @@ People use Hermes for software development, research, system administration, dat
 
 ```bash
 # Install
-curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/the local supporting file | bash
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
 
 # Interactive chat (default)
 hermes
@@ -834,7 +834,7 @@ existed for Ctrl+J on Windows, so this is a harmless side effect.
 mintty / git-bash behaves the same (fullscreen on Alt+Enter) unless you
 disable Alt+Fn shortcuts in Options → Keys. Easier to just use Ctrl+Enter.
 
-**Diagnosing keybindings.** Run `python the local supporting file`
+**Diagnosing keybindings.** Run `python scripts/keystroke_diagnostic.py`
 (repo root) to see exactly how prompt_toolkit identifies each keystroke
 in the current terminal. Answers questions like "does Shift+Enter come
 through as a distinct key?" (almost never — most terminals collapse it
@@ -859,11 +859,11 @@ from the child env. Python's `socket` module needs `SYSTEMROOT` to locate
 `mswsock.dll`. Fixed via the `_WINDOWS_ESSENTIAL_ENV_VARS` allowlist in
 `tools/code_execution_tool.py`. If you still hit it, echo `os.environ`
 inside an `execute_code` block to confirm `SYSTEMROOT` is set. Full
-diagnostic recipe in the local supporting file.
+diagnostic recipe in `references/execute-code-sandbox-env-windows.md`.
 
 ### Testing / Contributing
 
-**the local supporting file doesn't work as-is on Windows** — it looks for
+**`scripts/run_tests.sh` doesn't work as-is on Windows** — it looks for
 POSIX venv layouts (`.venv/bin/activate`). The Hermes-installed venv at
 `venv/Scripts/` has no pip or pytest either (stripped for install size).
 Workaround: install `pytest + pytest-xdist + pyyaml` into a system Python
@@ -1065,7 +1065,7 @@ python -m pytest tests/tools/ -q            # Specific area
 - Run full suite before pushing any change
 - Use `-o 'addopts='` to clear any baked-in pytest flags
 
-**Windows contributors:** the local supporting file currently looks for POSIX venvs (`.venv/bin/activate` / `venv/bin/activate`) and will error out on Windows where the layout is `venv/Scripts/activate` + `python.exe`. The Hermes-installed venv at `venv/Scripts/` also has no `pip` or `pytest` — it's stripped for end-user install size. Workaround: install pytest + pytest-xdist + pyyaml into a system Python 3.11 user site (`/c/Program Files/Python311/python -m pip install --user pytest pytest-xdist pyyaml`), then run tests directly:
+**Windows contributors:** `scripts/run_tests.sh` currently looks for POSIX venvs (`.venv/bin/activate` / `venv/bin/activate`) and will error out on Windows where the layout is `venv/Scripts/activate` + `python.exe`. The Hermes-installed venv at `venv/Scripts/` also has no `pip` or `pytest` — it's stripped for end-user install size. Workaround: install pytest + pytest-xdist + pyyaml into a system Python 3.11 user site (`/c/Program Files/Python311/python -m pip install --user pytest pytest-xdist pyyaml`), then run tests directly:
 
 ```bash
 export PYTHONPATH="$(pwd)"
@@ -1099,7 +1099,7 @@ Factual guidance about the host OS, user home, cwd, terminal backend, and shell 
 - **Key fact for prompt authoring:** when `TERMINAL_ENV != "local"`, *every* file tool (`read_file`, `write_file`, `patch`, `search_files`) runs inside the backend container, not on the host. The system prompt must never describe the host in that case — the agent can't touch it.
 
 Full design notes, the exact emitted strings, and testing pitfalls:
-the local supporting file.
+`references/prompt-builder-environment-hints.md`.
 
 **Refactor-safety pattern (POSIX-equivalence guard):** when you extract inline logic into a helper that adds Windows/platform-specific behavior, keep a `_legacy_<name>` oracle function in the test file that's a verbatim copy of the old code, then parametrize-diff against it. Example: `tests/tools/test_code_execution_windows_env.py::TestPosixEquivalence`. This locks in the invariant that POSIX behavior is bit-for-bit identical and makes any future drift fail loudly with a clear diff.
 

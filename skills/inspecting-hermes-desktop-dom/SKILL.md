@@ -1,6 +1,6 @@
 ---
 name: inspecting-hermes-desktop-dom
-description: "Use when read the live Hermes desktop DOM/CSS over CDP."
+description: "Read the live Hermes desktop DOM/CSS over CDP."
 version: 1.0.0
 author: Hermes Agent
 license: MIT
@@ -65,18 +65,18 @@ their state. Launch your own isolated instance instead (below).
 
 ## Reading the DOM
 
-`apps/desktop/the local supporting file` is the one-liner:
+`apps/desktop/scripts/eval.mjs` is the one-liner:
 
 ```bash
 cd apps/desktop
-node the local supporting file "document.querySelectorAll('[data-slot]').length"
+node scripts/eval.mjs "document.querySelectorAll('[data-slot]').length"
 ```
 
 For multi-step work use the shared client — it has target discovery and
 promise-aware eval:
 
 ```js
-import { CDP, SELECTORS } from './the local supporting file'
+import { CDP, SELECTORS } from './scripts/perf/lib/cdp.mjs'
 
 const cdp = await CDP.connect({ port: 9222, match: '5174' })
 const out = await cdp.eval(`JSON.stringify({
@@ -86,7 +86,7 @@ const out = await cdp.eval(`JSON.stringify({
 cdp.close()
 ```
 
-`SELECTORS` in the local supporting file holds the stable `data-slot` hooks
+`SELECTORS` in `scripts/perf/lib/cdp.mjs` holds the stable `data-slot` hooks
 (composer, thread viewport, assistant message, turn pair, profile rail). Prefer
 them over inventing a `querySelector` — they are updated as a unit when
 components move.
@@ -155,4 +155,4 @@ also want the perf harness.
 - **`cdp.eval` returns the value; raw `Runtime.evaluate` double-nests it**
   (`.result.result.value`). Use the wrapper.
 - **`import.meta.env.DEV` is `true` under `vite dev`** in this repo. The note in
-  `apps/desktop/the local supporting file` claiming otherwise is stale.
+  `apps/desktop/scripts/profile-typing-lag.md` claiming otherwise is stale.

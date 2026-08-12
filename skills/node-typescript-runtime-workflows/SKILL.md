@@ -1,6 +1,6 @@
 ---
 name: node-typescript-runtime-workflows
-description: "Use when diagnose and repair Node/TypeScript runtime-boundary failures in application scripts, seeds, migrations, and local mock flows."
+description: Diagnose and repair Node/TypeScript runtime-boundary failures in application scripts, seeds, migrations, and local mock flows.
 version: 1.0.0
 
 metadata:
@@ -25,7 +25,7 @@ Framework aliases such as `@/*` in `tsconfig.json` are compile-time/framework co
 Prefer a package-script-level fix that changes only the affected child command, for example:
 
 ```json
-"seed": "node the local supporting file tsx the local supporting file"
+"seed": "node scripts/dev/run-env.mjs tsx scripts/dev/seed.mjs"
 ```
 
 Preserve the existing env wrapper and command ordering. Do not replace aliases with absolute host paths, add ad-hoc `NODE_PATH`, copy production code into the script, or broadly convert unrelated scripts.

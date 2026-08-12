@@ -1,6 +1,6 @@
 ---
 name: personal-productivity-workflows
-description: "Use when personal productivity workflows for location lookups, public technical writing, and lightweight exploratory notebooks."
+description: "Personal productivity workflows for location lookups, public technical writing, and lightweight exploratory notebooks."
 version: 1.0.0
 created_by: agent
 
@@ -83,7 +83,7 @@ Use this when a task benefits from a stateful Python REPL instead of one-shot ex
 
 ```bash
 command -v uv
-SCRIPT="$HOME/.agent-skills/hamelnb/skills/jupyter-live-kernel/the local supporting file"
+SCRIPT="$HOME/.agent-skills/hamelnb/skills/jupyter-live-kernel/scripts/jupyter_live_kernel.py"
 uv run "$SCRIPT" servers --compact
 uv run "$SCRIPT" notebooks --compact
 ```
@@ -109,5 +109,5 @@ When Semyon asks “anything else missed?” do not stop at active cron jobs: se
 ## General verification
 
 - Verify outputs in the surface the user will consume: map links, rendered blog page, notebook result, Discord target, or created todo file.
-- Keep generated the local supporting file inside this skill’s `scripts/`, `templates/`, or `references/` directories instead of creating one-off sibling skills.
+- Keep generated scripts/templates inside this skill’s `scripts/`, `templates/`, or `references/` directories instead of creating one-off sibling skills.
 - If the task touches a repo, run the repo’s build/checks before declaring success.
