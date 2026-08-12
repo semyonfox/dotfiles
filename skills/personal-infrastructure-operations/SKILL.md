@@ -1,6 +1,6 @@
 ---
 name: personal-infrastructure-operations
-description: "Use when operate Semyon's personal infrastructure across homelab Docker stacks, cloud/provider accounts, workstation CLI recovery, NAS backups, billing triage, and safe admin verification."
+description: "Operate Semyon's personal infrastructure across homelab Docker stacks, cloud/provider accounts, workstation CLI recovery, NAS backups, billing triage, and safe admin verification."
 version: 1.0.0
 created_by: agent
 

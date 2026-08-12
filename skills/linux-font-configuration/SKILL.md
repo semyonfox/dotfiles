@@ -1,6 +1,6 @@
 ---
 name: linux-font-configuration
-description: "Use when use for Linux desktop/browser font mismatch diagnosis."
+description: "Use for Linux desktop/browser font mismatch diagnosis."
 version: 1.0.0
 created_by: agent
 

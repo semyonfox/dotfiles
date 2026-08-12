@@ -1,6 +1,6 @@
 ---
 name: healthcare-care-navigation
-description: "Use when use for healthcare referral and appointment forms."
+description: "Use for healthcare referral and appointment forms."
 version: 1.0.0
 
 metadata:

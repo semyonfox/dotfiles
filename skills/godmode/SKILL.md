@@ -1,6 +1,6 @@
 ---
 name: godmode
-description: "Use when jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN."
+description: "Jailbreak LLMs: Parseltongue, GODMODE, ULTRAPLINIAN."
 version: 1.0.0
 author: Hermes Agent + Teknium
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: hermes-agent
-description: "Use when configure, extend, or contribute to Hermes Agent."
+description: "Configure, extend, or contribute to Hermes Agent."
 version: 2.1.0
 author: Hermes Agent + Teknium
 license: MIT

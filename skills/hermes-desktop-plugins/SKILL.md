@@ -1,6 +1,6 @@
 ---
 name: hermes-desktop-plugins
-description: "Use when write desktop app plugins that add UI panes and commands."
+description: Write desktop app plugins that add UI panes and commands.
 version: 1.0.0
 platforms: [linux, macos, windows]
 

@@ -1,6 +1,6 @@
 ---
 name: personal-task-system
-description: "Use when maintain Semyon's canonical Personal Tasks Kanban board and task-linked reminders. Use whenever an email creates a commitment or Semyon asks to track, remind, defer, or complete personal work."
+description: Maintain Semyon's canonical Personal Tasks Kanban board and task-linked reminders. Use whenever an email creates a commitment or Semyon asks to track, remind, defer, or complete personal work.
 
 metadata:
   harness: [hermes]

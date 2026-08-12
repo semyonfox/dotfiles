@@ -1,6 +1,6 @@
 ---
 name: personal-travel-booking
-description: "Use when book and optimise personal rail, bus, flight, and local travel for Semyon, while handling accounts, fares, seats, payment approval, and delivery safely."
+description: "Book and optimise personal rail, bus, flight, and local travel for Semyon, while handling accounts, fares, seats, payment approval, and delivery safely."
 version: 1.1.0
 created_by: agent
 

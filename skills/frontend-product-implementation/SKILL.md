@@ -1,6 +1,6 @@
 ---
 name: frontend-product-implementation
-description: "Use when implement, verify, and hand off scoped product-facing frontend changes without broadening visual feedback or leaving backend form contracts inconsistent."
+description: Implement, verify, and hand off scoped product-facing frontend changes without broadening visual feedback or leaving backend form contracts inconsistent.
 version: 1.0.0
 
 metadata:

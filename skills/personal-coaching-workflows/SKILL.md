@@ -1,6 +1,6 @@
 ---
 name: personal-coaching-workflows
-description: "Use when class-level coaching workflows for Semyon: interview preparation, career conversations, personal reflection, identity questions, motivation, social/emotional fluency, and concise conversational coaching."
+description: "Class-level coaching workflows for Semyon: interview preparation, career conversations, personal reflection, identity questions, motivation, social/emotional fluency, and concise conversational coaching."
 version: 1.0.0
 created_by: agent
 

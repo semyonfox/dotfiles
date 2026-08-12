@@ -1,6 +1,6 @@
 ---
 name: local-video-transcription
-description: "Use when transcribe YouTube or local video/audio using Semyon's local faster-whisper server pipeline, with yt-dlp acquisition and verified artifacts."
+description: "Transcribe YouTube or local video/audio using Semyon's local faster-whisper server pipeline, with yt-dlp acquisition and verified artifacts."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

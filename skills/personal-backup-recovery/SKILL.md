@@ -1,6 +1,6 @@
 ---
 name: personal-backup-recovery
-description: "Use when design and operate Semyon's selective personal backups, offsite restic repositories, recovery verification, and data-retention boundaries."
+description: Design and operate Semyon's selective personal backups, offsite restic repositories, recovery verification, and data-retention boundaries.
 version: 1.0.0
 created_by: agent
 

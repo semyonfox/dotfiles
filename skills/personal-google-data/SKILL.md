@@ -1,6 +1,6 @@
 ---
 name: personal-google-data
-description: "Use when use Semyon's Google Calendar, Contacts/People API, and Drive metadata access from personal OAuth tokens."
+description: "Use Semyon's Google Calendar, Contacts/People API, and Drive metadata access from personal OAuth tokens."
 version: 1.0.0
 created_by: agent
 related_skills:

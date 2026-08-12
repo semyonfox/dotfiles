@@ -1,6 +1,6 @@
 ---
 name: personal-device-migration
-description: "Use when safely replace a personal Windows installation with Linux while preserving user data, game/app state, rollback media, and supported remote access."
+description: Safely replace a personal Windows installation with Linux while preserving user data, game/app state, rollback media, and supported remote access.
 version: 1.0.0
 
 metadata:
