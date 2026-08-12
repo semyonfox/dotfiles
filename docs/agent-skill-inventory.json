@@ -1,0 +1,1356 @@
+[
+  {
+    "directory": "agent-friendly-sites",
+    "name": "agent-friendly-sites",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/agent-friendly-sites"
+    ]
+  },
+  {
+    "directory": "agent-skill-library-management",
+    "name": "agent-skill-library-management",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/agent-skill-library-management"
+    ]
+  },
+  {
+    "directory": "agents-sdk",
+    "name": "agents-sdk",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/agents-sdk",
+      "/tmp/all-agent-skill-sources/.claude/skills/agents-sdk",
+      "/tmp/all-agent-skill-sources/.codex/skills/agents-sdk",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/agents-sdk"
+    ]
+  },
+  {
+    "directory": "apple-automation",
+    "name": "apple-automation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/apple/apple-automation"
+    ]
+  },
+  {
+    "directory": "audio-learning-production",
+    "name": "audio-learning-production",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/audio-learning-production"
+    ]
+  },
+  {
+    "directory": "autonomous-ai-agents",
+    "name": "autonomous-ai-agents",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/autonomous-ai-agents"
+    ]
+  },
+  {
+    "directory": "availability-observability",
+    "name": "availability-observability",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/availability-observability"
+    ]
+  },
+  {
+    "directory": "babysit-pr",
+    "name": "babysit-pr",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/babysit-pr"
+    ]
+  },
+  {
+    "directory": "backup-recovery-operations",
+    "name": "backup-recovery-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/backup-recovery-operations"
+    ]
+  },
+  {
+    "directory": "better-typography",
+    "name": "better-typography",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/better-typography"
+    ]
+  },
+  {
+    "directory": "chaptered-audio-learning",
+    "name": "chaptered-audio-learning",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/chaptered-audio-learning"
+    ]
+  },
+  {
+    "directory": "claude-second-opinion",
+    "name": "claude-second-opinion",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/claude-second-opinion"
+    ]
+  },
+  {
+    "directory": "cloudflare",
+    "name": "cloudflare",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare"
+    ]
+  },
+  {
+    "directory": "cloudflare--claude-codex-opencode",
+    "name": "cloudflare",
+    "harness": [
+      "claude",
+      "codex",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/cloudflare",
+      "/tmp/all-agent-skill-sources/.codex/skills/cloudflare",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare"
+    ]
+  },
+  {
+    "directory": "cloudflare-email-service",
+    "name": "cloudflare-email-service",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare-email-service"
+    ]
+  },
+  {
+    "directory": "cloudflare-email-service--claude-codex-opencode",
+    "name": "cloudflare-email-service",
+    "harness": [
+      "claude",
+      "codex",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-email-service",
+      "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-email-service",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-email-service"
+    ]
+  },
+  {
+    "directory": "cloudflare-one",
+    "name": "cloudflare-one",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare-one",
+      "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-one",
+      "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-one",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-one"
+    ]
+  },
+  {
+    "directory": "cloudflare-one-migrations",
+    "name": "cloudflare-one-migrations",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare-one-migrations",
+      "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-one-migrations",
+      "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-one-migrations",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-one-migrations"
+    ]
+  },
+  {
+    "directory": "competitor-news-monitor",
+    "name": "competitor-news-monitor",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/research/competitor-news-monitor"
+    ]
+  },
+  {
+    "directory": "compress",
+    "name": "compress",
+    "harness": [
+      "claude"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/compress"
+    ]
+  },
+  {
+    "directory": "computer-use",
+    "name": "computer-use",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/computer-use"
+    ]
+  },
+  {
+    "directory": "creative",
+    "name": "creative",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/creative/creative"
+    ]
+  },
+  {
+    "directory": "curiosity-led-teaching",
+    "name": "curiosity-led-teaching",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/curiosity-led-teaching"
+    ]
+  },
+  {
+    "directory": "device-fleet",
+    "name": "device-fleet",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/device-fleet"
+    ]
+  },
+  {
+    "directory": "discord-file-delivery",
+    "name": "discord-file-delivery",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/discord-file-delivery"
+    ]
+  },
+  {
+    "directory": "distributed-agent-runtime-operations",
+    "name": "distributed-agent-runtime-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/distributed-agent-runtime-operations"
+    ]
+  },
+  {
+    "directory": "docker-maintenance",
+    "name": "docker-maintenance",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/docker-maintenance"
+    ]
+  },
+  {
+    "directory": "document-to-action-items",
+    "name": "document-to-action-items",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/document-to-action-items"
+    ]
+  },
+  {
+    "directory": "docx",
+    "name": "docx",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/docx"
+    ]
+  },
+  {
+    "directory": "durable-objects",
+    "name": "durable-objects",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/durable-objects",
+      "/tmp/all-agent-skill-sources/.claude/skills/durable-objects",
+      "/tmp/all-agent-skill-sources/.codex/skills/durable-objects",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/durable-objects"
+    ]
+  },
+  {
+    "directory": "editor-mcp-integration",
+    "name": "editor-mcp-integration",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/creative/editor-mcp-integration"
+    ]
+  },
+  {
+    "directory": "email-inbox-triage",
+    "name": "email-inbox-triage",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/email/email-inbox-triage"
+    ]
+  },
+  {
+    "directory": "file-pr",
+    "name": "file-pr",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/file-pr"
+    ]
+  },
+  {
+    "directory": "find-skills",
+    "name": "find-skills",
+    "harness": [
+      "claude"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/find-skills"
+    ]
+  },
+  {
+    "directory": "flatmmo-userscript-handoff",
+    "name": "flatmmo-userscript-handoff",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/flatmmo-userscript-handoff"
+    ]
+  },
+  {
+    "directory": "frontend-design",
+    "name": "frontend-design",
+    "harness": [
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/frontend-design"
+    ]
+  },
+  {
+    "directory": "frontend-product-implementation",
+    "name": "frontend-product-implementation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/frontend-product-implementation"
+    ]
+  },
+  {
+    "directory": "game-development",
+    "name": "game-development",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/creative/game-development"
+    ]
+  },
+  {
+    "directory": "gameplay-coaching",
+    "name": "gameplay-coaching",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/creative/gameplay-coaching"
+    ]
+  },
+  {
+    "directory": "git-history-rewriting",
+    "name": "git-history-rewriting",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/github/git-history-rewriting"
+    ]
+  },
+  {
+    "directory": "github",
+    "name": "github",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/github/github"
+    ]
+  },
+  {
+    "directory": "github-issue-to-pr",
+    "name": "github-issue-to-pr",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/github/github-issue-to-pr"
+    ]
+  },
+  {
+    "directory": "godmode",
+    "name": "godmode",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/red-teaming/godmode"
+    ]
+  },
+  {
+    "directory": "grounded-citations",
+    "name": "grounded-citations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/research/grounded-citations"
+    ]
+  },
+  {
+    "directory": "healthcare-care-navigation",
+    "name": "healthcare-care-navigation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/healthcare-care-navigation"
+    ]
+  },
+  {
+    "directory": "helium-graceful-shutdown",
+    "name": "helium-graceful-shutdown",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/helium-graceful-shutdown"
+    ]
+  },
+  {
+    "directory": "hermes-agent",
+    "name": "hermes-agent",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/hermes-agent"
+    ]
+  },
+  {
+    "directory": "hermes-desktop-plugins",
+    "name": "hermes-desktop-plugins",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/hermes-desktop-plugins"
+    ]
+  },
+  {
+    "directory": "inspecting-hermes-desktop-dom",
+    "name": "inspecting-hermes-desktop-dom",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/inspecting-hermes-desktop-dom"
+    ]
+  },
+  {
+    "directory": "irish-health-insurance-comparison",
+    "name": "irish-health-insurance-comparison",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/research/irish-health-insurance-comparison"
+    ]
+  },
+  {
+    "directory": "kanban",
+    "name": "kanban",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/kanban"
+    ]
+  },
+  {
+    "directory": "linux-desktop-authentication",
+    "name": "linux-desktop-authentication",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-desktop-authentication"
+    ]
+  },
+  {
+    "directory": "linux-desktop-typography",
+    "name": "linux-desktop-typography",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/design/linux-desktop-typography"
+    ]
+  },
+  {
+    "directory": "linux-font-configuration",
+    "name": "linux-font-configuration",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-font-configuration"
+    ]
+  },
+  {
+    "directory": "linux-font-rendering-troubleshooting",
+    "name": "linux-font-rendering-troubleshooting",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-font-rendering-troubleshooting"
+    ]
+  },
+  {
+    "directory": "linux-graphics-app-troubleshooting",
+    "name": "linux-graphics-app-troubleshooting",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-graphics-app-troubleshooting"
+    ]
+  },
+  {
+    "directory": "linux-wayland-session-autostart",
+    "name": "linux-wayland-session-autostart",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-wayland-session-autostart"
+    ]
+  },
+  {
+    "directory": "local-video-transcription",
+    "name": "local-video-transcription",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/media/local-video-transcription"
+    ]
+  },
+  {
+    "directory": "marketing-search-intelligence",
+    "name": "marketing-search-intelligence",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/business/marketing-search-intelligence"
+    ]
+  },
+  {
+    "directory": "media",
+    "name": "media",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/media/media"
+    ]
+  },
+  {
+    "directory": "meeting-action-items",
+    "name": "meeting-action-items",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/meeting-action-items"
+    ]
+  },
+  {
+    "directory": "merge-reconciler",
+    "name": "merge-reconciler",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/merge-reconciler"
+    ]
+  },
+  {
+    "directory": "mlops",
+    "name": "mlops",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/mlops/mlops"
+    ]
+  },
+  {
+    "directory": "mmo-combat-ui-configuration",
+    "name": "mmo-combat-ui-configuration",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/gameplay/mmo-combat-ui-configuration"
+    ]
+  },
+  {
+    "directory": "model-routing",
+    "name": "model-routing",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/model-routing"
+    ]
+  },
+  {
+    "directory": "node-typescript-runtime-workflows",
+    "name": "node-typescript-runtime-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/node-typescript-runtime-workflows"
+    ]
+  },
+  {
+    "directory": "obliteratus",
+    "name": "obliteratus",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/mlops/inference/obliteratus"
+    ]
+  },
+  {
+    "directory": "online-assessment-preparation",
+    "name": "online-assessment-preparation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/online-assessment-preparation"
+    ]
+  },
+  {
+    "directory": "openclaw-agent-team",
+    "name": "openclaw-agent-team",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/openclaw-agent-team"
+    ]
+  },
+  {
+    "directory": "pdf",
+    "name": "pdf",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/pdf"
+    ]
+  },
+  {
+    "directory": "personal-backup-recovery",
+    "name": "personal-backup-recovery",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-backup-recovery"
+    ]
+  },
+  {
+    "directory": "personal-billing-reconciliation",
+    "name": "personal-billing-reconciliation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-billing-reconciliation"
+    ]
+  },
+  {
+    "directory": "personal-coaching-workflows",
+    "name": "personal-coaching-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-coaching-workflows"
+    ]
+  },
+  {
+    "directory": "personal-data-protection",
+    "name": "personal-data-protection",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-data-protection"
+    ]
+  },
+  {
+    "directory": "personal-device-migration",
+    "name": "personal-device-migration",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-device-migration"
+    ]
+  },
+  {
+    "directory": "personal-financial-review",
+    "name": "personal-financial-review",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-financial-review"
+    ]
+  },
+  {
+    "directory": "personal-gmail",
+    "name": "personal-gmail",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-gmail"
+    ]
+  },
+  {
+    "directory": "personal-google-apis",
+    "name": "personal-google-apis",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-apis"
+    ]
+  },
+  {
+    "directory": "personal-google-automation",
+    "name": "personal-google-automation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-automation"
+    ]
+  },
+  {
+    "directory": "personal-google-data",
+    "name": "personal-google-data",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-data"
+    ]
+  },
+  {
+    "directory": "personal-google-workspace-automation",
+    "name": "personal-google-workspace-automation",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-workspace-automation"
+    ]
+  },
+  {
+    "directory": "personal-infrastructure-operations",
+    "name": "personal-infrastructure-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-infrastructure-operations"
+    ]
+  },
+  {
+    "directory": "personal-operations",
+    "name": "personal-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-operations"
+    ]
+  },
+  {
+    "directory": "personal-productivity-workflows",
+    "name": "personal-productivity-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-productivity-workflows"
+    ]
+  },
+  {
+    "directory": "personal-task-system",
+    "name": "personal-task-system",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-task-system"
+    ]
+  },
+  {
+    "directory": "personal-travel-booking",
+    "name": "personal-travel-booking",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-travel-booking"
+    ]
+  },
+  {
+    "directory": "personal-web-monitoring",
+    "name": "personal-web-monitoring",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-web-monitoring"
+    ]
+  },
+  {
+    "directory": "personal-youtube-analytics",
+    "name": "personal-youtube-analytics",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/media/personal-youtube-analytics"
+    ]
+  },
+  {
+    "directory": "petdex",
+    "name": "petdex",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/petdex"
+    ]
+  },
+  {
+    "directory": "plan",
+    "name": "plan",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/plan"
+    ]
+  },
+  {
+    "directory": "portfolio-blog-writing",
+    "name": "portfolio-blog-writing",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/portfolio-blog-writing"
+    ]
+  },
+  {
+    "directory": "product-price-monitor",
+    "name": "product-price-monitor",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/product-price-monitor"
+    ]
+  },
+  {
+    "directory": "product-ui-ux-accessibility",
+    "name": "product-ui-ux-accessibility",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/design/product-ui-ux-accessibility"
+    ]
+  },
+  {
+    "directory": "productivity",
+    "name": "productivity",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/productivity"
+    ]
+  },
+  {
+    "directory": "remote-desktop-service-recovery",
+    "name": "remote-desktop-service-recovery",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/remote-desktop-service-recovery"
+    ]
+  },
+  {
+    "directory": "remote-development-workflows",
+    "name": "remote-development-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/remote-development-workflows"
+    ]
+  },
+  {
+    "directory": "remote-service-client-connectivity",
+    "name": "remote-service-client-connectivity",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/remote-service-client-connectivity"
+    ]
+  },
+  {
+    "directory": "research",
+    "name": "research",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/research/research"
+    ]
+  },
+  {
+    "directory": "rustdesk-hyprland-wake-screen",
+    "name": "rustdesk-hyprland-wake-screen",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/rustdesk-hyprland-wake-screen"
+    ]
+  },
+  {
+    "directory": "saas-funnel-growth",
+    "name": "saas-funnel-growth",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/business/saas-funnel-growth"
+    ]
+  },
+  {
+    "directory": "sales-pricing-storytelling",
+    "name": "sales-pricing-storytelling",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/business/sales-pricing-storytelling"
+    ]
+  },
+  {
+    "directory": "sandbox-sdk",
+    "name": "sandbox-sdk",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/sandbox-sdk",
+      "/tmp/all-agent-skill-sources/.claude/skills/sandbox-sdk",
+      "/tmp/all-agent-skill-sources/.codex/skills/sandbox-sdk",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/sandbox-sdk"
+    ]
+  },
+  {
+    "directory": "sdlc-review",
+    "name": "sdlc-review",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/sdlc-review"
+    ]
+  },
+  {
+    "directory": "self-hosted-photo-library-operations",
+    "name": "self-hosted-photo-library-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/self-hosted-photo-library-operations"
+    ]
+  },
+  {
+    "directory": "seol",
+    "name": "seol",
+    "harness": [
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.codex/skills/seol"
+    ]
+  },
+  {
+    "directory": "ship-changes",
+    "name": "ship-changes",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/ship-changes"
+    ]
+  },
+  {
+    "directory": "skill-authoring",
+    "name": "skill-authoring",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/skill-authoring"
+    ]
+  },
+  {
+    "directory": "social-platform-operations",
+    "name": "social-platform-operations",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/social-media/social-platform-operations"
+    ]
+  },
+  {
+    "directory": "software-development-workflows",
+    "name": "software-development-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/software-development-workflows"
+    ]
+  },
+  {
+    "directory": "source-grounded-deliverables",
+    "name": "source-grounded-deliverables",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/research/source-grounded-deliverables"
+    ]
+  },
+  {
+    "directory": "staging-content-dedupe-migration-review",
+    "name": "staging-content-dedupe-migration-review",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/staging-content-dedupe-migration-review"
+    ]
+  },
+  {
+    "directory": "static-artifact-publishing",
+    "name": "static-artifact-publishing",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/static-artifact-publishing"
+    ]
+  },
+  {
+    "directory": "storage-capacity-auditing",
+    "name": "storage-capacity-auditing",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/storage-capacity-auditing"
+    ]
+  },
+  {
+    "directory": "t3-code-remote-pairing",
+    "name": "t3-code-remote-pairing",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/devops/t3-code-remote-pairing"
+    ]
+  },
+  {
+    "directory": "technical-assessment-prep",
+    "name": "technical-assessment-prep",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-assessment-prep"
+    ]
+  },
+  {
+    "directory": "technical-presentation-workflows",
+    "name": "technical-presentation-workflows",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-presentation-workflows"
+    ]
+  },
+  {
+    "directory": "technical-writing-verification",
+    "name": "technical-writing-verification",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-writing-verification"
+    ]
+  },
+  {
+    "directory": "turnstile-spin",
+    "name": "turnstile-spin",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/turnstile-spin",
+      "/tmp/all-agent-skill-sources/.claude/skills/turnstile-spin",
+      "/tmp/all-agent-skill-sources/.codex/skills/turnstile-spin",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/turnstile-spin"
+    ]
+  },
+  {
+    "directory": "typography-ux",
+    "name": "typography-ux",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/design/typography-ux"
+    ]
+  },
+  {
+    "directory": "unity-blender-mcp-setup",
+    "name": "unity-blender-mcp-setup",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/software-development/unity-blender-mcp-setup"
+    ]
+  },
+  {
+    "directory": "university-technical-learning",
+    "name": "university-technical-learning",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/university-technical-learning"
+    ]
+  },
+  {
+    "directory": "visual-evidence",
+    "name": "visual-evidence",
+    "harness": [
+      "claude",
+      "codex"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.agents/skills/visual-evidence"
+    ]
+  },
+  {
+    "directory": "web-perf",
+    "name": "web-perf",
+    "harness": [
+      "claude",
+      "codex",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/web-perf",
+      "/tmp/all-agent-skill-sources/.codex/skills/web-perf",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/web-perf"
+    ]
+  },
+  {
+    "directory": "web-perf--hermes",
+    "name": "web-perf",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/web-perf"
+    ]
+  },
+  {
+    "directory": "weekly-review-planning",
+    "name": "weekly-review-planning",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/weekly-review-planning"
+    ]
+  },
+  {
+    "directory": "workers-best-practices",
+    "name": "workers-best-practices",
+    "harness": [
+      "claude",
+      "codex",
+      "hermes",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/workers-best-practices",
+      "/tmp/all-agent-skill-sources/.claude/skills/workers-best-practices",
+      "/tmp/all-agent-skill-sources/.codex/skills/workers-best-practices",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/workers-best-practices"
+    ]
+  },
+  {
+    "directory": "wrangler",
+    "name": "wrangler",
+    "harness": [
+      "claude",
+      "codex",
+      "opencode"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.claude/skills/wrangler",
+      "/tmp/all-agent-skill-sources/.codex/skills/wrangler",
+      "/tmp/all-agent-skill-sources/.config/opencode/skills/wrangler"
+    ]
+  },
+  {
+    "directory": "wrangler--hermes",
+    "name": "wrangler",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/wrangler"
+    ]
+  },
+  {
+    "directory": "xlsx",
+    "name": "xlsx",
+    "harness": [
+      "hermes"
+    ],
+    "sources": [
+      "/tmp/all-agent-skill-sources/.hermes/skills/productivity/xlsx"
+    ]
+  }
+]

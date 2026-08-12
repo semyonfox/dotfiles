@@ -88,24 +88,27 @@ printf '\n$ fleet_neighbors\n'
 fleet_neighbors || true
 
 section "TCP/22 reachability"
-for host in ${FLEET_TCP_HOSTS:-server nas pc laptop}; do
+for host in 10.0.0.5 10.0.0.6 10.0.0.15 10.0.0.17 100.65.148.17 100.77.148.51 100.127.128.15; do
   tcp_check "$host" 22
 done
 
 section "MagicDNS resolution"
-if [[ -n "${FLEET_MAGICDNS_NAMES:-}" ]]; then
-  for name in $FLEET_MAGICDNS_NAMES; do
-    getent hosts "$name" || true
-  done
-else
-  printf 'Skipped. Set FLEET_MAGICDNS_NAMES to space-separated private names.\n'
-fi
+for name in \
+  server.taild7128c.ts.net \
+  nas.taild7128c.ts.net \
+  semyons-pc.taild7128c.ts.net \
+  semyons-laptop.taild7128c.ts.net \
+  samsung-sm-a546b.taild7128c.ts.net \
+  xiaomi-11t.taild7128c.ts.net; do
+  getent hosts "$name" || true
+done
 
 if [[ "${FLEET_SSH_PROBE:-0}" == "1" ]]; then
   section "SSH read-only probes"
-  for target in ${FLEET_SSH_TARGETS:-server nas pc laptop}; do
-    remote_probe "$target"
-  done
+  remote_probe server
+  remote_probe nas
+  remote_probe pc
+  remote_probe semyon@100.127.128.15
 else
   section "SSH read-only probes"
   printf 'Skipped. Re-run with FLEET_SSH_PROBE=1 for remote read-only probes.\n'

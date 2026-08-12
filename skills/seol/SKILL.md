@@ -1,26 +1,44 @@
 ---
 name: seol
-description: "Use when the user asks to upload, host, publish, deploy, or share a static artifact through Seol."
+description: Publish HTML files, ZIP archives, or static-site directories to temporary public URLs with Seol. Use when asked to host, publish, upload, deploy, or share generated reports, dashboards, diagrams, documentation, demos, webpages, or other static artifacts.
+
+metadata:
+  harness: [codex]
 ---
 
-# Seol publish
+# Seol
 
-Publish a reviewable static artifact to Semyon's Seol service only when the user asks for an external link.
+Publish only when requested; this is an external side effect.
 
-1. Require the documented `seol` CLI on the execution host. Never print its token or configuration.
-2. Accept one `.html`/`.htm` file, or a directory/ZIP whose root contains `index.html`. For an application/project, inspect its documented build command and publish the real static output; do not invent a build command.
-3. Preserve relative asset paths such as `assets/chart.svg`; never use root-relative paths.
-4. Scan the artifact for obvious secrets or sensitive/private data. Stop and flag it rather than publishing if found.
-5. Publish using the documented CLI:
+1. Require `seol` on `PATH`.
+2. Accept one `.html`/`.htm` file, or a directory/ZIP with root `index.html`.
+3. For framework source, inspect its scripts/docs; when useful, run its existing
+   production build and upload the static output (`dist/`, `build/`, etc.). Never
+   invent an unknown build command.
+4. Check text for obvious credentials or sensitive data; stop and warn if found.
+5. Preserve relative assets (`assets/app.js`, not `/assets/app.js`).
+6. Publish and return the printed URL:
 
 ```bash
 seol publish --quiet PATH
-# Optional: --title "Title" --expires 7d
+# Optional: --expires 7d --title "Title"
 ```
 
-6. Keep the local source directory for revision. Publish the same canonical path again when the stable URL should update; use `--new` only when a separate URL is intended.
-7. Verify the returned public URL and representative assets before saying it is live.
+Omit `--expires` for the one-day default unless the user requests another
+duration; seven days is the maximum. Publishing requires the configured server
+token. If the server is not configured, ask the user to run:
 
-## Done
+```bash
+seol configure --server URL --token TOKEN
+```
 
-Return the URL and actual lifetime. Seol pages are temporary public links, not private storage or permanent hosting.
+Never print the token or configuration. Manage only when requested:
+
+```bash
+seol list
+seol stats
+seol info PAGE_ID
+seol replace PAGE_ID PATH
+seol expiry PAGE_ID 3d
+seol delete PAGE_ID
+```

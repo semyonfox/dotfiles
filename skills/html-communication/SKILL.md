@@ -1,6 +1,9 @@
 ---
 name: html-communication
 description: "Use when the user asks for a plan, spec, writeup, findings, summary, report, comparison, UI mocks, or HTML document to read outside the terminal; also use when they say HTML without more context."
+
+metadata:
+  harness: [claude, codex]
 ---
 
 # HTML communication

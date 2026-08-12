@@ -8,6 +8,9 @@ references:
   - astro
   - sveltekit
   - hugo
+
+metadata:
+  harness: [claude, codex, hermes, opencode]
 ---
 
 # Turnstile Spin skill

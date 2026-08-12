@@ -7,6 +7,9 @@ references:
   - d1
   - durable-objects
   - workers-ai
+
+metadata:
+  harness: [hermes]
 ---
 
 # Cloudflare Platform Skill
@@ -18,6 +21,13 @@ Your knowledge of Cloudflare APIs, types, limits, and pricing may be outdated. *
 ## Retrieval Sources
 
 Fetch the **latest** information before citing specific numbers, API signatures, or configuration options. Do not rely on baked-in knowledge or these reference files alone.
+
+### Local migration references
+
+- `references/zone-account-migration.md` — practical checklist and pitfalls for moving a domain between Cloudflare accounts, including token permissions, registrar nameserver propagation checks, and Cloudflare Tunnel DNS-route gotchas.
+- `references/zone-account-migration-r2-queues-email.md` — follow-up checklist for account moves that also involve R2 object migration, Queues HTTP pull consumers, Email Routing, exact-key verification, and runtime env cutover.
+- `references/r2-queues-email-account-migration.md` — app-resource migration notes for R2, Queues, Wrangler auth pitfalls, and Email Routing MX cutover after a zone/account move.
+- `references/account-migration-r2-queues-email.md` — account-migration pitfalls for R2 buckets, Queues, Email Routing, Wrangler `--remote`, dashboard R2 enablement, and DNS/MX cutover verification.
 
 | Source | How to retrieve | Use for |
 |--------|----------------|---------|
@@ -88,6 +98,7 @@ Need AI?
 ```
 Need networking?
 ├─ Expose local service to internet → tunnel/
+├─ Move a domain between Cloudflare accounts with Tunnel cutover → references/zone-account-migration-tunnel-cutover.md
 ├─ TCP/UDP proxy (non-HTTP) → spectrum/
 ├─ WebRTC TURN server → turn/
 ├─ Private network connectivity → network-interconnect/
@@ -95,6 +106,18 @@ Need networking?
 ├─ Optimize latency to backend (not user) → smart-placement/
 └─ Real-time video/audio → realtimekit/ or realtime-sfu/
 ```
+
+### "I need to move a domain between Cloudflare accounts"
+
+Use `references/zone-account-migration.md` for the CLI/API workflow: inspect current NS/registrar, export DNS records from the source zone, create the destination zone with a target-account user API token, copy portable DNS records, then update registrar nameservers. Common pitfall: a `cloudflared` tunnel token or zone-scoped token may verify successfully but still fail zone creation with `com.cloudflare.api.account.zone.create`; the target-account token needs `Zone → Zone → Edit` plus `Zone → DNS → Edit` over **All zones**.
+
+If the app also uses account-scoped products (R2, Queues, Email Routing), immediately load `references/zone-account-migration-r2-queues-email.md`. DNS moving cleanly does **not** migrate R2 buckets, S3 credentials, queue IDs, HTTP pull consumers, or runtime env files.
+
+For migrations that also involve R2, Queues, and Email Routing, see `references/oghmanotes-account-migration-lessons-2026-07-01.md`: `wrangler r2 object get/put` needs `--remote`, destination R2 may need dashboard enablement first, Email Routing cannot be enabled until non-Cloudflare MX records are removed, and mail records should stay DNS-only.
+
+If the app also uses R2, Queues, or Email Routing, also use `references/r2-queues-email-account-migration.md`. Move app resources separately from the DNS zone: back up R2 with account-stable S3 credentials before switching Wrangler auth, recreate queues and HTTP consumers in the target account, and keep old runtime env active until destination resources are verified.
+
+If app resources are involved, also use `references/account-migration-r2-queues-email.md`: R2 buckets and Queues are account-scoped and do not move with the zone; Email Routing catch-all rules can exist while routing is still disabled; and Wrangler R2 object operations need `--remote` for remote storage.
 
 ### "I need security"
 

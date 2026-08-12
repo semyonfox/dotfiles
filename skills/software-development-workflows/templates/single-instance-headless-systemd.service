@@ -1,0 +1,29 @@
+# Template: single-instance user systemd service for a headless web/backend tool
+# Copy to ~/.config/systemd/user/<name>.service and replace APP placeholders.
+# Pair with a small preflight script that refuses to start if another APP server
+# process or target port is already active.
+
+[Unit]
+Description=APP headless backend (single instance)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+Type=simple
+WorkingDirectory=%h
+Environment=HOME=%h
+Environment=APP_HOME=%h/.APP
+Environment=APP_NO_BROWSER=1
+Environment=APP_HOST=0.0.0.0
+Environment=APP_PORT=3773
+ExecStartPre=%h/bin/APP-headless-preflight
+ExecStart=%h/bin/APP-headless-run
+Restart=on-failure
+RestartSec=10
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=default.target

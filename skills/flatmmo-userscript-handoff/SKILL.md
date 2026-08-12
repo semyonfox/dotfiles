@@ -1,6 +1,9 @@
 ---
 name: flatmmo-userscript-handoff
 description: Build and hand off the FlatMMO Mega Helper userscript for Helium/browser installation. Use when working in the flatmmo-mega-helper repo after UI, automation, targeting, mining, loot, pathing, or command changes; when the user asks to put/update/install the script in their browser; or when the user mentions Helium, Downloads, userscript manager, Tampermonkey, or Violentmonkey.
+
+metadata:
+  harness: [codex]
 ---
 
 # FlatMMO Userscript Handoff
@@ -15,9 +18,8 @@ description: Build and hand off the FlatMMO Mega Helper userscript for Helium/br
    ```
 
    This runs `npm run check`, `npm run build`, copies the built script to the
-   configured `pc` SSH target, starts a PC-local `python3 -m http.server` from
-   the PC's Downloads folder, and opens the cache-busted URL in Helium via
-   Hyprland.
+   PC at `10.0.0.15`, starts a PC-local `python3 -m http.server` from the PC's
+   Downloads folder, and opens the cache-busted URL in Helium via Hyprland.
 
 3. If the PC is unreachable or `ship:helium` is unavailable, use the local
    Downloads handoff:
