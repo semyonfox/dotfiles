@@ -1,6 +1,6 @@
 ---
 name: git-history-rewriting
-description: Safely remove sensitive files or secrets from Git history, verify all reachable refs, and coordinate GitHub cleanup.
+description: "Use when safely remove sensitive files or secrets from Git history, verify all reachable refs, and coordinate GitHub cleanup."
 version: 1.0.0
 
 metadata:

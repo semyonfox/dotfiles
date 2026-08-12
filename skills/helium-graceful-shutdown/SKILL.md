@@ -1,6 +1,6 @@
 ---
 name: helium-graceful-shutdown
-description: Use when Helium loses sessions after a PC reboot.
+description: "Use when Helium loses sessions after a PC reboot."
 version: 1.0.0
 created_by: agent
 

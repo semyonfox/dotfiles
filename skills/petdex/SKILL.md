@@ -1,6 +1,6 @@
 ---
 name: petdex
-description: Install and select animated petdex mascots for Hermes.
+description: "Use when install and select animated petdex mascots for Hermes."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

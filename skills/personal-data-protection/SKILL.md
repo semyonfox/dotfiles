@@ -1,6 +1,6 @@
 ---
 name: personal-data-protection
-description: Design, operate, verify, and restore Semyon's local and offsite backups for NAS, Immich, servers, devices, and recovery archives.
+description: "Use when design, operate, verify, and restore Semyon's local and offsite backups for NAS, Immich, servers, devices, and recovery archives."
 
 metadata:
   harness: [hermes]

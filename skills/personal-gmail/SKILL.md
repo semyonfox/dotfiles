@@ -1,6 +1,6 @@
 ---
 name: personal-gmail
-description: "Read, search, summarize, label, modify, or send Gmail for Semyon's personal Google accounts using local OAuth tokens."
+description: "Use when read, search, summarize, label, modify, or send Gmail for Semyon's personal Google accounts using local OAuth tokens."
 version: 1.0.0
 created_by: agent
 related_skills:

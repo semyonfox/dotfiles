@@ -1,6 +1,6 @@
 ---
 name: personal-youtube-analytics
-description: "Fetch Semyon's personal/FoxScope YouTube channel stats and analytics using local OAuth tokens and YouTube APIs."
+description: "Use when fetch Semyon's personal/FoxScope YouTube channel stats and analytics using local OAuth tokens and YouTube APIs."
 version: 1.0.0
 created_by: agent
 related_skills:

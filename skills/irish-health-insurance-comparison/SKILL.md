@@ -1,6 +1,6 @@
 ---
 name: irish-health-insurance-comparison
-description: Compare Irish private health-insurance plans for genuine cover/value using HIA plan data, without creating insurer sales leads or using invented identities.
+description: "Use when compare Irish private health-insurance plans for genuine cover/value using HIA plan data, without creating insurer sales leads or using invented identities."
 version: 1.0.0
 
 metadata:

@@ -1,6 +1,6 @@
 ---
 name: node-typescript-runtime-workflows
-description: Diagnose and repair Node/TypeScript runtime-boundary failures in application scripts, seeds, migrations, and local mock flows.
+description: "Use when diagnose and repair Node/TypeScript runtime-boundary failures in application scripts, seeds, migrations, and local mock flows."
 version: 1.0.0
 
 metadata:

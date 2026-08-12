@@ -1,6 +1,6 @@
 ---
 name: personal-productivity-workflows
-description: "Personal productivity workflows for location lookups, public technical writing, and lightweight exploratory notebooks."
+description: "Use when personal productivity workflows for location lookups, public technical writing, and lightweight exploratory notebooks."
 version: 1.0.0
 created_by: agent
 

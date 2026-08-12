@@ -1,6 +1,6 @@
 ---
 name: personal-billing-reconciliation
-description: Reconcile Semyon's AI-provider bills, receipts, and subscription histories with token-usage or API-equivalent cost ledgers.
+description: "Use when reconcile Semyon's AI-provider bills, receipts, and subscription histories with token-usage or API-equivalent cost ledgers."
 version: 1.0.0
 created_by: agent
 related_skills:

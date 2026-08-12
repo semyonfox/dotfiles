@@ -1,6 +1,6 @@
 ---
 name: portfolio-blog-writing
-description: "Write, revise, and review Semyon Fox's semyon.ie blog posts in the established first-person builder-journal voice."
+description: "Use when write, revise, and review Semyon Fox's semyon.ie blog posts in the established first-person builder-journal voice."
 version: 1.0.0
 
 metadata:

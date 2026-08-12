@@ -1,6 +1,6 @@
 ---
 name: linux-desktop-authentication
-description: Configure and verify Linux desktop login, fingerprint, PAM, sudo, and authentication-agent workflows safely.
+description: "Use when configure and verify Linux desktop login, fingerprint, PAM, sudo, and authentication-agent workflows safely."
 version: 1.0.0
 created_by: agent
 

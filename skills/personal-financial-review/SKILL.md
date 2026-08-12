@@ -1,6 +1,6 @@
 ---
 name: personal-financial-review
-description: "Use for personal savings, spending, and investment reviews."
+description: "Use when use for personal savings, spending, and investment reviews."
 version: 1.0.0
 author: Hermes
 license: MIT

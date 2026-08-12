@@ -1,6 +1,6 @@
 ---
 name: personal-operations
-description: Operate Semyon's personal email intake, canonical task board, reminders, and daily briefing without duplicate lists or accidental agent dispatch.
+description: "Use when operate Semyon's personal email intake, canonical task board, reminders, and daily briefing without duplicate lists or accidental agent dispatch."
 
 metadata:
   harness: [hermes]

@@ -1,6 +1,6 @@
 ---
 name: personal-google-workspace-automation
-description: Safely operate Semyon's Gmail, Google Tasks, and Google Calendar as one personal intake, task, and reminder system.
+description: "Use when safely operate Semyon's Gmail, Google Tasks, and Google Calendar as one personal intake, task, and reminder system."
 
 metadata:
   harness: [hermes]

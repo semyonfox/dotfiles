@@ -1,6 +1,6 @@
 ---
 name: online-assessment-preparation
-description: "Prepare for timed technical and work-style hiring assessments using the actual invitation requirements and focused, authentic practice."
+description: "Use when prepare for timed technical and work-style hiring assessments using the actual invitation requirements and focused, authentic practice."
 version: 1.0.0
 created_by: agent
 related_skills:

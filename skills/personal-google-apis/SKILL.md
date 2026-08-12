@@ -1,6 +1,6 @@
 ---
 name: personal-google-apis
-description: "Generic setup map for Semyon's personal Google OAuth accounts and local helper tooling; load before task-specific Gmail, YouTube, or Google data skills when account/token context is needed."
+description: "Use when generic setup map for Semyon's personal Google OAuth accounts and local helper tooling; load before task-specific Gmail, YouTube, or Google data skills when account/token context is needed."
 version: 1.1.0
 created_by: agent
 related_skills:

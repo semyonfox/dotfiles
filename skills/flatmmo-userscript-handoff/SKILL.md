@@ -1,6 +1,6 @@
 ---
 name: flatmmo-userscript-handoff
-description: Build and hand off the FlatMMO Mega Helper userscript for Helium/browser installation. Use when working in the flatmmo-mega-helper repo after UI, automation, targeting, mining, loot, pathing, or command changes; when the user asks to put/update/install the script in their browser; or when the user mentions Helium, Downloads, userscript manager, Tampermonkey, or Violentmonkey.
+description: "Use when build and hand off the FlatMMO Mega Helper userscript for Helium/browser installation. Use when working in the flatmmo-mega-helper repo after UI, automation, targeting, mining, loot, pathing, or command changes; when the user asks to put/update/install the script in their browser; or when the user mentions Helium, Downloads, userscript manager, Tampermonkey, or Violentmonkey."
 
 metadata:
   harness: [codex]

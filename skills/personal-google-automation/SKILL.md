@@ -1,6 +1,6 @@
 ---
 name: personal-google-automation
-description: Safely operate and monitor Semyon's personal Google Tasks and Google Calendar through local OAuth helpers, preserving source structure and avoiding duplicate reminders.
+description: "Use when safely operate and monitor Semyon's personal Google Tasks and Google Calendar through local OAuth helpers, preserving source structure and avoiding duplicate reminders."
 
 metadata:
   harness: [hermes]
