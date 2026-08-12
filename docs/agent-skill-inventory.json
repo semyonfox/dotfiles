@@ -7,7 +7,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/agent-friendly-sites"
-    ]
+    ],
+    "library_path": "generic/codex/agent-friendly-sites",
+    "classification": "generic"
   },
   {
     "directory": "agent-skill-library-management",
@@ -17,7 +19,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/agent-skill-library-management"
-    ]
+    ],
+    "library_path": "generic/hermes/agent-skill-library-management",
+    "classification": "generic"
   },
   {
     "directory": "agents-sdk",
@@ -33,7 +37,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/agents-sdk",
       "/tmp/all-agent-skill-sources/.codex/skills/agents-sdk",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/agents-sdk"
-    ]
+    ],
+    "library_path": "generic/shared/agents-sdk",
+    "classification": "generic"
   },
   {
     "directory": "apple-automation",
@@ -43,7 +49,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/apple/apple-automation"
-    ]
+    ],
+    "library_path": "generic/hermes/apple-automation",
+    "classification": "generic"
   },
   {
     "directory": "audio-learning-production",
@@ -53,7 +61,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/audio-learning-production"
-    ]
+    ],
+    "library_path": "generic/hermes/audio-learning-production",
+    "classification": "generic"
   },
   {
     "directory": "autonomous-ai-agents",
@@ -63,7 +73,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/autonomous-ai-agents"
-    ]
+    ],
+    "library_path": "generic/hermes/autonomous-ai-agents",
+    "classification": "generic"
   },
   {
     "directory": "availability-observability",
@@ -73,7 +85,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/availability-observability"
-    ]
+    ],
+    "library_path": "generic/hermes/availability-observability",
+    "classification": "generic"
   },
   {
     "directory": "babysit-pr",
@@ -84,7 +98,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/babysit-pr"
-    ]
+    ],
+    "library_path": "personal/babysit-pr",
+    "classification": "personal"
   },
   {
     "directory": "backup-recovery-operations",
@@ -94,7 +110,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/backup-recovery-operations"
-    ]
+    ],
+    "library_path": "generic/hermes/backup-recovery-operations",
+    "classification": "generic"
   },
   {
     "directory": "better-typography",
@@ -104,7 +122,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/better-typography"
-    ]
+    ],
+    "library_path": "generic/codex/better-typography",
+    "classification": "generic"
   },
   {
     "directory": "chaptered-audio-learning",
@@ -114,7 +134,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/chaptered-audio-learning"
-    ]
+    ],
+    "library_path": "generic/hermes/chaptered-audio-learning",
+    "classification": "generic"
   },
   {
     "directory": "claude-second-opinion",
@@ -124,7 +146,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/claude-second-opinion"
-    ]
+    ],
+    "library_path": "personal/claude-second-opinion",
+    "classification": "personal"
   },
   {
     "directory": "cloudflare",
@@ -134,7 +158,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare"
-    ]
+    ],
+    "library_path": "generic/hermes/cloudflare",
+    "classification": "generic"
   },
   {
     "directory": "cloudflare--claude-codex-opencode",
@@ -148,7 +174,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/cloudflare",
       "/tmp/all-agent-skill-sources/.codex/skills/cloudflare",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare"
-    ]
+    ],
+    "library_path": "generic/shared/cloudflare--claude-codex-opencode",
+    "classification": "generic"
   },
   {
     "directory": "cloudflare-email-service",
@@ -158,7 +186,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/cloudflare-email-service"
-    ]
+    ],
+    "library_path": "generic/hermes/cloudflare-email-service",
+    "classification": "generic"
   },
   {
     "directory": "cloudflare-email-service--claude-codex-opencode",
@@ -172,7 +202,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-email-service",
       "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-email-service",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-email-service"
-    ]
+    ],
+    "library_path": "generic/shared/cloudflare-email-service--claude-codex-opencode",
+    "classification": "generic"
   },
   {
     "directory": "cloudflare-one",
@@ -188,7 +220,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-one",
       "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-one",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-one"
-    ]
+    ],
+    "library_path": "generic/shared/cloudflare-one",
+    "classification": "generic"
   },
   {
     "directory": "cloudflare-one-migrations",
@@ -204,7 +238,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/cloudflare-one-migrations",
       "/tmp/all-agent-skill-sources/.codex/skills/cloudflare-one-migrations",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/cloudflare-one-migrations"
-    ]
+    ],
+    "library_path": "generic/shared/cloudflare-one-migrations",
+    "classification": "generic"
   },
   {
     "directory": "competitor-news-monitor",
@@ -214,7 +250,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/research/competitor-news-monitor"
-    ]
+    ],
+    "library_path": "generic/hermes/competitor-news-monitor",
+    "classification": "generic"
   },
   {
     "directory": "compress",
@@ -224,7 +262,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.claude/skills/compress"
-    ]
+    ],
+    "library_path": "generic/claude/compress",
+    "classification": "generic"
   },
   {
     "directory": "computer-use",
@@ -234,7 +274,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/computer-use"
-    ]
+    ],
+    "library_path": "generic/hermes/computer-use",
+    "classification": "generic"
   },
   {
     "directory": "creative",
@@ -244,7 +286,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/creative/creative"
-    ]
+    ],
+    "library_path": "generic/hermes/creative",
+    "classification": "generic"
   },
   {
     "directory": "curiosity-led-teaching",
@@ -254,7 +298,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/curiosity-led-teaching"
-    ]
+    ],
+    "library_path": "generic/hermes/curiosity-led-teaching",
+    "classification": "generic"
   },
   {
     "directory": "device-fleet",
@@ -264,7 +310,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/device-fleet"
-    ]
+    ],
+    "library_path": "personal/device-fleet",
+    "classification": "personal"
   },
   {
     "directory": "discord-file-delivery",
@@ -274,7 +322,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/discord-file-delivery"
-    ]
+    ],
+    "library_path": "generic/hermes/discord-file-delivery",
+    "classification": "generic"
   },
   {
     "directory": "distributed-agent-runtime-operations",
@@ -284,7 +334,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/distributed-agent-runtime-operations"
-    ]
+    ],
+    "library_path": "generic/hermes/distributed-agent-runtime-operations",
+    "classification": "generic"
   },
   {
     "directory": "docker-maintenance",
@@ -294,7 +346,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/docker-maintenance"
-    ]
+    ],
+    "library_path": "generic/hermes/docker-maintenance",
+    "classification": "generic"
   },
   {
     "directory": "document-to-action-items",
@@ -304,7 +358,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/document-to-action-items"
-    ]
+    ],
+    "library_path": "generic/hermes/document-to-action-items",
+    "classification": "generic"
   },
   {
     "directory": "docx",
@@ -314,7 +370,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/docx"
-    ]
+    ],
+    "library_path": "generic/hermes/docx",
+    "classification": "generic"
   },
   {
     "directory": "durable-objects",
@@ -330,7 +388,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/durable-objects",
       "/tmp/all-agent-skill-sources/.codex/skills/durable-objects",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/durable-objects"
-    ]
+    ],
+    "library_path": "generic/shared/durable-objects",
+    "classification": "generic"
   },
   {
     "directory": "editor-mcp-integration",
@@ -340,7 +400,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/creative/editor-mcp-integration"
-    ]
+    ],
+    "library_path": "generic/hermes/editor-mcp-integration",
+    "classification": "generic"
   },
   {
     "directory": "email-inbox-triage",
@@ -350,7 +412,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/email/email-inbox-triage"
-    ]
+    ],
+    "library_path": "generic/hermes/email-inbox-triage",
+    "classification": "generic"
   },
   {
     "directory": "file-pr",
@@ -361,7 +425,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/file-pr"
-    ]
+    ],
+    "library_path": "personal/file-pr",
+    "classification": "personal"
   },
   {
     "directory": "find-skills",
@@ -371,7 +437,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.claude/skills/find-skills"
-    ]
+    ],
+    "library_path": "generic/claude/find-skills",
+    "classification": "generic"
   },
   {
     "directory": "flatmmo-userscript-handoff",
@@ -381,7 +449,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/flatmmo-userscript-handoff"
-    ]
+    ],
+    "library_path": "personal/flatmmo-userscript-handoff",
+    "classification": "personal"
   },
   {
     "directory": "frontend-design",
@@ -391,7 +461,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.config/opencode/skills/frontend-design"
-    ]
+    ],
+    "library_path": "generic/opencode/frontend-design",
+    "classification": "generic"
   },
   {
     "directory": "frontend-product-implementation",
@@ -401,7 +473,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/frontend-product-implementation"
-    ]
+    ],
+    "library_path": "generic/hermes/frontend-product-implementation",
+    "classification": "generic"
   },
   {
     "directory": "game-development",
@@ -411,7 +485,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/creative/game-development"
-    ]
+    ],
+    "library_path": "generic/hermes/game-development",
+    "classification": "generic"
   },
   {
     "directory": "gameplay-coaching",
@@ -421,7 +497,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/creative/gameplay-coaching"
-    ]
+    ],
+    "library_path": "generic/hermes/gameplay-coaching",
+    "classification": "generic"
   },
   {
     "directory": "git-history-rewriting",
@@ -431,7 +509,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/github/git-history-rewriting"
-    ]
+    ],
+    "library_path": "generic/hermes/git-history-rewriting",
+    "classification": "generic"
   },
   {
     "directory": "github",
@@ -441,7 +521,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/github/github"
-    ]
+    ],
+    "library_path": "generic/hermes/github",
+    "classification": "generic"
   },
   {
     "directory": "github-issue-to-pr",
@@ -451,7 +533,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/github/github-issue-to-pr"
-    ]
+    ],
+    "library_path": "generic/hermes/github-issue-to-pr",
+    "classification": "generic"
   },
   {
     "directory": "godmode",
@@ -461,7 +545,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/red-teaming/godmode"
-    ]
+    ],
+    "library_path": "generic/hermes/godmode",
+    "classification": "generic"
   },
   {
     "directory": "grounded-citations",
@@ -471,7 +557,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/research/grounded-citations"
-    ]
+    ],
+    "library_path": "generic/hermes/grounded-citations",
+    "classification": "generic"
   },
   {
     "directory": "healthcare-care-navigation",
@@ -481,7 +569,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/healthcare-care-navigation"
-    ]
+    ],
+    "library_path": "generic/hermes/healthcare-care-navigation",
+    "classification": "generic"
   },
   {
     "directory": "helium-graceful-shutdown",
@@ -491,7 +581,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/helium-graceful-shutdown"
-    ]
+    ],
+    "library_path": "personal/helium-graceful-shutdown",
+    "classification": "personal"
   },
   {
     "directory": "hermes-agent",
@@ -501,7 +593,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/hermes-agent"
-    ]
+    ],
+    "library_path": "generic/hermes/hermes-agent",
+    "classification": "generic"
   },
   {
     "directory": "hermes-desktop-plugins",
@@ -511,7 +605,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/hermes-desktop-plugins"
-    ]
+    ],
+    "library_path": "generic/hermes/hermes-desktop-plugins",
+    "classification": "generic"
   },
   {
     "directory": "inspecting-hermes-desktop-dom",
@@ -521,7 +617,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/inspecting-hermes-desktop-dom"
-    ]
+    ],
+    "library_path": "generic/hermes/inspecting-hermes-desktop-dom",
+    "classification": "generic"
   },
   {
     "directory": "irish-health-insurance-comparison",
@@ -531,7 +629,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/research/irish-health-insurance-comparison"
-    ]
+    ],
+    "library_path": "generic/hermes/irish-health-insurance-comparison",
+    "classification": "generic"
   },
   {
     "directory": "kanban",
@@ -541,7 +641,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/kanban"
-    ]
+    ],
+    "library_path": "generic/hermes/kanban",
+    "classification": "generic"
   },
   {
     "directory": "linux-desktop-authentication",
@@ -551,7 +653,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-desktop-authentication"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-desktop-authentication",
+    "classification": "generic"
   },
   {
     "directory": "linux-desktop-typography",
@@ -561,7 +665,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/design/linux-desktop-typography"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-desktop-typography",
+    "classification": "generic"
   },
   {
     "directory": "linux-font-configuration",
@@ -571,7 +677,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-font-configuration"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-font-configuration",
+    "classification": "generic"
   },
   {
     "directory": "linux-font-rendering-troubleshooting",
@@ -581,7 +689,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-font-rendering-troubleshooting"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-font-rendering-troubleshooting",
+    "classification": "generic"
   },
   {
     "directory": "linux-graphics-app-troubleshooting",
@@ -591,7 +701,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-graphics-app-troubleshooting"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-graphics-app-troubleshooting",
+    "classification": "generic"
   },
   {
     "directory": "linux-wayland-session-autostart",
@@ -601,7 +713,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/linux-wayland-session-autostart"
-    ]
+    ],
+    "library_path": "generic/hermes/linux-wayland-session-autostart",
+    "classification": "generic"
   },
   {
     "directory": "local-video-transcription",
@@ -611,7 +725,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/media/local-video-transcription"
-    ]
+    ],
+    "library_path": "generic/hermes/local-video-transcription",
+    "classification": "generic"
   },
   {
     "directory": "marketing-search-intelligence",
@@ -621,7 +737,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/business/marketing-search-intelligence"
-    ]
+    ],
+    "library_path": "generic/hermes/marketing-search-intelligence",
+    "classification": "generic"
   },
   {
     "directory": "media",
@@ -631,7 +749,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/media/media"
-    ]
+    ],
+    "library_path": "generic/hermes/media",
+    "classification": "generic"
   },
   {
     "directory": "meeting-action-items",
@@ -641,7 +761,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/meeting-action-items"
-    ]
+    ],
+    "library_path": "generic/hermes/meeting-action-items",
+    "classification": "generic"
   },
   {
     "directory": "merge-reconciler",
@@ -651,7 +773,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/autonomous-ai-agents/merge-reconciler"
-    ]
+    ],
+    "library_path": "generic/hermes/merge-reconciler",
+    "classification": "generic"
   },
   {
     "directory": "mlops",
@@ -661,7 +785,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/mlops/mlops"
-    ]
+    ],
+    "library_path": "generic/hermes/mlops",
+    "classification": "generic"
   },
   {
     "directory": "mmo-combat-ui-configuration",
@@ -671,7 +797,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/gameplay/mmo-combat-ui-configuration"
-    ]
+    ],
+    "library_path": "generic/hermes/mmo-combat-ui-configuration",
+    "classification": "generic"
   },
   {
     "directory": "model-routing",
@@ -682,7 +810,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/model-routing"
-    ]
+    ],
+    "library_path": "personal/model-routing",
+    "classification": "personal"
   },
   {
     "directory": "node-typescript-runtime-workflows",
@@ -692,7 +822,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/node-typescript-runtime-workflows"
-    ]
+    ],
+    "library_path": "generic/hermes/node-typescript-runtime-workflows",
+    "classification": "generic"
   },
   {
     "directory": "obliteratus",
@@ -702,7 +834,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/mlops/inference/obliteratus"
-    ]
+    ],
+    "library_path": "generic/hermes/obliteratus",
+    "classification": "generic"
   },
   {
     "directory": "online-assessment-preparation",
@@ -712,7 +846,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/online-assessment-preparation"
-    ]
+    ],
+    "library_path": "generic/hermes/online-assessment-preparation",
+    "classification": "generic"
   },
   {
     "directory": "openclaw-agent-team",
@@ -722,7 +858,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/openclaw-agent-team"
-    ]
+    ],
+    "library_path": "generic/hermes/openclaw-agent-team",
+    "classification": "generic"
   },
   {
     "directory": "pdf",
@@ -732,7 +870,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/pdf"
-    ]
+    ],
+    "library_path": "generic/hermes/pdf",
+    "classification": "generic"
   },
   {
     "directory": "personal-backup-recovery",
@@ -742,7 +882,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-backup-recovery"
-    ]
+    ],
+    "library_path": "personal/personal-backup-recovery",
+    "classification": "personal"
   },
   {
     "directory": "personal-billing-reconciliation",
@@ -752,7 +894,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-billing-reconciliation"
-    ]
+    ],
+    "library_path": "personal/personal-billing-reconciliation",
+    "classification": "personal"
   },
   {
     "directory": "personal-coaching-workflows",
@@ -762,7 +906,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-coaching-workflows"
-    ]
+    ],
+    "library_path": "personal/personal-coaching-workflows",
+    "classification": "personal"
   },
   {
     "directory": "personal-data-protection",
@@ -772,7 +918,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-data-protection"
-    ]
+    ],
+    "library_path": "personal/personal-data-protection",
+    "classification": "personal"
   },
   {
     "directory": "personal-device-migration",
@@ -782,7 +930,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-device-migration"
-    ]
+    ],
+    "library_path": "personal/personal-device-migration",
+    "classification": "personal"
   },
   {
     "directory": "personal-financial-review",
@@ -792,7 +942,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-financial-review"
-    ]
+    ],
+    "library_path": "personal/personal-financial-review",
+    "classification": "personal"
   },
   {
     "directory": "personal-gmail",
@@ -802,7 +954,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-gmail"
-    ]
+    ],
+    "library_path": "personal/personal-gmail",
+    "classification": "personal"
   },
   {
     "directory": "personal-google-apis",
@@ -812,7 +966,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-apis"
-    ]
+    ],
+    "library_path": "personal/personal-google-apis",
+    "classification": "personal"
   },
   {
     "directory": "personal-google-automation",
@@ -822,7 +978,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-automation"
-    ]
+    ],
+    "library_path": "personal/personal-google-automation",
+    "classification": "personal"
   },
   {
     "directory": "personal-google-data",
@@ -832,7 +990,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-data"
-    ]
+    ],
+    "library_path": "personal/personal-google-data",
+    "classification": "personal"
   },
   {
     "directory": "personal-google-workspace-automation",
@@ -842,7 +1002,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-google-workspace-automation"
-    ]
+    ],
+    "library_path": "personal/personal-google-workspace-automation",
+    "classification": "personal"
   },
   {
     "directory": "personal-infrastructure-operations",
@@ -852,7 +1014,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/personal-infrastructure-operations"
-    ]
+    ],
+    "library_path": "personal/personal-infrastructure-operations",
+    "classification": "personal"
   },
   {
     "directory": "personal-operations",
@@ -862,7 +1026,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-operations"
-    ]
+    ],
+    "library_path": "personal/personal-operations",
+    "classification": "personal"
   },
   {
     "directory": "personal-productivity-workflows",
@@ -872,7 +1038,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-productivity-workflows"
-    ]
+    ],
+    "library_path": "personal/personal-productivity-workflows",
+    "classification": "personal"
   },
   {
     "directory": "personal-task-system",
@@ -882,7 +1050,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-task-system"
-    ]
+    ],
+    "library_path": "personal/personal-task-system",
+    "classification": "personal"
   },
   {
     "directory": "personal-travel-booking",
@@ -892,7 +1062,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-travel-booking"
-    ]
+    ],
+    "library_path": "personal/personal-travel-booking",
+    "classification": "personal"
   },
   {
     "directory": "personal-web-monitoring",
@@ -902,7 +1074,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/personal-web-monitoring"
-    ]
+    ],
+    "library_path": "personal/personal-web-monitoring",
+    "classification": "personal"
   },
   {
     "directory": "personal-youtube-analytics",
@@ -912,7 +1086,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/media/personal-youtube-analytics"
-    ]
+    ],
+    "library_path": "personal/personal-youtube-analytics",
+    "classification": "personal"
   },
   {
     "directory": "petdex",
@@ -922,7 +1098,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/petdex"
-    ]
+    ],
+    "library_path": "generic/hermes/petdex",
+    "classification": "generic"
   },
   {
     "directory": "plan",
@@ -932,7 +1110,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/plan"
-    ]
+    ],
+    "library_path": "generic/hermes/plan",
+    "classification": "generic"
   },
   {
     "directory": "portfolio-blog-writing",
@@ -942,7 +1122,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/portfolio-blog-writing"
-    ]
+    ],
+    "library_path": "generic/hermes/portfolio-blog-writing",
+    "classification": "generic"
   },
   {
     "directory": "product-price-monitor",
@@ -952,7 +1134,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/product-price-monitor"
-    ]
+    ],
+    "library_path": "generic/hermes/product-price-monitor",
+    "classification": "generic"
   },
   {
     "directory": "product-ui-ux-accessibility",
@@ -962,7 +1146,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/design/product-ui-ux-accessibility"
-    ]
+    ],
+    "library_path": "generic/hermes/product-ui-ux-accessibility",
+    "classification": "generic"
   },
   {
     "directory": "productivity",
@@ -972,7 +1158,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/productivity"
-    ]
+    ],
+    "library_path": "generic/hermes/productivity",
+    "classification": "generic"
   },
   {
     "directory": "remote-desktop-service-recovery",
@@ -982,7 +1170,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/remote-desktop-service-recovery"
-    ]
+    ],
+    "library_path": "personal/remote-desktop-service-recovery",
+    "classification": "personal"
   },
   {
     "directory": "remote-development-workflows",
@@ -992,7 +1182,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/remote-development-workflows"
-    ]
+    ],
+    "library_path": "generic/hermes/remote-development-workflows",
+    "classification": "generic"
   },
   {
     "directory": "remote-service-client-connectivity",
@@ -1002,7 +1194,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/remote-service-client-connectivity"
-    ]
+    ],
+    "library_path": "personal/remote-service-client-connectivity",
+    "classification": "personal"
   },
   {
     "directory": "research",
@@ -1012,7 +1206,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/research/research"
-    ]
+    ],
+    "library_path": "generic/hermes/research",
+    "classification": "generic"
   },
   {
     "directory": "rustdesk-hyprland-wake-screen",
@@ -1022,7 +1218,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/rustdesk-hyprland-wake-screen"
-    ]
+    ],
+    "library_path": "personal/rustdesk-hyprland-wake-screen",
+    "classification": "personal"
   },
   {
     "directory": "saas-funnel-growth",
@@ -1032,7 +1230,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/business/saas-funnel-growth"
-    ]
+    ],
+    "library_path": "generic/hermes/saas-funnel-growth",
+    "classification": "generic"
   },
   {
     "directory": "sales-pricing-storytelling",
@@ -1042,7 +1242,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/business/sales-pricing-storytelling"
-    ]
+    ],
+    "library_path": "generic/hermes/sales-pricing-storytelling",
+    "classification": "generic"
   },
   {
     "directory": "sandbox-sdk",
@@ -1058,7 +1260,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/sandbox-sdk",
       "/tmp/all-agent-skill-sources/.codex/skills/sandbox-sdk",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/sandbox-sdk"
-    ]
+    ],
+    "library_path": "generic/shared/sandbox-sdk",
+    "classification": "generic"
   },
   {
     "directory": "sdlc-review",
@@ -1068,7 +1272,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/sdlc-review"
-    ]
+    ],
+    "library_path": "generic/hermes/sdlc-review",
+    "classification": "generic"
   },
   {
     "directory": "self-hosted-photo-library-operations",
@@ -1078,7 +1284,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/self-hosted-photo-library-operations"
-    ]
+    ],
+    "library_path": "personal/self-hosted-photo-library-operations",
+    "classification": "personal"
   },
   {
     "directory": "seol",
@@ -1088,7 +1296,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.codex/skills/seol"
-    ]
+    ],
+    "library_path": "personal/seol",
+    "classification": "personal"
   },
   {
     "directory": "ship-changes",
@@ -1099,7 +1309,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/ship-changes"
-    ]
+    ],
+    "library_path": "personal/ship-changes",
+    "classification": "personal"
   },
   {
     "directory": "skill-authoring",
@@ -1110,7 +1322,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/skill-authoring"
-    ]
+    ],
+    "library_path": "personal/skill-authoring",
+    "classification": "personal"
   },
   {
     "directory": "social-platform-operations",
@@ -1120,7 +1334,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/social-media/social-platform-operations"
-    ]
+    ],
+    "library_path": "generic/hermes/social-platform-operations",
+    "classification": "generic"
   },
   {
     "directory": "software-development-workflows",
@@ -1130,7 +1346,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/software-development-workflows"
-    ]
+    ],
+    "library_path": "generic/hermes/software-development-workflows",
+    "classification": "generic"
   },
   {
     "directory": "source-grounded-deliverables",
@@ -1140,7 +1358,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/research/source-grounded-deliverables"
-    ]
+    ],
+    "library_path": "generic/hermes/source-grounded-deliverables",
+    "classification": "generic"
   },
   {
     "directory": "staging-content-dedupe-migration-review",
@@ -1150,7 +1370,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/staging-content-dedupe-migration-review"
-    ]
+    ],
+    "library_path": "personal/staging-content-dedupe-migration-review",
+    "classification": "personal"
   },
   {
     "directory": "static-artifact-publishing",
@@ -1160,7 +1382,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/static-artifact-publishing"
-    ]
+    ],
+    "library_path": "generic/hermes/static-artifact-publishing",
+    "classification": "generic"
   },
   {
     "directory": "storage-capacity-auditing",
@@ -1170,7 +1394,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/storage-capacity-auditing"
-    ]
+    ],
+    "library_path": "generic/hermes/storage-capacity-auditing",
+    "classification": "generic"
   },
   {
     "directory": "t3-code-remote-pairing",
@@ -1180,7 +1406,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/devops/t3-code-remote-pairing"
-    ]
+    ],
+    "library_path": "personal/t3-code-remote-pairing",
+    "classification": "personal"
   },
   {
     "directory": "technical-assessment-prep",
@@ -1190,7 +1418,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-assessment-prep"
-    ]
+    ],
+    "library_path": "generic/hermes/technical-assessment-prep",
+    "classification": "generic"
   },
   {
     "directory": "technical-presentation-workflows",
@@ -1200,7 +1430,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-presentation-workflows"
-    ]
+    ],
+    "library_path": "generic/hermes/technical-presentation-workflows",
+    "classification": "generic"
   },
   {
     "directory": "technical-writing-verification",
@@ -1210,7 +1442,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/technical-writing-verification"
-    ]
+    ],
+    "library_path": "generic/hermes/technical-writing-verification",
+    "classification": "generic"
   },
   {
     "directory": "turnstile-spin",
@@ -1226,7 +1460,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/turnstile-spin",
       "/tmp/all-agent-skill-sources/.codex/skills/turnstile-spin",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/turnstile-spin"
-    ]
+    ],
+    "library_path": "generic/shared/turnstile-spin",
+    "classification": "generic"
   },
   {
     "directory": "typography-ux",
@@ -1236,7 +1472,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/design/typography-ux"
-    ]
+    ],
+    "library_path": "generic/hermes/typography-ux",
+    "classification": "generic"
   },
   {
     "directory": "unity-blender-mcp-setup",
@@ -1246,7 +1484,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/software-development/unity-blender-mcp-setup"
-    ]
+    ],
+    "library_path": "generic/hermes/unity-blender-mcp-setup",
+    "classification": "generic"
   },
   {
     "directory": "university-technical-learning",
@@ -1256,7 +1496,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/university-technical-learning"
-    ]
+    ],
+    "library_path": "generic/hermes/university-technical-learning",
+    "classification": "generic"
   },
   {
     "directory": "visual-evidence",
@@ -1267,7 +1509,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.agents/skills/visual-evidence"
-    ]
+    ],
+    "library_path": "personal/visual-evidence",
+    "classification": "personal"
   },
   {
     "directory": "web-perf",
@@ -1281,7 +1525,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/web-perf",
       "/tmp/all-agent-skill-sources/.codex/skills/web-perf",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/web-perf"
-    ]
+    ],
+    "library_path": "generic/shared/web-perf",
+    "classification": "generic"
   },
   {
     "directory": "web-perf--hermes",
@@ -1291,7 +1537,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/web-perf"
-    ]
+    ],
+    "library_path": "generic/hermes/web-perf--hermes",
+    "classification": "generic"
   },
   {
     "directory": "weekly-review-planning",
@@ -1301,7 +1549,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/weekly-review-planning"
-    ]
+    ],
+    "library_path": "generic/hermes/weekly-review-planning",
+    "classification": "generic"
   },
   {
     "directory": "workers-best-practices",
@@ -1317,7 +1567,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/workers-best-practices",
       "/tmp/all-agent-skill-sources/.codex/skills/workers-best-practices",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/workers-best-practices"
-    ]
+    ],
+    "library_path": "generic/shared/workers-best-practices",
+    "classification": "generic"
   },
   {
     "directory": "wrangler",
@@ -1331,7 +1583,9 @@
       "/tmp/all-agent-skill-sources/.claude/skills/wrangler",
       "/tmp/all-agent-skill-sources/.codex/skills/wrangler",
       "/tmp/all-agent-skill-sources/.config/opencode/skills/wrangler"
-    ]
+    ],
+    "library_path": "generic/shared/wrangler",
+    "classification": "generic"
   },
   {
     "directory": "wrangler--hermes",
@@ -1341,7 +1595,9 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/wrangler"
-    ]
+    ],
+    "library_path": "generic/hermes/wrangler--hermes",
+    "classification": "generic"
   },
   {
     "directory": "xlsx",
@@ -1351,6 +1607,8 @@
     ],
     "sources": [
       "/tmp/all-agent-skill-sources/.hermes/skills/productivity/xlsx"
-    ]
+    ],
+    "library_path": "generic/hermes/xlsx",
+    "classification": "generic"
   }
 ]
