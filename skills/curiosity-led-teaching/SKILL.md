@@ -1,6 +1,6 @@
 ---
 name: curiosity-led-teaching
-description: "Use when teach Semyon technical or academic material through bounded curiosity, active prediction, real-project relevance, and visible closure."
+description: "Teach Semyon technical or academic material through bounded curiosity, active prediction, real-project relevance, and visible closure."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

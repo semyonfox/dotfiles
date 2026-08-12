@@ -1,6 +1,6 @@
 ---
 name: backup-recovery-operations
-description: "Use when design, operate, verify, and document selective local/offsite backup and recovery systems."
+description: Design, operate, verify, and document selective local/offsite backup and recovery systems.
 version: 1.0.0
 
 metadata:

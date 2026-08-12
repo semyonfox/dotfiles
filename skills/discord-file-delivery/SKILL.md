@@ -1,6 +1,6 @@
 ---
 name: discord-file-delivery
-description: "Use when deliver files from Hermes to Discord reliably, including MEDIA tags, upload size limits, and fallback links for large artifacts."
+description: "Deliver files from Hermes to Discord reliably, including MEDIA tags, upload size limits, and fallback links for large artifacts."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

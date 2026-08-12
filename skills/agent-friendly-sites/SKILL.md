@@ -1,6 +1,6 @@
 ---
 name: agent-friendly-sites
-description: "Use when audit, design, or implement websites that are friendly to user-delegated AI agents while staying spam-safe. Use when the task mentions AI-friendly sites, agent accessibility, llms.txt, machine-readable discovery, OpenAPI/action endpoints, structured data, robots rules for AI crawlers, contact forms for agents, or making a site usable by assistants without exposing raw email or unsafe state-changing actions."
+description: Audit, design, or implement websites that are friendly to user-delegated AI agents while staying spam-safe. Use when the task mentions AI-friendly sites, agent accessibility, llms.txt, machine-readable discovery, OpenAPI/action endpoints, structured data, robots rules for AI crawlers, contact forms for agents, or making a site usable by assistants without exposing raw email or unsafe state-changing actions.
 
 metadata:
   harness: [codex]

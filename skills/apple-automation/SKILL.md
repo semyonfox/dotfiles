@@ -1,6 +1,6 @@
 ---
 name: apple-automation
-description: "Use when class-level macOS and Apple-device automation: screen-driven computer use, AppleScript, screenshots, and Find My workflows."
+description: "Class-level macOS and Apple-device automation: screen-driven computer use, AppleScript, screenshots, and Find My workflows."
 version: 1.0.0
 author: Hermes Agent
 license: MIT

@@ -1,6 +1,6 @@
 ---
 name: availability-observability
-description: "Use when audit and present host, network-uplink, and service availability from existing system evidence before adding monitoring."
+description: "Audit and present host, network-uplink, and service availability from existing system evidence before adding monitoring."
 version: 1.0.0
 created_by: agent
 

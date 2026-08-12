@@ -1,6 +1,6 @@
 ---
 name: chaptered-audio-learning
-description: "Use when use for multi-chapter audio learning series."
+description: "Use for multi-chapter audio learning series."
 version: 1.0.0
 created_by: agent
 

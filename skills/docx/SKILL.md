@@ -1,6 +1,6 @@
 ---
 name: docx
-description: "Use when create, read, edit, template, and review Word .docx files."
+description: Create, read, edit, template, and review Word .docx files.
 version: 1.1.0
 author: Nous Research
 license: MIT
