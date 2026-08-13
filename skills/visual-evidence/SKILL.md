@@ -1,6 +1,6 @@
 ---
 name: visual-evidence
-description: Inspect slide decks, SVG or vector-heavy compositions, complex infographics, and production visual-reference comparisons with Gemini through the local agy CLI. Use when exact rendered evidence materially affects those tasks. Do not use for generic visuals, ordinary frontend work, or simple image viewing, and do not let Gemini make architecture, taste, or product decisions.
+description: "Use when slide decks, vector-heavy visuals, complex infographics, or reference comparisons need rendered evidence. Use Gemini via agy as an observer, not a design or product decision-maker."
 
 metadata:
   harness: [claude, codex]
