@@ -1,6 +1,6 @@
 ---
 name: visual-evidence
-description: "Use when slide decks, vector-heavy compositions, complex infographics, or visual-reference comparisons need exact rendered evidence — not for generic visuals, ordinary frontend work, or simple image viewing. Use Gemini via agy as an observer, not a design or product decision-maker."
+description: "Use when slide decks, vector compositions, complex infographics, or visual-reference QA need rendered evidence from Gemini via agy — not ordinary frontend or simple image viewing."
 
 metadata:
   harness: [claude, codex]

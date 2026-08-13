@@ -1,6 +1,6 @@
 ---
 name: model-routing
-description: "Use before delegating implementation, orchestrating agents, escalating reasoning effort, requesting cross-model review, or deciding between Sol, Terra, Luna, Spark, Opus, Sonnet, or Fable. Select the decision owner, implementer, effort, and review path; do not invoke merely because several models are available."
+description: "Use before delegating, orchestrating agents, escalating effort, requesting cross-model review, or picking Sol, Terra, Luna, Spark, Opus, Sonnet, or Fable — not whenever multiple models exist."
 
 metadata:
   harness: [claude, codex]

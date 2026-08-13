@@ -1,6 +1,6 @@
 ---
 name: html-communication
-description: "Use when the user asks for a plan, spec, writeup, findings, report, comparison, or UI mockup to read outside the terminal, or says HTML without more context. Produce one standalone HTML document; do not use for product HTML."
+description: "Use when asked for a plan, spec, writeup, findings, report, comparison, UI mockup, or just HTML to read outside the terminal — not product HTML."
 
 metadata:
   harness: [claude, codex]
