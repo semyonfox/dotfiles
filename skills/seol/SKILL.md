@@ -1,6 +1,6 @@
 ---
 name: seol
-description: "Use when the user asks to publish or share a static artifact through Seol. Upload a safe HTML file, archive, or static-site directory to a temporary URL."
+description: "Use when the user asks to host, publish, upload, deploy, or share a report, dashboard, diagram, demo, or other static artifact as a temporary public URL. Publish an HTML file, ZIP, or static-site directory with Seol."
 
 metadata:
   harness: [codex]

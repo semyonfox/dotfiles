@@ -1,6 +1,6 @@
 ---
 name: model-routing
-description: "Use when delegating or choosing a Codex or Claude lane for a bounded task. Select the decision owner, implementer, effort, and review path."
+description: "Use before delegating implementation, orchestrating agents, escalating reasoning effort, requesting cross-model review, or deciding between Sol, Terra, Luna, Spark, Opus, Sonnet, or Fable. Select the decision owner, implementer, effort, and review path; do not invoke merely because several models are available."
 
 metadata:
   harness: [claude, codex]

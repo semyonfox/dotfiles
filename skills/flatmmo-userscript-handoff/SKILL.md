@@ -1,6 +1,6 @@
 ---
 name: flatmmo-userscript-handoff
-description: "Use when building or handing off FlatMMO Mega Helper to Helium or a userscript manager. Verify the installed script handoff without claiming browser confirmation prematurely."
+description: "Use when building, installing, or handing off the FlatMMO Mega Helper userscript to Helium, Tampermonkey, or Violentmonkey. Verify the handoff without claiming browser confirmation prematurely."
 
 metadata:
   harness: [codex]

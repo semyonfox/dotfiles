@@ -1,6 +1,6 @@
 ---
 name: claude-second-opinion
-description: "Use when the user requests Claude, Fable, or a second opinion on an uncertain, failed, or high-risk diagnosis. Get a bounded local Claude review and verify it yourself."
+description: "Use when the user asks for Claude, Fable, or a second opinion, or when local investigation still leaves material uncertainty, a repeatedly failed fix, or a high-risk diagnosis to sanity-check. Get a bounded local `claude --model fable -p` review and verify it yourself; not for routine code reading or obvious fixes."
 
 metadata:
   harness: [codex]

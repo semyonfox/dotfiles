@@ -1,6 +1,6 @@
 ---
 name: device-fleet
-description: "Use when inspecting, accessing, configuring, or troubleshooting Semyon’s personal device fleet. Follow the documented inventory and safe remote-access workflow."
+description: "Use when inspecting, SSHing into, configuring, or troubleshooting Semyon's machines — server, NAS, PC, laptop, router, Tailscale, or T3 Code hosts. Follow the documented inventory and safe remote-access workflow."
 
 metadata:
   harness: [codex]
