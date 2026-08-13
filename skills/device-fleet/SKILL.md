@@ -8,8 +8,6 @@ metadata:
 
 # Device Fleet
 
-## Overview
-
 Use this skill to work safely across Semyon's personal machines. Keep durable facts in `references/computers.md`, refresh them with non-secret discovery, and treat device changes as higher-risk than normal repo edits.
 
 ## First Steps

@@ -8,8 +8,6 @@ metadata:
 
 # FlatMMO Userscript Handoff
 
-## Workflow
-
 1. Work from the `flatmmo-mega-helper` repo root.
 2. Prefer the project command that loads the script into Helium on the user's PC:
 
