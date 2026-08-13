@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: "Create, split, tune, or retire reusable agent skills from repeated real-world failures, workflows, or user corrections. Use when a user asks to make a skill, improve an agent instruction, turn a workflow into reusable guidance, or reduce repeated prompting."
+description: "Use when creating, revising, splitting, or retiring a reusable skill after repeated workflow friction or corrections. Keep its trigger narrow and procedure evidence-based."
 
 metadata:
   harness: [claude, codex]
