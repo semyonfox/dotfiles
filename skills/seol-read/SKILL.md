@@ -8,13 +8,13 @@ metadata:
 
 # Seol read
 
-Read a Seol page directly through the shell rather than opening a browser or searching the web.
+Fetch the supplied Seol URL with the shell. Do not use a browser or web search.
 
-1. Treat the supplied Seol URL as the source of truth. Preserve the page path and use a bounded shell fetch such as `curl --fail --location --max-time 30 URL`.
-2. Fetch the page first. Do not use web search to rediscover it and do not open a browser unless the user explicitly asks for visual review.
-3. Extract and report only the content relevant to the request. State plainly when the page cannot be fetched or is no longer available.
-4. Do not mutate, replace, extend, or republish a page merely because it was read.
+1. Fetch the exact URL directly:
 
-## Done
+   ```bash
+   curl --fail --silent --show-error --location --max-time 30 URL
+   ```
 
-Provide the requested grounded reading/synthesis and identify the fetched Seol URL.
+2. Use the fetched content to answer the request. Report fetch failures plainly.
+3. Reading never mutates, replaces, extends, or republishes a page.

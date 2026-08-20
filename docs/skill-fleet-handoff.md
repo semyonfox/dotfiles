@@ -47,8 +47,51 @@ Runtime targets:
 - Migration worktree: `/home/semyon/dotfiles-skill-fleet-20260820` on `chore/skill-fleet-migration-20260820`. The original checkout remains untouched on its dirty branch.
 - Restored the canonical `skill-fleet` and `unslop` sources, provider links for `unslop`, this handoff, and the revised fleet documentation to the migration branch.
 - Moved the Codex package definition from `codex/.codex/skills` to `codex/.agents/skills`. The new links are relative and resolve to canonical `skills/` directories. The old package links were absolute and made GNU Stow reject the package even with an empty target.
-- A clean-target Stow simulation succeeds. The live server dry-run correctly fails because `~/.agents` is a real unmanaged directory, and the old `~/.codex/skills` tree has mixed ownership. Do not deploy or delete those runtime paths yet.
+- A clean-target Stow simulation succeeds. The live server dry-run refuses the legacy state: `~/.agents` is a dangling old Stow link and the old Claude/Codex locations mix links with real directories. Do not force Stow over those paths; move only inventoried legacy skill entries to a recoverable backup, then create the provider links.
 - Read-only inventory: NAS has only Codex's managed `.system` directory. Laptop has shared `compress` and `find-skills`, plus untracked laptop-only `caveman`, `caveman-commit`, and `caveman-review` skills. Keep the latter three machine-specific until their source, trigger scope, and ownership are reviewed. The server Hermes corpus remains separate.
+
+## Mini checklist, 2026-08-20
+
+Legend: `x` means the canonical source and declared provider link have been checked. `-` means the skill does not declare that provider.
+
+| Skill | Claude | Codex | Notes |
+| --- | :---: | :---: | --- |
+| agent-friendly-sites | - | x | |
+| agents-sdk | x | x | |
+| babysit-pr | x | x | |
+| better-typography | - | x | |
+| claude-second-opinion | - | x | |
+| cloudflare--claude-codex-opencode | x | x | |
+| cloudflare-email-service--claude-codex-opencode | x | x | |
+| cloudflare-one | x | x | |
+| cloudflare-one-migrations | x | x | |
+| compress | x | - | |
+| device-fleet | x | x | PC edit reviewed: Claude support added. |
+| durable-objects | x | x | |
+| file-pr | x | x | Review its interaction with `ship-changes` before the next PR workflow revision. |
+| find-skills | x | - | |
+| flatmmo-userscript-handoff | - | x | |
+| html-communication | x | x | PC edit reviewed: Seol publishing remains user-requested. |
+| model-routing | x | x | |
+| sandbox-sdk | x | x | |
+| seol | x | x | PC edit reviewed: accountless credential wording retained; sensitive content blocks publishing. |
+| seol-read | x | x | PC edit reviewed: exact shell fetch, no `/raw` rewrite. |
+| ship-changes | x | x | |
+| skill-authoring | x | x | |
+| skill-fleet | x | x | Provider links added during this pass. |
+| turnstile-spin | x | x | |
+| unslop | x | x | |
+| visual-evidence | x | x | |
+| web-perf | x | x | |
+| workers-best-practices | x | x | |
+| wrangler | x | x | |
+
+### PC edits
+
+- [x] `device-fleet`: declare Claude and Codex support.
+- [x] `html-communication`: preserve the human-document workflow; publish only on an explicit share request and let `seol` own publishing details.
+- [x] `seol-read`: fetch the supplied URL directly with bounded shell `curl`; no browser, search, or `/raw` rewrite.
+- [x] `seol`: declare Claude and Codex support, retain the sensitive-content stop, and name the accountless publisher credential accurately.
 
 ## Next work
 

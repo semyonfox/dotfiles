@@ -3,18 +3,18 @@ name: seol
 description: "Use when the user asks to publish, host, upload, deploy, or share an HTML file, ZIP, or static site as a temporary public URL."
 
 metadata:
-  harness: [codex]
+  harness: [claude, codex]
 ---
 
 # Seol
 
-Publish only on request; it is an external side effect.
+Publish only when requested; this is an external side effect.
 
 1. Require `seol` on `PATH`.
-2. Accept one `.html`/`.htm`, or a directory/ZIP rooted at `index.html`.
-3. For framework source, inspect scripts/docs; if useful, run its existing production build and upload static output (`dist/`, `build/`, etc.). Never invent an unknown build command.
-4. Check text for obvious credentials or sensitive data; stop and warn if found.
-5. Preserve relative assets: `assets/app.js`, not `/assets/app.js`.
+2. Accept one `.html`/`.htm` file, or a directory/ZIP with root `index.html`.
+3. For framework source, inspect its scripts/docs; when useful, run its existing production build and upload the static output (`dist/`, `build/`, etc.). Never invent an unknown build command.
+4. Check text for obvious credentials or sensitive data. Stop and warn if found; do not publish it.
+5. Preserve relative assets (`assets/app.js`, not `/assets/app.js`).
 6. Publish and return the printed URL:
 
 ```bash
@@ -22,7 +22,7 @@ seol publish --quiet PATH
 # Optional: --expires 7d --title "Title"
 ```
 
-Default expiry is one day: omit `--expires` unless the user requests another duration. Seven days is the maximum. Publishing needs the configured server token; if unavailable, ask the user to run:
+Omit `--expires` for the one-day default unless the user requests another duration. Seven days is the maximum. Publishing needs the configured accountless publisher credential; if unavailable, ask the user to run:
 
 ```bash
 seol configure --server URL --token TOKEN
