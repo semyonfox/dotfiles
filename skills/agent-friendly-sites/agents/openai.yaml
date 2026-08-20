@@ -1,4 +1,0 @@
-interface:
-  display_name: "Agent-Friendly Sites"
-  short_description: "Make sites discoverable and safe for agents"
-  default_prompt: "Use $agent-friendly-sites to audit this website for user-delegated agent accessibility, machine-readable discovery, and spam-safe actions."

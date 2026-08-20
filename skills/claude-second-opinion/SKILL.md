@@ -8,29 +8,20 @@ metadata:
 
 # Claude Second Opinion
 
-Use this skill to bring in Claude as an independent reviewer when another model pass is likely to reduce uncertainty or unblock a fix. Do the local investigation first unless the user directly asks to ask Claude immediately.
+Bring in Claude as an independent reviewer only when it reduces uncertainty or unblocks a fix. Investigate locally first unless the user asks for Claude immediately.
 
-## Use Judiciously
+## When to use it
 
-Ask Claude when one of these is true:
+Use it for an explicit Claude/Fable/second-opinion request; an ambiguity remaining after relevant code, logs, tests, or docs; a fix that has failed more than once; a high-impact change needing an independent sanity check before edit/deploy; or focused critique of a proposed remediation. Do **not** use it for routine reading, simple commands, obvious fixes, user-prohibited external services, or broad brainstorming. Its answer never replaces local verification.
 
-- The user explicitly asks to call Claude, Fable, or get a second opinion.
-- A bug or design issue remains ambiguous after reading the relevant code, logs, tests, or docs.
-- A fix has failed more than once and a fresh diagnosis could expose a missed assumption.
-- The issue is high impact and warrants an independent sanity check before editing or deploying.
-- You need a focused critique of a proposed remediation, not broad brainstorming.
+## Command format
 
-Do not ask Claude for routine code reading, simple commands, obvious fixes, or tasks where the user has asked not to use external services. Do not let Claude's answer replace local verification.
+`claude -p fable` means the literal prompt `fable` to the default model. For Claude Code print mode with Fable, use `claude --model fable -p "prompt"`.
 
-## Command Format
-
-Interpret the user's shorthand `claude -p fable` as "use Claude Code print mode with the Fable model." The correct documented shape is `claude --model fable -p "prompt"`. A bare `claude -p fable` sends the word `fable` as the prompt to the default model.
-
-Default to a non-interactive, bounded, no-tools call:
+Default to this bounded, non-interactive, no-tools call:
 
 ```bash
 timeout 180s claude --model fable -p \
-  --no-session-persistence \
   --max-turns 1 \
   --max-budget-usd 0.75 \
   --tools "" \
@@ -41,29 +32,19 @@ PASTE_REDACTED_CONTEXT_HERE
 </context>"
 ```
 
-If `timeout` is not available, omit it. If a documented flag is rejected by the installed Claude version, retry with the smallest compatible command and note the removed flag:
+If `timeout` is unavailable, omit it. If the installed version rejects a documented flag, retry with the smallest compatible command and state which flag was removed:
 
 ```bash
 claude --model fable -p "PROMPT"
 ```
 
-Use `--output-format json` when the result needs to be machine-parseable or when cost/session metadata is useful. Use text output for ordinary second-opinion reads.
+Use `--output-format json` for machine parsing or cost/session metadata; use text otherwise.
 
-## Prompt Hygiene
+## Prompt and access boundaries
 
-Give Claude the smallest useful context:
+Give the smallest useful context: exact question; observed failing command/error, paths, relevant snippets, constraints, and attempts; ask it to challenge a weak diagnosis and propose concrete checks. Redact secrets, tokens, credentials, private keys, `.env`, customer data, and irrelevant personal data. Prefer `git diff --stat`, `git diff -- <file>`, short traces, and excerpts over repositories, long logs, or unrelated diffs.
 
-- State the exact question to answer.
-- Include observed facts: failing command, error excerpt, relevant file paths, key code snippets, environment constraints, and what has already been tried.
-- Ask for disagreement explicitly: "Challenge my likely diagnosis if it is weak."
-- Ask for concrete checks, not just an opinion.
-- Redact secrets, tokens, credentials, private keys, `.env` content, customer data, and irrelevant personal data.
-
-Avoid dumping an entire repository, long logs, or unrelated diffs. Prefer `git diff --stat`, focused `git diff -- <file>`, stack traces, and short code excerpts.
-
-## Read-Only Repository Access
-
-Prefer no-tools calls with pasted context. If Claude genuinely needs to inspect files itself, restrict it to read-only tools and the current working tree:
+Prefer pasted context and no tools. If repository inspection is genuinely needed, allow only read-only access to the current tree:
 
 ```bash
 timeout 180s claude --model fable -p \
@@ -75,17 +56,12 @@ timeout 180s claude --model fable -p \
   "Inspect this repository read-only and give a second opinion on: QUESTION_HERE. Do not edit files or run shell commands."
 ```
 
-Do not grant edit, write, bash, browser, MCP, or permission-bypass capabilities for a second opinion unless the user explicitly asks Claude to do active work.
+Never grant edit, write, bash, browser, MCP, or permission bypass for a second opinion unless the user explicitly requests active Claude work.
 
-## Use The Answer
+## Use the answer
 
-After Claude responds:
+Compare its claims with local code, tests, docs, and runtime behavior; use it to refine the plan or patch while retaining final engineering judgment; then run relevant local checks. Tell the user what was useful and whether you agreed, rejected, or partly used it.
 
-1. Compare its claim against the local code, tests, docs, and runtime behavior.
-2. Use the answer to refine the plan or patch, but make the final engineering judgment yourself.
-3. Run the relevant local checks after implementing any change.
-4. In the user-facing response, summarize the useful part of Claude's second opinion and call out whether you agreed, rejected, or partially used it.
+## Docs checked
 
-## Docs Checked
-
-At skill creation, the local CLI was `claude 2.1.199 (Claude Code)`. `claude --help` and the official Claude Code CLI reference confirmed that `-p/--print` is non-interactive print mode, `--model fable` selects the Fable model alias, `--no-session-persistence`, `--output-format`, `--max-budget-usd`, `--max-turns`, `--tools`, and `--add-dir` are relevant for bounded scripted use. Re-check `claude --help` and the official CLI reference if a flag fails or precise behavior matters.
+At creation, local CLI `claude 2.1.199 (Claude Code)`, `claude --help`, and the official Claude Code CLI reference confirmed `-p/--print`, `--model fable`, `--no-session-persistence`, `--output-format`, `--max-budget-usd`, `--max-turns`, `--tools`, and `--add-dir` for bounded scripts. Re-check `claude --help` and the official reference if flags fail or precision matters.

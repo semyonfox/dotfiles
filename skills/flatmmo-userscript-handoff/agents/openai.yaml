@@ -1,4 +1,0 @@
-interface:
-  display_name: "FlatMMO Userscript Handoff"
-  short_description: "Copy FlatMMO userscript builds to Downloads"
-  default_prompt: "Use $flatmmo-userscript-handoff after changing FlatMMO Mega Helper to build and copy the userscript to Downloads for Helium."

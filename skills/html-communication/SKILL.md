@@ -8,15 +8,13 @@ metadata:
 
 # HTML communication
 
-Create a readable standalone HTML artifact for a human. This is communication material, not product HTML.
+Create a readable standalone HTML artifact for a human, not product HTML.
 
-1. Do not use this for HTML that ships as part of the application.
-2. Create one self-contained HTML document, capped at 512 KB unless the user asks otherwise.
-3. Write it like a clear spec/report, not a landing page: obvious hierarchy, concise prose, direct evidence, and no decorative product marketing.
-4. When presenting UI alternatives, label them A, B, C and lay them out for direct comparison.
-5. Keep a stable local source path across revisions so the same Seol page can be updated when the user wants a stable review URL.
-6. Use `seol` only if the user asks to share/publish it. Do not claim it is hosted or inspect it in a browser before upload succeeds; browser verification is only needed after a successful publish or when the user asks.
+1. Do not use it for HTML that ships with the application.
+2. Produce one self-contained document, at most 512 KB unless requested otherwise.
+3. Write a clear spec/report—not a landing page—with obvious hierarchy, concise prose, direct evidence, and no decorative product marketing.
+4. Label UI alternatives A, B, C and lay them out for comparison.
+5. Keep a stable local source path across revisions so the same Seol page can be updated for a stable review URL.
+6. Use `seol` only on a request to share/publish. Do not claim hosting or inspect it in a browser before upload succeeds; browser verification is needed only after successful publishing or on request.
 
-## Done
-
-Give the local artifact path. If published, return the verified Seol URL and say it is temporary.
+Return the local artifact path. If published, return the verified temporary Seol URL.

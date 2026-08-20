@@ -1,4 +1,0 @@
-interface:
-  display_name: "Seol"
-  short_description: "Publish static pages as shareable links"
-  default_prompt: "Use $seol to publish this static HTML page and return its temporary shareable URL."

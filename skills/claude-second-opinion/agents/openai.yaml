@@ -1,4 +1,0 @@
-interface:
-  display_name: "Claude Second Opinion"
-  short_description: "Ask Claude Fable for a second opinion"
-  default_prompt: "Use $claude-second-opinion to ask Claude Fable for a concise second opinion on this issue."
