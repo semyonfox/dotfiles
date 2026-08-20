@@ -47,6 +47,10 @@ A one-off task, generic preference, or instruction already covered by global/pro
 ---
 name: lowercase-hyphenated-name
 description: "Use when <recognisable user trigger>. <one-line outcome>."
+
+metadata:
+    harness: [ <csv list of installed harnesses it can be used with> ]
+
 ---
 
 # Human-readable name
