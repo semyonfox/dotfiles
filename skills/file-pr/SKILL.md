@@ -8,28 +8,28 @@ metadata:
 
 # File PR
 
-<!-- Body transcribed/adapted only from the video passage at 00:15:04–00:17:45. Frontmatter is structural metadata, not spoken video text. -->
+Before filing, check whether a PR for this branch already exists. Review the diff locally against `origin/main` to confirm its contents match the goal.
 
-Before filing, check whether this branch already has a PR and review its diff against `origin/main` to confirm it matches the goal.
-
-Follow the repository's title conventions by checking merged PRs and Git history. Titles often become commit messages: make them concise, human-readable, and explain why the change matters.
-
-Bad:
-
-> Perf server negotiate per message deflate on the WebSocket
-
-Good:
-
-> Perf server cut WebSocket frame size by 70% with gzipping
-
-Start the description with the problem from the user's prompt, then briefly explain the solution—not an implementation inventory.
+PR titles usually become commit messages, so follow the repository's title conventions.
+Look at recently merged PRs and Git history for examples.
+Prefer a concise, human-readable title that explains why the change matters:
 
 Bad:
 
-> Removed implicit workspace carryover from every new thread entry point. New threads inherit only the project from context. Branch, work tree, ...
+> perf(server): negotiate permessage-deflate on the WebSocket
 
 Good:
 
-> My new work tree default was ignored when starting new threads on existing work trees. Super unintuitive. Now your preferences always apply.
+> perf(server): cut WebSocket frame size by 70%+ with gzipping
 
-Open a real PR, not a draft, so review bots run. If it needs monitoring, use `babysit-pr`. End the description with the model and harness that made the changes.
+Open the description with a simple explanation of the problem based on the user's original prompt, then briefly explain the solution. Do not lead with an implementation inventory:
+
+Bad:
+
+> Removed implicit workspace carry-over from every 'new thread' entry point (cmd+n / cmd+shift+o, sidebar v1/v2 buttons, command palatte). New threads inherit only the project from context; branch, work tree, and env mode always come from the configured defaults. Deleted buildContextualThreadOptions, startNewThreadInProjectFromContext, and the V1 sidebar is seed-context machinery.
+
+Good:
+
+> My 'new worktree' default was ignored when starting new threads on existing worktrees. Super unintuitive. Now your preferences always apply.
+
+Open a real PR, rather than a draft, so review bots run. If the user asks to babysit or monitor it, use the `babysit-pr`.
