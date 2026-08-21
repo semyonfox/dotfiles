@@ -57,34 +57,24 @@ Legend: `x` means the canonical source and declared provider link have been chec
 | Skill | Claude | Codex | Notes |
 | --- | :---: | :---: | --- |
 | agent-friendly-sites | - | x | |
-| agents-sdk | x | x | |
 | babysit-pr | x | x | |
 | better-typography | - | x | |
 | claude-second-opinion | - | x | |
-| cloudflare--claude-codex-opencode | x | x | |
-| cloudflare-email-service--claude-codex-opencode | x | x | |
-| cloudflare-one | x | x | |
-| cloudflare-one-migrations | x | x | |
 | compress | x | - | |
 | device-fleet | x | x | PC edit reviewed: Claude support added. |
-| durable-objects | x | x | |
 | file-pr | x | x | Review its interaction with `ship-changes` before the next PR workflow revision. |
 | find-skills | x | - | |
 | flatmmo-userscript-handoff | - | x | |
 | html-communication | x | x | PC edit reviewed: Seol publishing remains user-requested. |
 | model-routing | x | x | |
-| sandbox-sdk | x | x | |
 | seol | x | x | PC edit reviewed: accountless credential wording retained; sensitive content blocks publishing. |
 | seol-read | x | x | PC edit reviewed: exact shell fetch, no `/raw` rewrite. |
 | ship-changes | x | x | |
 | skill-authoring | x | x | |
 | skill-fleet | x | x | Provider links added during this pass. |
-| turnstile-spin | x | x | |
 | unslop | x | x | |
 | visual-evidence | x | x | |
 | web-perf | x | x | |
-| workers-best-practices | x | x | |
-| wrangler | x | x | |
 
 ### PC edits
 
@@ -95,7 +85,7 @@ Legend: `x` means the canonical source and declared provider link have been chec
 
 ### Deployment status
 
-- [x] Server and PC now expose 25 Claude and 27 Codex skills each. Every live provider link resolves through the migration worktree's provider link to `skills/<name>/SKILL.md`.
+- [x] Server and PC now expose 15 Claude and 17 Codex skills each. Every remaining live provider link resolves through the migration worktree's provider link to `skills/<name>/SKILL.md`.
 - [x] The legacy non-system `~/.codex/skills` entries were moved out, leaving only Codex-managed `.system` content. Codex now reads `~/.agents/skills`, its documented user-level discovery location.
 - [x] Existing provider entries were moved, not deleted, into dated directories under `~/.local/state/skill-fleet-migration-20260820/` on each machine before links were recreated.
 - [x] The PC's four in-progress edits are also preserved in the named Git stash `skill-fleet-pc-edits-before-a3d43e2`; the reviewed versions are committed on this branch.
