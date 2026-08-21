@@ -1,6 +1,6 @@
 ---
 name: seol
-description: "Use when the user asks to publish, host, upload, deploy, or share an HTML file, ZIP, or static site as a temporary public URL."
+description: Use when the user asks to publish, host, upload, deploy, or share an HTML file, ZIP, or static site as a temporary public URL.
 
 metadata:
   harness: [claude, codex]

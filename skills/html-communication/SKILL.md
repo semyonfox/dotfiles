@@ -1,6 +1,6 @@
 ---
 name: html-communication
-description: "Create a standalone HTML document when the user wants a plan, report, comparison, or mockup to read outside the terminal, not product HTML."
+description: Create a standalone HTML document when the user wants a plan, report, comparison, or mockup to read outside the terminal, not product HTML.
 
 metadata:
   harness: [claude, codex]

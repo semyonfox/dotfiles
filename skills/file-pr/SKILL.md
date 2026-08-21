@@ -1,6 +1,6 @@
 ---
 name: file-pr
-description: "Use when the user asks to file, open, or create a PR."
+description: Use when the user asks to file, open, or create a PR.
 
 metadata:
   harness: [claude, codex]

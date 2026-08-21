@@ -1,6 +1,6 @@
 ---
 name: claude-second-opinion
-description: "Use when asked for Claude, Fable, or a second opinion, or when uncertainty, a repeatedly failed fix, or high-risk diagnosis persists — not routine code reading."
+description: Use when asked for Claude, Fable, or a second opinion, or when uncertainty, a repeatedly failed fix, or high-risk diagnosis persists — not routine code reading.
 
 metadata:
   harness: [codex]

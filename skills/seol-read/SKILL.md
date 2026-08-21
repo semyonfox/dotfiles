@@ -1,6 +1,6 @@
 ---
 name: seol-read
-description: "Use when the user supplies a Seol page URL and asks to read, inspect, summarise, or use its published content."
+description: Use when the user supplies a Seol page URL and asks to read, inspect, summarise, or use its published content.
 
 metadata:
   harness: [claude, codex]

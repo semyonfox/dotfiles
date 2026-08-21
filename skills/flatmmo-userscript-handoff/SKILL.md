@@ -1,6 +1,6 @@
 ---
 name: flatmmo-userscript-handoff
-description: "Use when building, installing, or handing off the FlatMMO Mega Helper userscript to Helium, Tampermonkey, or Violentmonkey."
+description: Use when building, installing, or handing off the FlatMMO Mega Helper userscript to Helium, Tampermonkey, or Violentmonkey.
 
 metadata:
   harness: [codex]
