@@ -1,4 +1,0 @@
-interface:
-  display_name: "Unslop"
-  short_description: "Remove AI patterns and restore human voice"
-  default_prompt: "Use $unslop to remove AI patterns from this writing while preserving meaning and adding a natural human voice."
