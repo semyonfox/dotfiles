@@ -3,7 +3,7 @@ name: compress
 description: Use when a user asks to compress natural-language memory files into caveman format to save input tokens.
 
 metadata:
-  harness: [claude]
+  harness: [claude, codex, opencode, cursor]
 ---
 
 # Caveman Compress

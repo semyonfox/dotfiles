@@ -3,7 +3,7 @@ name: ship-changes
 description: Use when the user asks to commit, push, open or update a PR, repair CI, mark ready, or merge. Validate and deliver only the authorised stage and prerequisites.
 
 metadata:
-  harness: [claude, codex]
+  harness: [claude, codex, opencode, cursor]
 ---
 
 # Ship changes

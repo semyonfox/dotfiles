@@ -2,7 +2,7 @@
 name: skill-fleet
 description: Explain, audit, and safely wire shared skills from this dotfiles repository into Claude Code, Codex, and selected other providers.
 metadata:
-  harnesses: [claude, codex]
+  harnesses: [claude, codex, opencode, cursor]
   compatibility: Claude Code and Codex CLI on Semyon's dotfiles-managed machines.
   category: maintenance
   tier: core

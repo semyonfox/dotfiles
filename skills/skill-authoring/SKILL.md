@@ -3,7 +3,7 @@ name: skill-authoring
 description: Use when asked to make, improve, split, or retire a skill, turn a repeated workflow or correction into reusable guidance, or reduce repeated prompting.
 
 metadata:
-  harness: [claude, codex]
+  harness: [claude, codex, opencode, cursor]
 ---
 
 # Skill authoring

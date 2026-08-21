@@ -3,7 +3,7 @@ name: frontend-design
 description: Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 
 metadata:
-  harness: [claude, codex, opencode]
+  harness: [claude, codex, opencode, cursor]
 ---
 
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.

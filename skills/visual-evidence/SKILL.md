@@ -3,7 +3,7 @@ name: visual-evidence
 description: Use when slide decks, vector compositions, complex infographics, or visual-reference QA need rendered evidence from Gemini via agy — not ordinary frontend or simple image viewing.
 
 metadata:
-  harness: [claude, codex]
+  harness: [claude, codex, opencode, cursor]
 ---
 
 # Visual evidence
