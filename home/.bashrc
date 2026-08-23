@@ -10,7 +10,6 @@
 # ======================================================================
 # ENVIRONMENT VARIABLES
 # ======================================================================
-export NPM_CONFIG_PREFIX="$HOME/.local"
 export PATH="$HOME/.local/bin:$PATH"
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME/bin:$PATH"
@@ -207,3 +206,13 @@ export SDL_VIDEODRIVER=wayland                # prefer Wayland for SDL2 apps
 alias zed=zeditor
 
 [[ -f "$HOME/.local/share/../bin/env" ]] && . "$HOME/.local/share/../bin/env"
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/semyon/.local/bin:$PATH"
+
+# Unity CLI
+. "/home/semyon/.unity/env"
+
+# opencode
+export PATH=/home/semyon/.opencode/bin:$PATH

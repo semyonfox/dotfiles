@@ -1,0 +1,4 @@
+interface:
+  display_name: "Model Routing"
+  short_description: "Choose lead, worker, and reasoning lanes"
+  default_prompt: "Use $model-routing to choose the right model, effort, and delegation pattern for this task."

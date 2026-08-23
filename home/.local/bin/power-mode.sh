@@ -97,7 +97,9 @@ apply_laptop() {
     local powerprofiles=$1 governor=$2 epp=$3 epb=$4 start=$5 end=$6 mode=$7
 
     set_governor_all "$governor"
-    powerprofilesctl set "$powerprofiles" 2>/dev/null || true
+    if [[ "$(powerprofilesctl get 2>/dev/null || true)" != "$powerprofiles" ]]; then
+        powerprofilesctl set "$powerprofiles" 2>/dev/null || true
+    fi
     set_epp_all "$epp"
     set_epb_all "$epb"
     set_thresholds "$start" "$end"

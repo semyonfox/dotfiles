@@ -10,6 +10,7 @@ Do not track:
 - Local caches, histories, generated auth state, or downloaded binary installs
 - Machine-private files from `~/.ssh`, `~/.gnupg`, browser config dirs, or password stores
 - Codex auth/session/task state, plugin caches, sqlite databases, memories, generated images, and private `device-fleet` references
+- Raw OBS Studio scene/profile/plugin state unless deliberately scrubbed; it can contain stream settings, overlay URLs, device IDs, browser-source state, and personal scene names
 
 Safe to track:
 
