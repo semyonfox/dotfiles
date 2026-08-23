@@ -11,7 +11,7 @@ The laptop keeps Hyprland for compositor, monitor, input, window, and keybind du
 ## Ownership
 
 - Hyprland owns monitors, window management, input, rules, and compositor keybinds.
-- Noctalia configuration lives in `laptop/.config/noctalia/`.
+- Noctalia configuration lives in `hyprland/.config/noctalia/` and is shared by every GUI host.
 - Laptop helpers live in `laptop/.local/bin/`.
 
 ## Deploy
@@ -25,7 +25,7 @@ The laptop profile still deploys the shared desktop packages. Laptop-specific gu
 ## Validation
 
 ```bash
-noctalia config validate "$HOME/dotfiles/laptop/.config/noctalia"
+noctalia config validate "$HOME/dotfiles/hyprland/.config/noctalia"
 git diff --check
 ```
 

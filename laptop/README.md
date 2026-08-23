@@ -19,8 +19,6 @@ This package owns host-specific Hyprland and Waybar files:
 
 It also owns the laptop Noctalia sources:
 
-- `~/.config/noctalia/`
-- `~/.local/bin/noctalia-lock`
-- `~/.local/bin/noctalia-idle-suspend`
+- shared Noctalia config and helpers come from the `hyprland` and `home` packages
 
 Hyprland remains the compositor. Noctalia owns the shell surfaces on the laptop, while the old shell tools stay available for rollback. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).
