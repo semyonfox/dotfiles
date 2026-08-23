@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the PC-to-NAS Restic backup daily
+
+[Timer]
+OnCalendar=*-*-* 01:30:00
+RandomizedDelaySec=30m
+Persistent=true
+Unit=semyon-pc-restic-backup.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,14 @@
+[Default Applications]
+x-scheme-handler/http=helium.desktop
+x-scheme-handler/https=helium.desktop
+text/html=helium.desktop
+application/xhtml+xml=helium.desktop
+x-scheme-handler/t3code=t3code-url-handler.desktop
+x-scheme-handler/bitwarden=bitwarden.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+
+[Added Associations]
+x-scheme-handler/http=helium.desktop;
+x-scheme-handler/https=helium.desktop;
+text/html=helium.desktop;
+application/xhtml+xml=helium.desktop;

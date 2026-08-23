@@ -1,0 +1,11 @@
+[Unit]
+Description=Run PC Restic retention and integrity maintenance weekly
+
+[Timer]
+OnCalendar=Sun *-*-* 05:30:00
+RandomizedDelaySec=30m
+Persistent=true
+Unit=semyon-pc-restic-maintenance.service
+
+[Install]
+WantedBy=timers.target

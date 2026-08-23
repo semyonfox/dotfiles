@@ -1,0 +1,23 @@
+[Unit]
+Description=Maintain and sample-check the PC NAS Restic repository
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/semyon/.local/bin/semyon-pc-restic-backup maintenance
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes
+Nice=10
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=6h
+TimeoutStopSec=5m

@@ -1,0 +1,173 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+readonly PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+readonly RESTIC='/usr/bin/restic'
+readonly NAS_SOURCE='10.0.0.6:/nas'
+readonly REPOSITORY='/mnt/nas/users/semyon/restic/semyon-pc'
+readonly PASSWORD_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/restic/pc.password"
+readonly STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/restic"
+readonly LOCK_FILE="$STATE_DIR/semyon-pc-restic-backup.lock"
+
+die() {
+  printf '%s\n' "semyon-pc-restic-backup: $*" >&2
+  exit 1
+}
+
+prepare_lock() {
+  install -d -m 700 -- "$STATE_DIR"
+  exec 9>"$LOCK_FILE"
+  if ! flock -n 9; then
+    printf '%s\n' 'semyon-pc-restic-backup: another run is active; skipping this run' >&2
+    exit 0
+  fi
+}
+
+verify_password_file() {
+  [[ -f "$PASSWORD_FILE" && ! -L "$PASSWORD_FILE" ]] || die 'missing regular password file'
+
+  local mode
+  mode="$(stat -c '%a' -- "$PASSWORD_FILE")"
+  (( (8#$mode & 8#077) == 0 )) || die 'password file permissions are too open'
+}
+
+ensure_nas_repository() {
+  timeout 45s stat -- "$REPOSITORY" >/dev/null || die 'NAS repository is unavailable'
+
+  local mount_info
+  mount_info="$(findmnt -T "$REPOSITORY" -n -o SOURCE,FSTYPE)" || die 'could not inspect NAS mount'
+  awk -v expected="$NAS_SOURCE" '$1 == expected && $2 ~ /^nfs/ { found = 1 } END { exit !found }' <<<"$mount_info" || \
+    die 'repository is not on the expected NFS mount'
+
+  "$RESTIC" snapshots >/dev/null || die 'repository validation failed; refusing to initialize or change it'
+}
+
+declare -a sources=()
+declare -A source_seen=()
+
+add_source() {
+  local candidate="$1"
+  [[ -e "$candidate" ]] || return 0
+  [[ -n "${source_seen[$candidate]:-}" ]] && return 0
+  source_seen["$candidate"]=1
+  sources+=("$candidate")
+}
+
+add_prism_recovery_data() {
+  local root="$1"
+  local base
+  local candidate
+
+  [[ -d "$root" ]] || return 0
+  add_source "$root/prismlauncher.cfg"
+
+  for base in "$root/instances" "$root/ORIGINAL"; do
+    [[ -d "$base" ]] || continue
+    while IFS= read -r -d '' candidate; do
+      add_source "$candidate"
+    done < <(
+      find "$base" -maxdepth 5 \
+        \( -type d \( -name saves -o -name screenshots -o -path '*/minecraft/config' -o -path '*/.minecraft/config' \) \
+        -o -type f \( -name instance.cfg -o -name mmc-pack.json -o -name options.txt -o -name servers.dat \) \) \
+        -print0
+    )
+  done
+}
+
+build_sources() {
+  add_source "$HOME/Documents"
+  add_source "$HOME/Desktop"
+  add_source "$HOME/Downloads"
+  add_source "$HOME/Pictures"
+  add_source "$HOME/Videos"
+  add_source "$HOME/code"
+  add_source "$HOME/projects"
+  add_source "$HOME/Projects"
+  add_source "$HOME/obsidian"
+  add_source "$HOME/dotfiles"
+  add_source "$HOME/.t3"
+  add_source "$HOME/.claude"
+  add_source "$HOME/.codex"
+  add_source "$HOME/.opencode"
+  add_source "$HOME/.config/obs-studio"
+  add_source "$HOME/.local/share/DaVinciResolve"
+  add_source "$HOME/.config/DaVinciResolve"
+  add_source "$HOME/.config/zed"
+  add_source "$HOME/.config/kitty"
+  add_source "$HOME/.config/fish"
+  add_source "$HOME/.config/btop"
+  add_source "$HOME/.config/systemd/user"
+  add_source "$HOME/.ssh/config"
+  add_source "$HOME/.local/share/Steam/userdata"
+  add_prism_recovery_data "$HOME/.local/share/PrismLauncher"
+  add_prism_recovery_data "$HOME/.var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher"
+
+  ((${#sources[@]})) || die 'no backup sources were found'
+}
+
+backup() {
+  build_sources
+
+  local -a args=(--retry-lock 15m backup --tag semyon-pc --skip-if-unchanged --exclude-caches)
+  local pattern
+  for pattern in \
+    "$HOME/.cache/**" \
+    "$HOME/.local/share/Trash/**" \
+    "$HOME/Videos/CacheClip/**" \
+    "$HOME/Videos/Resolve-AAC-Tests/**" \
+    '**/node_modules/**' \
+    '**/.venv/**' \
+    '**/venv/**' \
+    '**/__pycache__/**' \
+    '**/.pytest_cache/**' \
+    '**/.mypy_cache/**' \
+    '**/.ruff_cache/**' \
+    '**/.next/**' \
+    '**/.nuxt/**' \
+    '**/target/**' \
+    '**/build/**' \
+    '**/dist/**' \
+    "$HOME/dotfiles/**/.ssh/id_*" \
+    "$HOME/dotfiles/**/.ssh/*.pem" \
+    "$HOME/dotfiles/**/.ssh/*.key" \
+    "$HOME/.claude/.credentials.json" \
+    "$HOME/.codex/auth.json" \
+    "$HOME/.opencode/auth.json"; do
+    args+=(--exclude "$pattern")
+  done
+
+  "$RESTIC" "${args[@]}" "${sources[@]}"
+}
+
+maintenance() {
+  "$RESTIC" --retry-lock 30m forget \
+    --tag semyon-pc \
+    --group-by host,tags \
+    --keep-daily 30 \
+    --keep-weekly 12 \
+    --keep-monthly 12 \
+    --prune
+  "$RESTIC" --retry-lock 30m check --read-data-subset=5% --with-cache
+}
+
+main() {
+  case "${1:-backup}" in
+    backup|maintenance) ;;
+    *) die 'usage: semyon-pc-restic-backup [backup|maintenance]' ;;
+  esac
+
+  [[ -x "$RESTIC" ]] || die 'restic is not installed at the expected path'
+  export RESTIC_REPOSITORY="$REPOSITORY"
+  export RESTIC_PASSWORD_FILE="$PASSWORD_FILE"
+  prepare_lock
+  verify_password_file
+  ensure_nas_repository
+
+  case "${1:-backup}" in
+    backup) backup ;;
+    maintenance) maintenance ;;
+  esac
+}
+
+main "$@"
