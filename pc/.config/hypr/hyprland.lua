@@ -50,15 +50,11 @@ hl.on("hyprland.start", function()
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "systemctl --user restart vicinae.service", -- start launcher after Wayland env is imported
         scripts .. "/polkitkdeauth.sh",
-        "sh -lc 'systemctl --user --quiet is-active waybar.service || pgrep -x waybar >/dev/null || { command -v waybar >/dev/null && waybar; }'",
+        "noctalia --daemon",
         "blueman-applet",
         "udiskie --no-automount --smart-tray",
         "nm-applet --indicator",
-        "sh -lc 'systemctl --user --quiet is-active swaync.service || pgrep -x swaync >/dev/null || { command -v swaync >/dev/null && swaync; }'",
-        scripts .. "/hyprpaper-cycle.sh current",
-        "sh -lc 'compgen -G /sys/class/power_supply/BAT\\* >/dev/null && [ -x \"$HOME/.local/share/bin/batterynotify.sh\" ] && \"$HOME/.local/share/bin/batterynotify.sh\"'",
         home .. "/.local/bin/power-mode.sh auto",
-        "hypridle",
         "playerctl daemon",
     }
     for _, command in ipairs(commands) do
@@ -252,7 +248,7 @@ hl.bind(main .. " + Delete", hl.dsp.exit())
 hl.bind(main .. " + W", hl.dsp.window.float({action = "toggle"}))
 hl.bind(main .. " + G", hl.dsp.group.toggle())
 hl.bind("ALT + Return", hl.dsp.window.fullscreen({action = "toggle"}))
-hl.bind(main .. " + L", exec(scripts .. "/hyprlock-wrapper"))
+hl.bind(main .. " + L", exec(home .. "/.local/bin/noctalia-lock"))
 hl.bind(main .. " + SHIFT + F", exec(scripts .. "/windowpin.sh"))
 hl.bind(main .. " + Backspace", exec(scripts .. "/logoutlaunch.sh"))
 hl.bind("CTRL + ALT + W", exec("killall waybar || (env reload_flag=1 " .. scripts .. "/wbarconfgen.sh)"))
