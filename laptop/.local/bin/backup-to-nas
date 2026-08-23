@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+umask 077
+
+# Keep systemd's environment from resolving a user-controlled executable first.
+PATH=/usr/local/bin:/usr/bin:/bin
+export PATH
+
+readonly mountpoint=/mnt/nas
+readonly repo="$mountpoint/users/semyon/restic/semyon-laptop"
+readonly password_file="$HOME/.config/restic/password"
+readonly tag=semyon-laptop
+readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/backup-to-nas"
+readonly lock_file="$state_dir/restic.lock"
+
+die() {
+  printf 'backup-to-nas: %s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  printf 'Usage: %s [backup|maintenance|preflight]\n' "${0##*/}" >&2
+}
+
+acquire_lock() {
+  mkdir -p "$state_dir"
+  chmod 700 "$state_dir"
+  exec 9>"$lock_file"
+  flock -w 1800 9 || die 'another laptop Restic job still holds the lock'
+}
+
+ensure_existing_repository() {
+  [[ -r "$password_file" ]] || die 'missing or unreadable Restic password file'
+
+  # /mnt/nas is a systemd automount. Accessing a child path is what triggers
+  # the NFS mount; testing the automount root itself only reports "autofs".
+  timeout --foreground 90s stat -- "$repo" >/dev/null || \
+    die 'NAS repository path did not become reachable within 90 seconds'
+
+  findmnt --target "$repo" --noheadings --output FSTYPE | \
+    grep -Eq '^[[:space:]]*nfs(4)?[[:space:]]*$' || \
+    die 'NAS repository path is not backed by an NFS mount'
+
+  [[ -d "$repo" ]] || die 'expected existing Restic repository directory is missing'
+  export RESTIC_REPOSITORY="$repo"
+  export RESTIC_PASSWORD_FILE="$password_file"
+
+  # Never create a repository from a scheduled job. A mount, password, or NAS
+  # failure must fail closed rather than silently producing a new empty repo.
+  restic snapshots --no-lock --compact >/dev/null || \
+    die 'existing Restic repository is unavailable; refusing to run restic init'
+}
+
+sources=()
+add() {
+  if [[ -e "$1" ]]; then
+    sources+=("$1")
+  fi
+  return 0
+}
+
+add_prismlauncher_essentials() {
+  local prism_root="$HOME/.local/share/PrismLauncher"
+
+  add "$prism_root/prismlauncher.cfg"
+  [[ -d "$prism_root" ]] || return 0
+
+  # Keep worlds, screenshots and instance settings, not downloaded Minecraft
+  # libraries, assets, mods, or launcher/runtime payloads.
+  while IFS= read -r -d '' item; do
+    add "$item"
+  done < <(
+    find "$prism_root" -maxdepth 5 \
+      \( \
+        \( -type d \( -name saves -o -name screenshots \) \) -o \
+        \( -type f \( -name instance.cfg -o -name options.txt -o -name servers.dat \) \) \
+      \) -print0 2>/dev/null
+  )
+}
+
+collect_sources() {
+  sources=()
+
+  # Personal data and active work.
+  add "$HOME/Documents"
+  add "$HOME/Downloads"
+  add "$HOME/Desktop"
+  add "$HOME/Pictures"
+  add "$HOME/Videos"
+  add "$HOME/code"
+  add "$HOME/obsidian"
+  add "$HOME/dotfiles"
+
+  # Existing agent/workflow state retained for continuity after recovery.
+  add "$HOME/.t3"
+  add "$HOME/.claude"
+  add "$HOME/.codex"
+
+  # Device and workflow configuration. Do not include the Restic password.
+  add "$HOME/.config/obs-studio/basic"
+  add "$HOME/.config/obs-studio/global.ini"
+  add "$HOME/.config/obs-studio/user.ini"
+  add "$HOME/.config/obs-studio/plugin_config"
+  add "$HOME/.config/systemd/user"
+  add "$HOME/.config/hypr"
+  add "$HOME/.config/waybar"
+  add "$HOME/.config/swaync"
+  add "$HOME/.config/zed/settings.json"
+  add "$HOME/.config/zed/keymap.json"
+  add "$HOME/.config/zed/tasks.json"
+  add "$HOME/.config/zed/snippets"
+  add "$HOME/.local/bin"
+
+  # User-generated game data, without game installs or launcher payloads.
+  add "$HOME/.local/share/Steam/userdata"
+  add_prismlauncher_essentials
+
+  ((${#sources[@]})) || die 'no configured backup source paths exist'
+}
+
+apply_retention() {
+  restic --retry-lock 5m forget --tag "$tag" --group-by host,tags \
+    --keep-daily 30 --keep-weekly 12 --keep-monthly 12 "$@"
+}
+
+run_backup() {
+  collect_sources
+
+  restic --retry-lock 5m backup --tag "$tag" --skip-if-unchanged --exclude-caches \
+    --exclude "$HOME/dotfiles/home/.ssh/**" \
+    --exclude "$HOME/.local/bin/uv" \
+    --exclude "$HOME/.local/bin/uvx" \
+    "${sources[@]}"
+
+  # Retention stays cheap in the daily path; pruning is deliberately separate.
+  apply_retention
+}
+
+run_maintenance() {
+  # Monthly maintenance reclaims expired packs and reads a rotating 5% sample.
+  apply_retention --prune
+  restic --retry-lock 5m check --read-data-subset=5% --with-cache
+}
+
+run_preflight() {
+  collect_sources
+  printf 'backup-to-nas: preflight OK (%d source paths)\n' "${#sources[@]}"
+}
+
+mode=${1:-backup}
+[[ $# -le 1 ]] || { usage; exit 64; }
+case "$mode" in
+  backup|maintenance|preflight) ;;
+  *) usage; exit 64 ;;
+esac
+
+acquire_lock
+ensure_existing_repository
+
+case "$mode" in
+  backup) run_backup ;;
+  maintenance) run_maintenance ;;
+  preflight) run_preflight ;;
+esac
