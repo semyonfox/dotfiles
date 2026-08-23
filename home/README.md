@@ -12,7 +12,6 @@ The `home/` package provides:
 - **Integrated tool support**: NVM, Cargo, FZF, Zoxide, Starship, TheFuck, Pyenv
 - **Catppuccin Mocha theming** via Starship prompt
 - **Gaming/Wayland optimizations** for Hyprland users
-- **SSH agent management** with automatic startup
 
 ## Quick Start
 
@@ -61,7 +60,6 @@ Both shells are fully configured with **feature parity**:
     - Traditional shell scripting language
     - Direct git alias support (all 102 aliases)
     - Custom welcome bar with CPU/RAM usage
-    - SSH agent auto-management
     - Good for scripts and portability
 
 - **Zsh** (`~/.zshrc`)
@@ -398,15 +396,6 @@ Both shells maintain comprehensive history:
 - **HISTFORMAT**: Includes timestamps: `%F %T`
 - **Deduplication**: Automatic removal of duplicate entries
 - **Synchronization**: Bash syncs history across sessions (zsh shares)
-
-## SSH Agent
-
-Automatic SSH agent management:
-
-- Starts agent on shell initialization
-- Persistent across sessions
-- Credentials stored in `~/.ssh/agent-environment`
-- Automatic restart if crashed
 
 ## Completion Systems
 

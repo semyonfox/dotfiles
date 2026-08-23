@@ -46,10 +46,9 @@ Both shells follow a consistent sourcing pattern:
 # 3. Shell options
 # 4. Completions
 # 5. Tool integrations (NVM, Cargo, Zoxide, FZF, etc.)
-# 6. SSH agent
-# 7. Aliases
-# 8. Functions
-# 9. Welcome message
+# 6. Aliases
+# 7. Functions
+# 8. Welcome message
 # 10. Local overrides (.bashrc.local / .zshrc.local)
 ```
 
@@ -57,83 +56,83 @@ Both shells follow a consistent sourcing pattern:
 
 ### Feature Matrix
 
-| Feature | Bash | Zsh | Notes |
-|---------|------|-----|-------|
-| **Language** | POSIX-compatible shell | Extended shell with advanced features | Zsh superset of bash |
-| **Oh My Zsh** | N/A | ✅ Full integration | Framework for themes/plugins |
-| **Framework** | Manual configuration | ✅ Built-in plugins | 40+ plugins via Oh My Zsh |
-| **Completion** | Basic (COMPREPLY) | ✅ Advanced (zstyle) | Zsh completion much more powerful |
-| **Auto-CD** | Disabled | ✅ Enabled (AUTO_CD) | Type directory name to cd |
-| **Glob patterns** | Basic | ✅ Extended | Better pattern matching |
-| **Theming** | Via Starship | ✅ Via Starship + Oh My Zsh | Both use Starship (recommended) |
-| **Aliases** | 140+ directly | 140+ (some via Oh My Zsh) | Different delegation strategy |
-| **Startup time** | ~200ms | ~300ms | Minimal difference |
-| **Scripting** | ✅ Better | ✅ Good | Bash better for POSIX portability |
-| **Interactive use** | Good | ✅ Better | Zsh superior for daily use |
+| Feature             | Bash                   | Zsh                                   | Notes                             |
+| ------------------- | ---------------------- | ------------------------------------- | --------------------------------- |
+| **Language**        | POSIX-compatible shell | Extended shell with advanced features | Zsh superset of bash              |
+| **Oh My Zsh**       | N/A                    | ✅ Full integration                   | Framework for themes/plugins      |
+| **Framework**       | Manual configuration   | ✅ Built-in plugins                   | 40+ plugins via Oh My Zsh         |
+| **Completion**      | Basic (COMPREPLY)      | ✅ Advanced (zstyle)                  | Zsh completion much more powerful |
+| **Auto-CD**         | Disabled               | ✅ Enabled (AUTO_CD)                  | Type directory name to cd         |
+| **Glob patterns**   | Basic                  | ✅ Extended                           | Better pattern matching           |
+| **Theming**         | Via Starship           | ✅ Via Starship + Oh My Zsh           | Both use Starship (recommended)   |
+| **Aliases**         | 140+ directly          | 140+ (some via Oh My Zsh)             | Different delegation strategy     |
+| **Startup time**    | ~200ms                 | ~300ms                                | Minimal difference                |
+| **Scripting**       | ✅ Better              | ✅ Good                               | Bash better for POSIX portability |
+| **Interactive use** | Good                   | ✅ Better                             | Zsh superior for daily use        |
 
 ### Bash Strengths
 
 1. **POSIX Compliance**
-   - Maximum portability across systems
-   - Better for shell scripts
-   - Default on many Unix systems
+    - Maximum portability across systems
+    - Better for shell scripts
+    - Default on many Unix systems
 
 2. **Direct Alias Access**
-   - All 140+ aliases directly available
-   - No reliance on external plugins
-   - Simpler alias management
+    - All 140+ aliases directly available
+    - No reliance on external plugins
+    - Simpler alias management
 
 3. **Lower startup overhead**
-   - No framework initialization
-   - Pure configuration files
-   - Faster on slower systems
+    - No framework initialization
+    - Pure configuration files
+    - Faster on slower systems
 
 4. **Welcome Bar**
-   - Custom CPU/RAM usage display
-   - Color-coded progress bars
-   - System resource awareness on login
+    - Custom CPU/RAM usage display
+    - Color-coded progress bars
+    - System resource awareness on login
 
 ### Zsh Strengths
 
 1. **Oh My Zsh Framework**
-   - 40+ community plugins
-   - Powerful git plugin integration
-   - Theme support (we use Starship)
-   - Active community development
+    - 40+ community plugins
+    - Powerful git plugin integration
+    - Theme support (we use Starship)
+    - Active community development
 
 2. **Superior Completion System**
-   - Context-aware suggestions
-   - Fuzzy matching support
-   - Color-coded output
-   - Faster completion generation
+    - Context-aware suggestions
+    - Fuzzy matching support
+    - Color-coded output
+    - Faster completion generation
 
 3. **Auto-CD**
-   - Type directory name, automatically cd
-   - Saves keystrokes on frequent navigation
-   - Configurable via `AUTO_CD` option
+    - Type directory name, automatically cd
+    - Saves keystrokes on frequent navigation
+    - Configurable via `AUTO_CD` option
 
 4. **Enhanced Globbing**
-   - Extended pattern matching: `setopt EXTENDED_GLOB`
-   - More powerful filename patterns
-   - Recursive globbing with `**`
+    - Extended pattern matching: `setopt EXTENDED_GLOB`
+    - More powerful filename patterns
+    - Recursive globbing with `**`
 
 5. **Time-Aware Welcome**
-   - "Good morning/afternoon/evening"
-   - Context-sensitive greeting
-   - More personalized experience
+    - "Good morning/afternoon/evening"
+    - Context-sensitive greeting
+    - More personalized experience
 
 6. **Better Keyboard Navigation**
-   - Configurable key bindings
-   - History search with arrow keys
-   - Modal editing support (via zle)
+    - Configurable key bindings
+    - History search with arrow keys
+    - Modal editing support (via zle)
 
 ### Equivalent Features
 
 Both shells provide:
+
 - 140+ aliases organized by category
 - Comprehensive utility functions
 - Tool integration (NVM, Cargo, FZF, Zoxide, etc.)
-- SSH agent management
 - Starship prompt
 - Git configuration
 - Tmux integration
@@ -157,7 +156,6 @@ Both shells provide:
   ├── Bash completions
   ├── Color support
   ├── Tool integrations (NVM, Cargo, Zoxide, FZF, TheFuck, Starship)
-  ├── SSH agent
   ├── source ~/.bash_aliases
   ├── source ~/.bash_functions
   ├── _welcome_bar (CPU/RAM display)
@@ -193,11 +191,13 @@ Both shells provide:
 ### Login vs Interactive Shells
 
 **Bash**:
+
 - Login shell: `.bash_profile` → `.bashrc`
 - Interactive non-login: `.bashrc`
 - Non-interactive: neither (scripts only read sourced files)
 
 **Zsh**:
+
 - Login shell: `.zlogin` (not used), `.zshrc`
 - Interactive non-login: `.zshrc`
 - Non-interactive: neither
@@ -209,65 +209,62 @@ Both shells provide:
 Both shells now have:
 
 1. **Identical Aliases**
-   - 140+ aliases across both shells
-   - Organized in same categories
-   - Same behavior and naming convention
+    - 140+ aliases across both shells
+    - Organized in same categories
+    - Same behavior and naming convention
 
 2. **Same Utility Functions**
-   ```bash
-   mkcd()      # mkdir + cd
-   backup()    # Create .bak copy
-   f()         # Find files
-   ftext()     # Search text
-   extract()   # Multi-format extraction
-   sssh()      # SSH with completion
-   cleanup()   # 7-step system cleanup
-   ```
+
+    ```bash
+    mkcd()      # mkdir + cd
+    backup()    # Create .bak copy
+    f()         # Find files
+    ftext()     # Search text
+    extract()   # Multi-format extraction
+    sssh()      # SSH with completion
+    cleanup()   # 7-step system cleanup
+    ```
 
 3. **Identical Environment Variables**
-   - EDITOR=nvim
-   - VISUAL=nvim
-   - OLLAMA_NUM_CTX=16384
-   - PATH, HISTSIZE, etc.
+    - EDITOR=nvim
+    - VISUAL=nvim
+    - OLLAMA_NUM_CTX=16384
+    - PATH, HISTSIZE, etc.
 
 4. **Same Tool Integration**
-   - NVM (Node Version Manager)
-   - Cargo (Rust)
-   - Zoxide (smart cd)
-   - FZF (fuzzy finder)
-   - TheFuck (command corrector)
-   - Starship (prompt)
-   - Pyenv (Python)
-
-5. **Identical SSH Agent Management**
-   - Auto-start on login
-   - Persistent environment file
-   - Automatic restart if crashed
+    - NVM (Node Version Manager)
+    - Cargo (Rust)
+    - Zoxide (smart cd)
+    - FZF (fuzzy finder)
+    - TheFuck (command corrector)
+    - Starship (prompt)
+    - Pyenv (Python)
 
 ### Intentional Differences
 
 Some features are shell-optimized:
 
 1. **Welcome Message**
-   - **Bash**: CPU/RAM progress bars (system-aware)
-   - **Zsh**: Time-aware greeting (interactive-aware)
-   - Use `_welcome_bar` function in both (different implementations)
+    - **Bash**: CPU/RAM progress bars (system-aware)
+    - **Zsh**: Time-aware greeting (interactive-aware)
+    - Use `_welcome_bar` function in both (different implementations)
 
 2. **Completion System**
-   - **Bash**: COMPREPLY array (traditional)
-   - **Zsh**: zstyle (modern, more powerful)
-   - Both achieve similar results with shell-native mechanisms
+    - **Bash**: COMPREPLY array (traditional)
+    - **Zsh**: zstyle (modern, more powerful)
+    - Both achieve similar results with shell-native mechanisms
 
 3. **Git Aliases**
-   - **Bash**: All aliases directly sourced
-   - **Zsh**: Mix of Oh My Zsh plugin + custom aliases
-   - Behavior identical, sourcing different
+    - **Bash**: All aliases directly sourced
+    - **Zsh**: Mix of Oh My Zsh plugin + custom aliases
+    - Behavior identical, sourcing different
 
 ## Advanced Configuration
 
 ### History Management
 
 #### Bash History
+
 ```bash
 HISTSIZE=50000                # In-memory commands
 HISTFILESIZE=100000           # On-disk commands
@@ -283,6 +280,7 @@ PROMPT_COMMAND="_sync_history${PROMPT_COMMAND:+;${PROMPT_COMMAND}}"
 ```
 
 #### Zsh History
+
 ```bash
 HISTSIZE=50000                # In-memory commands
 SAVEHIST=100000               # On-disk commands
@@ -297,6 +295,7 @@ setopt INC_APPEND_HISTORY     # Write immediately
 ### Shell Options
 
 #### Bash Shell Options
+
 ```bash
 shopt -s cdspell              # Auto-correct cd typos
 shopt -s dirspell             # Correct directory names
@@ -307,6 +306,7 @@ shopt -s histappend           # Append to history file
 ```
 
 #### Zsh Shell Options
+
 ```bash
 setopt AUTO_CD                # cd on directory name
 setopt AUTO_PUSHD             # Push old directory on cd
@@ -374,6 +374,7 @@ Starship reads `~/.config/starship.toml` for customization.
 **Symptom**: Aliases undefined after shell start
 
 **Bash**:
+
 ```bash
 # Check if file exists
 test -f ~/.bash_aliases && echo "exists" || echo "missing"
@@ -386,6 +387,7 @@ source ~/.bash_aliases
 ```
 
 **Zsh**:
+
 ```bash
 # Same checks, but for zsh
 test -f ~/.zsh_aliases && echo "exists" || echo "missing"
@@ -396,6 +398,7 @@ source ~/.zsh_aliases
 #### 2. Functions Not Available
 
 **Bash**:
+
 ```bash
 # Check functions file
 test -f ~/.bash_functions && echo "exists" || echo "missing"
@@ -408,6 +411,7 @@ bash -x -c "source ~/.bashrc" 2>&1 | head -20
 ```
 
 **Zsh**:
+
 ```bash
 # Check functions file
 test -f ~/.zsh_functions && echo "exists" || echo "missing"
@@ -422,6 +426,7 @@ zsh -x -c "source ~/.zshrc" 2>&1 | head -20
 #### 3. Slow Startup
 
 **Bash** (~200ms expected):
+
 ```bash
 # Profile startup
 time bash -i -c exit
@@ -431,6 +436,7 @@ bash -x -i -c exit 2>&1 | grep -oE '[0-9]+\.[0-9]+ bash' | sort -rn | head -5
 ```
 
 **Zsh** (~300ms expected):
+
 ```bash
 # Profile startup
 time zsh -i -c exit
@@ -442,6 +448,7 @@ zsh -x -i -c exit 2>&1 | grep -E "^\+" | head -20
 #### 4. Tool Integration Not Working
 
 **NVM not available**:
+
 ```bash
 # Check if nvm installed
 test -d ~/.nvm && echo "NVM found" || echo "NVM not installed"
@@ -454,6 +461,7 @@ source ~/.bashrc  # or ~/.zshrc
 ```
 
 **Cargo not found**:
+
 ```bash
 # Check Rust installation
 rustc --version
@@ -466,6 +474,7 @@ source ~/.bashrc  # or ~/.zshrc
 ```
 
 **FZF not working**:
+
 ```bash
 # Check if installed
 command -v fzf
@@ -487,6 +496,7 @@ Ctrl+R  # Should open history search
 **Issue**: Zsh Oh My Zsh git aliases might conflict
 
 **Resolution**:
+
 ```bash
 # Check which alias is defined
 which ga          # Should show git alias

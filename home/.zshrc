@@ -178,24 +178,6 @@ if command -v starship &>/dev/null; then
 fi
 
 # ======================================================================
-# SSH AGENT MANAGEMENT
-# ======================================================================
-_ssh_agent_env="$HOME/.ssh/agent-environment"
-
-_start_ssh_agent() {
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "$_ssh_agent_env"
-    chmod 600 "$_ssh_agent_env"
-    source "$_ssh_agent_env" &>/dev/null
-}
-
-if [[ -f "$_ssh_agent_env" ]]; then
-    source "$_ssh_agent_env" &>/dev/null
-    ps -p "$SSH_AGENT_PID" 2>/dev/null | grep -q ssh-agent || _start_ssh_agent
-else
-    _start_ssh_agent
-fi
-
-# ======================================================================
 # ALIASES
 # ======================================================================
 if [[ -f ~/.zsh_aliases ]]; then
