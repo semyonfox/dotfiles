@@ -1,0 +1,10 @@
+[Unit]
+Description=Monthly laptop Restic repository maintenance
+
+[Timer]
+OnCalendar=*-*-01 05:30:00
+RandomizedDelaySec=15min
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

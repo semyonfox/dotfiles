@@ -46,6 +46,28 @@ stow --version
 | `nas` / `minimal` | `home claude` |
 
 Additional packages are opt-in. For example, `codex` is not part of a named profile:
+`codex` is intentionally omitted from the default profiles. Deploy it explicitly
+on devices where the same Codex global defaults and custom skills are wanted.
+
+## Important Layout Rules
+
+- Shared files go in shared packages only when they work on every target that deploys them.
+- Machine-specific files go in `server/`, `pc/`, or `laptop/`.
+- `hyprland` deliberately does not own `monitors.conf`, `monitors.json`, `hypridle.conf`, or `userprefs.conf`; host overlays own those.
+- `waybar` deliberately does not own `config.jsonc`; host overlays own the layout while the shared package owns scripts and CSS.
+- Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; the optional `codex/` package tracks Codex defaults and skills only, with no Codex global Fable routing.
+
+## Laptop Noctalia experiment
+
+The laptop keeps Hyprland as compositor and uses Noctalia as its shell layer. The migration passed its daily-use gate and has landed for all hosts. See [the laptop Noctalia handover](docs/noctalia-laptop-changeover-handover.md) and [laptop package notes](laptop/README.md).
+
+## Public Safety
+
+This repo is public. Do not commit secrets, private keys, credentials, tokens, local service env files, browser stores, or generated auth/cache directories.
+
+Tracked examples may use placeholders only. See [docs/public-safety.md](docs/public-safety.md).
+
+## Useful Commands
 
 ```bash
 ./setup.sh --dry-run --packages codex

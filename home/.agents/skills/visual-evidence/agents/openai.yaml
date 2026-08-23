@@ -1,0 +1,4 @@
+interface:
+  display_name: "Visual Evidence"
+  short_description: "Inspect decks, SVGs, and production visuals"
+  default_prompt: "Use $visual-evidence to inspect this deck, SVG, infographic, or production visual comparison and report objective evidence."

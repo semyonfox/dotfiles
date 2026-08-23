@@ -1,0 +1,22 @@
+[Unit]
+Description=Verify and prune laptop NAS Restic repository
+Documentation=man:restic(1)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/backup-to-nas maintenance
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=12h
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+LockPersonality=yes
+RestrictSUIDSGID=yes

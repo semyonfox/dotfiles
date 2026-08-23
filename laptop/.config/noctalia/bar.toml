@@ -1,0 +1,19 @@
+# A single floating pill: navigation left, time centred, essentials right.
+[bar.default]
+position = "top"
+thickness = 34
+background_opacity = 0.90
+radius = 20
+margin_ends = 14
+margin_edge = 10
+padding = 12
+widget_spacing = 8
+shadow = true
+capsule = false
+start = ["workspaces"]
+center = ["clock"]
+end = ["privacy", "battery"]
+
+# The centered audio spectrum opens the Control Center's media tab on click.
+[widget.audio_visualizer.actions]
+left = "panel-toggle control-center media"

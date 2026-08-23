@@ -1,6 +1,6 @@
 # Codex package
 
-Optional Codex global guidance and shared user-authored skills.
+Optional Codex global guidance and Codex-specific skill links. Shared personal skills live in the canonical `skills/` tree, with host-authored extras under `home/.agents/skills/`, linked into Codex and Claude discovery directories.
 
 Deploy manually with:
 
@@ -22,8 +22,8 @@ Codex defaults and custom skills are wanted.
 Tracked:
 
 - `~/.codex/AGENTS.md` with public personal agent defaults
-- shared Codex skills under `~/.agents/skills/`
-- provider symlinks into the canonical `skills/` source tree
+- non-system Codex skills under `~/.codex/skills/`
+- provider symlinks into the canonical `skills/` source tree plus `~/.agents/skills/`
 
 Not tracked:
 

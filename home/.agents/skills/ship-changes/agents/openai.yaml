@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ship Changes"
+  short_description: "Validate, branch, PR, and merge safely"
+  default_prompt: "Use $ship-changes to validate and deliver these changes through the appropriate branch and pull request workflow."

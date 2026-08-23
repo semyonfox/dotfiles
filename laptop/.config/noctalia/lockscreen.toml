@@ -1,0 +1,7 @@
+# Calm, Mac-like lock surface: blurred current desktop, restrained dark tint.
+[lockscreen]
+enabled = true
+fingerprint = true
+blurred_desktop = true
+blur_intensity = 0.60
+tint_intensity = 0.38
