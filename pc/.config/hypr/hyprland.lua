@@ -261,14 +261,14 @@ hl.bind(main .. " + A", exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh d
 hl.bind(main .. " + Tab", exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh w"))
 hl.bind(main .. " + SHIFT + E", exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh f"))
 
-local audio = home .. "/.config/waybar/scripts/audio-control.sh"
-hl.bind("F10", exec(audio .. " mute && pkill -RTMIN+9 waybar"), {locked = true})
-hl.bind("F11", exec(audio .. " down && pkill -RTMIN+9 waybar"), {locked = true, repeating = true})
-hl.bind("F12", exec(audio .. " up && pkill -RTMIN+9 waybar"), {locked = true, repeating = true})
-hl.bind("XF86AudioMute", exec(audio .. " mute && pkill -RTMIN+9 waybar"), {locked = true})
+local audio = scripts .. "/audio-control.sh"
+hl.bind("F10", exec(audio .. " mute"), {locked = true})
+hl.bind("F11", exec(audio .. " down"), {locked = true, repeating = true})
+hl.bind("F12", exec(audio .. " up"), {locked = true, repeating = true})
+hl.bind("XF86AudioMute", exec(audio .. " mute"), {locked = true})
 hl.bind("XF86AudioMicMute", exec(scripts .. "/volumecontrol.sh -i m"), {locked = true})
-hl.bind("XF86AudioLowerVolume", exec(audio .. " down && pkill -RTMIN+9 waybar"), {locked = true, repeating = true})
-hl.bind("XF86AudioRaiseVolume", exec(audio .. " up && pkill -RTMIN+9 waybar"), {locked = true, repeating = true})
+hl.bind("XF86AudioLowerVolume", exec(audio .. " down"), {locked = true, repeating = true})
+hl.bind("XF86AudioRaiseVolume", exec(audio .. " up"), {locked = true, repeating = true})
 hl.bind("XF86AudioPlay", exec("playerctl play-pause"), {locked = true})
 hl.bind("XF86AudioPause", exec("playerctl play-pause"), {locked = true})
 hl.bind("XF86AudioNext", exec("playerctl next"), {locked = true})

@@ -5,20 +5,17 @@ CachyOS laptop overlay for mobile Hyprland behavior and the Noctalia shell layer
 Deploy with:
 
 ```bash
-stow --no-folding home claude hyprland waybar swaync rofi laptop
+stow --no-folding home claude hyprland noctalia laptop
 ```
 
-This package owns host-specific Hyprland and Waybar files:
+This package owns host-specific files:
 
 - `~/.config/dotfiles/machine-profile`
 - `~/.config/hypr/hypridle.conf`
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
-- `~/.config/waybar/config.jsonc`
 
-It also owns the laptop Noctalia sources:
+Shared Noctalia config and helpers come from the `hyprland`, `noctalia`, and `home` packages.
 
-- shared Noctalia config and helpers come from the `hyprland` and `home` packages
-
-Hyprland remains the compositor. Noctalia owns the shell surfaces on the laptop, while the old shell tools stay available for rollback. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).
+Hyprland remains the compositor and Noctalia owns the shell surfaces. The retired waybar/swaync/rofi stack lives on the `legacy-shell-stack` branch. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).

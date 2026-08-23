@@ -16,10 +16,10 @@ profile_packages() {
             echo "home claude server"
             ;;
         pc)
-            echo "home claude hyprland waybar swaync rofi pc"
+            echo "home claude hyprland pc"
             ;;
         laptop)
-            echo "home claude hyprland waybar swaync rofi laptop"
+            echo "home claude hyprland laptop"
             ;;
         nas)
             echo "home claude"

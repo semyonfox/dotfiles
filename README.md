@@ -41,8 +41,8 @@ stow --version
 | Profile | Stow packages |
 | --- | --- |
 | `server` | `home claude server` |
-| `pc` | `home claude hyprland waybar swaync rofi pc` |
-| `laptop` | `home claude hyprland waybar swaync rofi laptop` |
+| `pc` | `home claude hyprland noctalia pc` |
+| `laptop` | `home claude hyprland noctalia laptop` |
 | `nas` / `minimal` | `home claude` |
 
 Additional packages are opt-in. For example, `codex` is not part of a named profile:
@@ -54,7 +54,7 @@ on devices where the same Codex global defaults and custom skills are wanted.
 - Shared files go in shared packages only when they work on every target that deploys them.
 - Machine-specific files go in `server/`, `pc/`, or `laptop/`.
 - `hyprland` deliberately does not own `monitors.conf`, `monitors.json`, `hypridle.conf`, or `userprefs.conf`; host overlays own those.
-- `waybar` deliberately does not own `config.jsonc`; host overlays own the layout while the shared package owns scripts and CSS.
+- The retired waybar/swaync/rofi shell stack lives on the `legacy-shell-stack` branch; Noctalia owns the shell layer via the `noctalia` package.
 - Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; the optional `codex/` package tracks Codex defaults and skills only, with no Codex global Fable routing.
 
 ## Laptop Noctalia experiment
