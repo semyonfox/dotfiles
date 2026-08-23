@@ -1,0 +1,73 @@
+# A Mac-inspired lock screen using Noctalia native login and fingerprint behaviour.
+# The player card appears only while media is active.
+[lockscreen_widgets]
+enabled = true
+schema_version = 2
+widget_order = ["lock-date", "lock-clock", "lock-media", "lock-login"]
+
+[lockscreen_widgets.grid]
+visible = false
+cell_size = 16
+major_interval = 4
+
+[lockscreen_widgets.widget.lock-clock]
+type = "clock"
+output = "eDP-1"
+cx = 768.0
+cy = 190.0
+box_width = 500.0
+box_height = 116.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-clock.settings]
+format = "{:%H:%M}"
+background = false
+
+[lockscreen_widgets.widget.lock-date]
+type = "clock"
+output = "eDP-1"
+cx = 768.0
+cy = 135.0
+box_width = 500.0
+box_height = 34.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-date.settings]
+format = "{:%A, %B %-d}"
+background = false
+
+[lockscreen_widgets.widget.lock-login]
+type = "login_box"
+output = "eDP-1"
+cx = 768.0
+cy = 780.0
+box_width = 720.0
+box_height = 196.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-login.settings]
+background_color = "surface"
+background_opacity = 0.54
+background_radius = 32.0
+input_opacity = 0.94
+input_radius = 22.0
+center_password_text = false
+layout = "regular"
+show_caps_lock = true
+show_keyboard_layout = false
+show_login_button = true
+show_media = false
+show_session_buttons = false
+show_unlock_hint = true
+show_weather = false
+
+[lockscreen_widgets.widget.lock-media]
+type = "media_player"
+output = "eDP-1"
+cx = 768.0
+cy = 465.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-media.settings]
+hide_when_no_media = true
+

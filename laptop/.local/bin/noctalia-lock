@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Start every manual lock with a freshly claimed fingerprint daemon.
+# If the privileged reset has not been installed yet, still lock securely.
+set -euo pipefail
+
+
+
+if sudo -n /usr/bin/systemctl restart fprintd.service; then
+    sleep 0.4
+else
+    notify-send -u low -a Noctalia "Fingerprint reset unavailable" "Locking anyway; run the one-time fprintd setup." || true
+fi
+
+exec noctalia msg session lock

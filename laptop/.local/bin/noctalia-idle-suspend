@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Match the old Hypridle before-sleep behaviour, but lock through Noctalia.
+set -euo pipefail
+
+exec "$HOME/.local/share/bin/hypridle-on-battery" sh -lc "\"$HOME/.local/bin/noctalia-lock\" && systemctl suspend"

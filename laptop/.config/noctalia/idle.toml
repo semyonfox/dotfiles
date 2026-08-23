@@ -1,0 +1,30 @@
+# Preserve the old Hypridle laptop behaviour while Noctalia remains the idle manager.
+[idle]
+behavior_order = ["dim", "lock", "screen-off", "suspend"]
+pre_action_fade_seconds = 0.0
+
+[idle.behavior.dim]
+timeout = 240
+action = "command"
+enabled = true
+command = "~/.local/share/bin/hypridle-on-battery brightnessctl -s set 10%"
+resume_command = "brightnessctl -r"
+
+[idle.behavior.lock]
+timeout = 300
+action = "command"
+enabled = true
+command = "~/.local/share/bin/hypridle-on-battery ~/.local/bin/noctalia-lock"
+
+[idle.behavior.screen-off]
+timeout = 360
+action = "command"
+enabled = true
+command = "~/.local/share/bin/hypridle-on-battery hyprctl dispatch dpms off"
+resume_command = "hyprctl dispatch dpms on"
+
+[idle.behavior.suspend]
+timeout = 1800
+action = "command"
+enabled = true
+command = "~/.local/bin/noctalia-idle-suspend"

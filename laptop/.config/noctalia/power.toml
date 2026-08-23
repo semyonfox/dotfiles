@@ -1,0 +1,5 @@
+# Keep the existing laptop power-mode helper as the sole tuning authority.
+# Noctalia profile names map to: performance → Beast, balanced → AC,
+# power-saver → Saver. The helper ignores no-op profile writes to avoid loops.
+[hooks]
+power_profile_changed = "/home/semyon/.local/bin/power-mode.sh \"$NOCTALIA_POWER_PROFILE\""

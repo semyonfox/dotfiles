@@ -68,6 +68,10 @@ on devices where the same Codex global defaults and custom skills are wanted.
 - `waybar` deliberately does not own `config.jsonc`; host overlays own the layout while the shared package owns scripts and CSS.
 - Claude and Codex config stay separate. This repo tracks Claude guidance under `claude/`; the optional `codex/` package tracks Codex defaults and skills only, with no Codex global Fable routing.
 
+## Laptop Noctalia experiment
+
+The laptop keeps Hyprland as compositor and uses Noctalia as its shell layer. The migration is reversible and remains uncommitted until daily-use checks pass. See [the laptop Noctalia handover](docs/noctalia-laptop-changeover-handover.md) and [laptop package notes](laptop/README.md).
+
 ## Public Safety
 
 This repo is public. Do not commit secrets, private keys, credentials, tokens, local service env files, browser stores, or generated auth/cache directories.
