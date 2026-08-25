@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+umask 077
+
+backup_root="${BACKUP_ROOT:-/mnt/media/users/semyon/backups/server}"
+host="$(hostname -s)"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+generations_root="$backup_root/generations"
+staging_root="$backup_root/.staging"
+stage="$staging_root/$timestamp-$$"
+published="$generations_root/$timestamp"
+current="$backup_root/current"
+log_dir="$backup_root/logs"
+lock_file="${XDG_RUNTIME_DIR:-/tmp}/server-nas-backup.lock"
+
+exec 9>"$lock_file"
+flock -n 9 || { echo "backup already running" >&2; exit 1; }
+
+if ! timeout 15 findmnt -T /mnt/media -n -o FSTYPE | grep -q '^nfs'; then
+  echo "/mnt/media is not an active NFS mount; refusing to write locally" >&2
+  exit 1
+fi
+
+if [[ ! -d /mnt/media/users/semyon || ! -w /mnt/media/users/semyon ]]; then
+  echo "/mnt/media/users/semyon is unavailable or not writable" >&2
+  exit 1
+fi
+
+mkdir -p "$generations_root" "$staging_root" "$log_dir"
+log="$log_dir/$timestamp.log"
+exec > >(tee -a "$log") 2>&1
+
+# Preserve unfinished generations for forensic inspection, but never present one as
+# current. Only a fully manifested directory is promoted below.
+mkdir -p "$stage/home-semyon" "$stage/system"
+printf 'started_utc=%s\nhost=%s\nstaging=%s\n' "$timestamp" "$host" "$stage"
+printf 'started_utc=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$stage/INCOMPLETE"
+
+previous=""
+if [[ -e "$current/COMPLETE" && -s "$current/MANIFEST.tsv" ]]; then
+  previous="$(readlink -f "$current")"
+fi
+
+sources=(
+  .claude
+  .claude.json
+  .codex
+  .hermes
+  .t3
+  .cursor
+  code
+  projects
+  obsidian
+  dotfiles
+  Scripts
+  scripts
+  server-stacks
+  compsoc
+  life-admin
+  jenkins
+  observability
+  swim-api
+  odysseus
+  robin
+  artificial
+  .config/systemd
+  .local/share/server-recovery-system
+  .ssh
+  .gnupg
+  .aws
+  .cloudflared
+  .docker
+  .wrangler
+  .terraform.d
+  .gam
+  .gemini
+  .copilot
+  .doppler
+  credentials
+  secrets
+  .secrets
+)
+
+rsync_args=(
+  -aHAX --no-group --numeric-ids --relative --delete-delay
+  --info=progress2,name0
+  --human-readable --stats
+  --exclude='**/node_modules/'
+  --exclude='**/.venv/'
+  --exclude='**/venv/'
+  --exclude='**/__pycache__/'
+  --exclude='**/target/debug/'
+  --exclude='**/target/release/'
+  --exclude='**/.next/'
+  --exclude='**/.cache/'
+  --exclude='.codex/tmp/'
+  --exclude='.codex/.tmp/'
+  --exclude=server-stacks/data/homeassistant/config/.storage/http
+  --exclude='.claude/backups/'
+  --exclude='.claude/.claude/backups/'
+  --exclude='.hermes/audio_cache/'
+  --exclude='.hermes/cron/output/'
+  --exclude='.hermes/image_cache/'
+  --exclude='.hermes/state-snapshots/'
+  --exclude='.hermes/skills/.curator_backups/'
+  --exclude='.t3/userdata/logs/'
+  --exclude='.t3/deploy-backups/'
+  --exclude='server-stacks/data/**/cache/'
+  --exclude='server-stacks/data/dormant-services/'
+  --exclude='server-stacks/data/pi-hole-recovery-*/'
+  --exclude='server-stacks/data/uisce/backups/'
+  --exclude='server-stacks/data/servarr/**/logs.db*'
+  --exclude='server-stacks/data/servarr/**/*.db-shm'
+  --exclude='server-stacks/data/servarr/**/*.db-wal'
+  # Live container databases and Home Assistant secret state need application-
+  # native backups or their owning service; do not quietly call them protected.
+  --exclude='server-stacks/data/matrix/postgres/'
+  --exclude='server-stacks/data/temporal/postgresql/'
+  --exclude='server-stacks/data/resolve/postgres/'
+  --exclude='server-stacks/data/pi-hole/etc-pihole/logrotate'
+  --exclude='server-stacks/data/homeassistant/config/.storage/auth'
+  --exclude='server-stacks/data/homeassistant/config/.storage/auth_provider.homeassistant'
+  --exclude='server-stacks/data/homeassistant/config/.storage/core.config'
+  --exclude='server-stacks/data/homeassistant/config/.storage/core.uuid'
+  --exclude='server-stacks/data/homeassistant/config/.storage/onboarding'
+  --exclude='credentials/'
+  --exclude='secrets/'
+  --exclude='.secrets/'
+)
+
+if [[ -n "$previous" ]]; then
+  rsync_args+=("--link-dest=$previous/home-semyon")
+fi
+
+existing=()
+for source in "${sources[@]}"; do
+  if [[ -e "$HOME/$source" ]]; then
+    existing+=("./$source")
+  fi
+done
+
+(( ${#existing[@]} > 0 )) || { echo "No configured source paths exist; refusing to publish" >&2; exit 1; }
+
+rsync_status=0
+(
+  cd "$HOME"
+  rsync "${rsync_args[@]}" "${existing[@]}" "$stage/home-semyon/"
+) || rsync_status=$?
+
+if [[ "$rsync_status" -eq 24 ]]; then
+  echo "warning: source files vanished during the live backup; continuing with files that remained" >&2
+elif [[ "$rsync_status" -ne 0 ]]; then
+  exit "$rsync_status"
+fi
+
+# Capture only readable, small host configuration. Any omission is recorded rather
+# than hidden by --ignore-errors, and container databases are intentionally excluded.
+for path in /etc/fstab /etc/hosts /etc/hostname /etc/ssh/sshd_config; do
+  if [[ -r "$path" ]]; then
+    rsync -aR "$path" "$stage/system/"
+  else
+    printf 'skipped_unreadable=%s\n' "$path" >> "$stage/system/SKIPPED-PATHS.txt"
+  fi
+done
+
+{
+  echo "# Server recovery inventory"
+  echo
+  echo "Generated: $timestamp"
+  echo "Host: $host"
+  echo
+  echo "## OS"
+  uname -a
+  test -r /etc/os-release && cat /etc/os-release
+  echo
+  echo "## Filesystems"
+  findmnt --real
+  echo
+  echo "## Block devices"
+  lsblk -o NAME,SIZE,FSTYPE,FSVER,LABEL,UUID,MOUNTPOINTS
+  echo
+  echo "## Enabled user units"
+  systemctl --user list-unit-files --state=enabled --no-pager || true
+  echo
+  echo "## Enabled system units"
+  systemctl list-unit-files --state=enabled --no-pager || true
+  echo
+  echo "## Docker containers"
+  docker ps -a --format '{{.Names}}\t{{.Image}}\t{{.Status}}' || true
+  echo
+  echo "## Docker images"
+  docker image ls --digests --format '{{.Repository}}:{{.Tag}}\t{{.Digest}}\t{{.ID}}' || true
+  echo
+  echo "## Packages"
+  dpkg-query -W -f='${binary:Package}\t${Version}\n' 2>/dev/null || true
+} > "$stage/system/RECOVERY-INVENTORY.txt"
+
+[[ -d "$stage/home-semyon" ]] || { echo "Missing staged home recovery set" >&2; exit 1; }
+[[ -s "$stage/system/RECOVERY-INVENTORY.txt" ]] || { echo "Missing recovery inventory" >&2; exit 1; }
+find "$stage" -xdev -type f -printf '%P\t%s\t%TY-%Tm-%TdT%TH:%TM:%TSZ\n' | sort > "$stage/MANIFEST.tsv"
+[[ -s "$stage/MANIFEST.tsv" ]] || { echo "Empty manifest; refusing to publish" >&2; exit 1; }
+manifest_sha256="$(sha256sum "$stage/MANIFEST.tsv" | cut -d' ' -f1)"
+printf 'completed_utc=%s\nmanifest_sha256=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$manifest_sha256" > "$stage/COMPLETE"
+rm -f "$stage/INCOMPLETE"
+
+# Publish only a complete generation. The first migration converts the legacy
+# current/ directory after the new generation is already safely published; later
+# updates atomically replace the current symlink in one rename.
+mv "$stage" "$published"
+tmp_current="$backup_root/.current-$timestamp-$$"
+ln -s "generations/$timestamp" "$tmp_current"
+if [[ -L "$current" ]]; then
+  mv -Tf "$tmp_current" "$current"
+elif [[ -e "$current" ]]; then
+  mv "$current" "$generations_root/legacy-current-$timestamp"
+  mv "$tmp_current" "$current"
+else
+  mv "$tmp_current" "$current"
+fi
+
+manifest_bytes="$(awk -F '\t' '{ total += $2 } END { printf "%.0f\n", total }' "$published/MANIFEST.tsv")"
+printf 'backup_completed_utc=%s\npublished=%s\ncurrent=%s\ncurrent_apparent_size=%s\n' \
+  "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$published" "$(readlink -f "$current")" \
+  "$(numfmt --to=iec-i --suffix=B "$manifest_bytes")"
