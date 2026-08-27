@@ -256,28 +256,48 @@ _welcome_bar() {
     mem_used=$((mem_total - mem_available))
     mem_pct=$((mem_used * 100 / mem_total))
 
-    # Create progress bars (handle empty/zero values)
-    local cpu_filled mem_filled
-    cpu_filled=$((cpu_pct / 5))
-    mem_filled=$((mem_pct / 5))
-    [[ $cpu_filled -lt 1 ]] && cpu_filled=0
-    [[ $mem_filled -lt 1 ]] && mem_filled=0
+    # Get root filesystem usage
+    local disk_pct
+    disk_pct=$(df -P / | awk 'NR == 2 {gsub("%", "", $5); print $5}')
 
-    local cpu_bar cpu_empty mem_bar mem_empty
-    cpu_bar=$([ "$cpu_filled" -gt 0 ] && printf "\e[92m%0.s█\e[90m" $(seq 1 "$cpu_filled") || echo "")
-    cpu_empty=$(printf "%0.s░" $(seq 1 $((20 - cpu_filled))))
-    mem_bar=$([ "$mem_filled" -gt 0 ] && printf "\e[94m%0.s█\e[90m" $(seq 1 "$mem_filled") || echo "")
-    mem_empty=$(printf "%0.s░" $(seq 1 $((20 - mem_filled))))
+    _welcome_meter() {
+        local pct=$1 color=$2 index
+        local filled=$(((pct * 8 + 50) / 100))
+        printf '\e[%sm' "$color"
+        for ((index = 0; index < filled; index++)); do printf '█'; done
+        printf '\e[0;2m'
+        for ((index = filled; index < 8; index++)); do printf '░'; done
+        printf '\e[0m'
+    }
+
+    _welcome_color() {
+        if [[ $1 -gt 85 ]]; then
+            printf '31'
+        elif [[ $1 -ge 60 ]]; then
+            printf '33'
+        else
+            printf '32'
+        fi
+    }
 
     # Display welcome message
     local label="$greeting, $USER"
+    local cpu_color ram_color disk_color cpu_meter ram_meter disk_meter
+    cpu_color=$(_welcome_color "$cpu_pct")
+    ram_color=$(_welcome_color "$mem_pct")
+    disk_color=$(_welcome_color "$disk_pct")
+    cpu_meter=$(_welcome_meter "$cpu_pct" "$cpu_color")
+    ram_meter=$(_welcome_meter "$mem_pct" "$ram_color")
+    disk_meter=$(_welcome_meter "$disk_pct" "$disk_color")
+    unset -f _welcome_meter _welcome_color
     echo
-    echo -e "\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    printf "\e[96m│\e[0m  \e[1;97m%-45s\e[96m│\e[0m\n" "$label"
-    echo -e "\e[96m├─────────────────────────────────────────────────┤\e[0m"
-    printf "\e[96m│\e[0m  \e[97mCPU\e[0m  [%s%s\e[0m] \e[92m%-4s%%\e[0m       \e[96m│\e[0m\n" "$cpu_bar" "$cpu_empty" "$cpu_pct"
-    printf "\e[96m│\e[0m  \e[97mRAM\e[0m  [%s%s\e[0m] \e[94m%-4s%%\e[0m       \e[96m│\e[0m\n" "$mem_bar" "$mem_empty" "$mem_pct"
-    echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m"
+    echo -e "\e[96m╭─────────────────────────────────────╮\e[0m"
+    printf "\e[96m│\e[0m  \e[1;97m%-33s\e[0m  \e[96m│\e[0m\n" "$label"
+    echo -e "\e[96m├─────────────────────────────────────┤\e[0m"
+    printf "\e[96m│\e[0m  \e[2mCPU\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$cpu_meter" "$cpu_color" "$cpu_pct"
+    printf "\e[96m│\e[0m  \e[2mRAM\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$ram_meter" "$ram_color" "$mem_pct"
+    printf "\e[96m│\e[0m  \e[2mDSK\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$disk_meter" "$disk_color" "$disk_pct"
+    echo -e "\e[96m╰─────────────────────────────────────╯\e[0m"
     echo
 }
 

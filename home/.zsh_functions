@@ -241,11 +241,60 @@ _welcome_bar() {
     else
         greeting="Burning the midnight oil"
     fi
-    
+
+    # Summarise current load, memory, and root filesystem usage.
+    local cpu_load cpu_cores cpu_pct
+    cpu_load=$(cut -d " " -f1 /proc/loadavg)
+    cpu_cores=$(nproc)
+    cpu_pct=$(awk -v loadavg="$cpu_load" -v cores="$cpu_cores" 'BEGIN {printf "%.0f", (loadavg/cores)*100}')
+    [[ $cpu_pct -gt 100 ]] && cpu_pct=100
+
+    local mem_total mem_available mem_used mem_pct
+    mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    mem_available=$(awk '/MemAvailable/ {print $2}' /proc/meminfo)
+    mem_used=$((mem_total - mem_available))
+    mem_pct=$((mem_used * 100 / mem_total))
+
+    local disk_pct
+    disk_pct=$(df -P / | awk 'NR == 2 {gsub("%", "", $5); print $5}')
+
+    _welcome_meter() {
+        local pct=$1 color=$2 index
+        local filled=$(((pct * 8 + 50) / 100))
+        printf '\e[%sm' "$color"
+        for ((index = 0; index < filled; index++)); do printf '█'; done
+        printf '\e[0;2m'
+        for ((index = filled; index < 8; index++)); do printf '░'; done
+        printf '\e[0m'
+    }
+
+    _welcome_color() {
+        if [[ $1 -gt 85 ]]; then
+            printf '31'
+        elif [[ $1 -ge 60 ]]; then
+            printf '33'
+        else
+            printf '32'
+        fi
+    }
+
+    local label="$greeting, $USER"
+    local cpu_color ram_color disk_color cpu_meter ram_meter disk_meter
+    cpu_color=$(_welcome_color "$cpu_pct")
+    ram_color=$(_welcome_color "$mem_pct")
+    disk_color=$(_welcome_color "$disk_pct")
+    cpu_meter=$(_welcome_meter "$cpu_pct" "$cpu_color")
+    ram_meter=$(_welcome_meter "$mem_pct" "$ram_color")
+    disk_meter=$(_welcome_meter "$disk_pct" "$disk_color")
+    unfunction _welcome_meter _welcome_color
     echo
-    echo -e "\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    printf "\e[96m│\e[0m  \e[1;97m%-45s\e[96m│\e[0m\n" "$greeting, $USER"
-    echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m"
+    echo -e "\e[96m╭─────────────────────────────────────╮\e[0m"
+    printf "\e[96m│\e[0m  \e[1;97m%-33s\e[0m  \e[96m│\e[0m\n" "$label"
+    echo -e "\e[96m├─────────────────────────────────────┤\e[0m"
+    printf "\e[96m│\e[0m  \e[2mCPU\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$cpu_meter" "$cpu_color" "$cpu_pct"
+    printf "\e[96m│\e[0m  \e[2mRAM\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$ram_meter" "$ram_color" "$mem_pct"
+    printf "\e[96m│\e[0m  \e[2mDSK\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$disk_meter" "$disk_color" "$disk_pct"
+    echo -e "\e[96m╰─────────────────────────────────────╯\e[0m"
     echo
 }
 
