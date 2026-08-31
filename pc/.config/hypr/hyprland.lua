@@ -82,6 +82,7 @@ hl.env("TERMINAL", "kitty")
 hl.config({
     input = {
         kb_layout = "us",
+        kb_variant = "altgr-intl",
         kb_model = "pc105",
         kb_rules = "evdev",
         follow_mouse = 1,
