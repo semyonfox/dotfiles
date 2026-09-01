@@ -18,4 +18,10 @@ This package owns host-specific files:
 
 Shared Noctalia config and helpers come from the `hyprland`, `noctalia`, and `home` packages.
 
+Noctalia maps its standard power profiles onto the laptop helper's tuning:
+
+- `performance` selects Beast.
+- `balanced` selects AC or Mobile based on the current power source.
+- `power-saver` selects Saver.
+
 Hyprland remains the compositor and Noctalia owns the shell surfaces. The retired waybar/swaync/rofi stack lives on the `legacy-shell-stack` branch. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).

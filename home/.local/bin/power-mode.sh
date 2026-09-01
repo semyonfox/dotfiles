@@ -19,6 +19,8 @@ if [[ -z "$machine_profile" ]]; then
 fi
 
 mkdir -p "$(dirname "$cache_file")"
+exec 9>"${cache_file}.lock"
+flock 9
 
 current_mode() {
     cat "$cache_file" 2>/dev/null || echo ac
@@ -122,6 +124,64 @@ apply_laptop_saver() {
     apply_laptop power-saver powersave power 15 40 80 saver
 }
 
+apply_laptop_extras() {
+    local epb=$1 start=$2 end=$3 mode=$4
+
+    set_epb_all "$epb"
+    set_thresholds "$start" "$end"
+    write_mode "$mode"
+}
+
+wait_for_power_profile() {
+    local expected=$1 current
+
+    for _ in {1..40}; do
+        current="$(powerprofilesctl get 2>/dev/null || true)"
+        [[ "$current" == "$expected" ]] && return 0
+        sleep 0.05
+    done
+
+    printf 'power profile did not settle on %s; current profile is %s\n' \
+        "$expected" "${current:-unknown}" >&2
+    return 1
+}
+
+apply_noctalia_profile() {
+    local requested=$1 origin=${2:-external} current
+
+    # Noctalia fires this hook from its optimistic local state update, while
+    # power-profiles-daemon is still writing EPP on each CPU. Wait for the
+    # daemon to finish so our direct tuning cannot make that write fail EBUSY.
+    current="$(powerprofilesctl get 2>/dev/null || true)"
+    if [[ "$origin" != noctalia && "$current" != "$requested" ]]; then
+        return 0
+    fi
+
+    if [[ "$requested" != performance ]]; then
+        # intel_pstate rejects non-performance EPP while its pseudo-governor is
+        # performance. Beast selects that governor, so unlock EPP before asking
+        # power-profiles-daemon to move back down.
+        set_governor_all powersave
+    fi
+    if [[ "$current" != "$requested" ]]; then
+        powerprofilesctl set "$requested"
+    fi
+    wait_for_power_profile "$requested"
+
+    case "$requested" in
+        performance) apply_laptop_extras 0 0 100 beast ;;
+        balanced)
+            if ac_online; then
+                apply_laptop_extras 4 40 80 ac
+            else
+                apply_laptop_extras 8 40 80 mobile
+            fi
+            ;;
+        power-saver) apply_laptop_extras 15 40 80 saver ;;
+        *) usage ;;
+    esac
+}
+
 apply_mode() {
     local requested=$1
 
@@ -134,16 +194,20 @@ apply_mode() {
                 saver|power-saver) apply_laptop_saver ;;
                 auto)
                     target="$(current_mode)"
-                    if ! ac_online && [[ "$target" == beast ]]; then
+                    if ac_online; then
+                        [[ "$target" == mobile ]] && target=ac
+                    elif [[ "$target" == beast || "$target" == ac ]]; then
                         target=mobile
                     fi
                     apply_mode "$target"
                     ;;
                 on-ac)
-                    :
+                    [[ "$(current_mode)" == mobile ]] && apply_laptop_ac || true
                     ;;
                 on-battery)
-                    [[ "$(current_mode)" == beast ]] && apply_laptop_mobile || true
+                    # Preserve an explicitly selected saver profile. Everything
+                    # else switches to the battery-oriented balanced profile.
+                    [[ "$(current_mode)" == saver ]] || apply_laptop_mobile
                     ;;
                 *)
                     usage
@@ -211,13 +275,18 @@ status() {
 }
 
 usage() {
-    echo "usage: $0 {beast|ac|mobile|saver|balanced|performance|apply|cycle|auto|on-ac|on-battery|status}" >&2
+    echo "usage: $0 {beast|ac|mobile|saver|balanced|performance|apply|cycle|auto|on-ac|on-battery|status|noctalia PROFILE ORIGIN}" >&2
     exit 1
 }
 
 case "${1:-status}" in
     cycle) cycle ;;
     status) status ;;
+    noctalia)
+        [[ $# -eq 3 ]] || usage
+        apply_noctalia_profile "$2" "$3"
+        status
+        ;;
     beast|ac|mobile|saver|balanced|performance|apply|auto|on-ac|on-battery|power-saver)
         apply_mode "$1"
         status

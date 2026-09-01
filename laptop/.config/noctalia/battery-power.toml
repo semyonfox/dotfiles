@@ -1,0 +1,7 @@
+# Keep the laptop on its lower-power balanced tuning while discharging. This
+# leaves Noctalia's visible profile as "balanced", but selects the helper's
+# balance_power EPP instead of the AC-oriented balance_performance setting.
+# An explicit power-saver choice remains untouched.
+[hooks]
+started = "~/.local/bin/power-mode.sh auto"
+battery_discharging = "~/.local/bin/power-mode.sh on-battery"
