@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# One npm installation and one explicit restart, never a mid-install path trigger.
+set -euo pipefail
+PREFIX="$HOME/.local"
+PACKAGE="$PREFIX/lib/node_modules/t3/package.json"
+SERVICE=t3-code-headless.service
+WATCHER=t3-code-headless-update.path
+version() {
+  node -e 'console.log(require(process.argv[1]).version)' "$PACKAGE" 2>/dev/null || printf 'not-installed\n'
+}
+ready() {
+  systemctl --user is-active --quiet "$SERVICE" && ss -ltn 'sport = :3773' | grep -q LISTEN
+}
+case "${1:-}" in
+  --check)
+    printf 'installed version: %s\n' "$(version)"
+    systemctl --user show "$SERVICE" -p ActiveState -p MainPID
+    ready
+    exit "$?"
+    ;;
+  '') ;;
+  *) echo 'Usage: t3-headless-update [--check]' >&2; exit 2 ;;
+esac
+exec 9>"$HOME/.local/t3-update.lock"
+flock -n 9 || { echo 'Another T3 update is running.' >&2; exit 1; }
+before="$(version)"
+latest="$(npm view t3@nightly version)"
+[[ -n "$latest" ]] || { echo 'Could not resolve T3 nightly.' >&2; exit 1; }
+if systemctl --user cat "$WATCHER" >/dev/null 2>&1; then
+  systemctl --user disable --now "$WATCHER"
+fi
+if [[ "$before" == "$latest" ]]; then
+  printf 'T3 Code already current: %s\n' "$before"
+  ready
+  exit "$?"
+fi
+if grep -q '/t3-code-headless.service' /proc/self/cgroup; then
+  echo 'Run t3-headless-update from an external terminal. Restarting T3 would kill this updater and its session.' >&2
+  exit 1
+fi
+npm install --global --prefix "$PREFIX" \
+  --allow-scripts=node-pty,msgpackr-extract "t3@$latest"
+"$PREFIX/bin/t3" --version
+systemctl --user restart "$SERVICE"
+for ((attempt=0; attempt<30; attempt++)); do
+  if ready; then
+    printf 'T3 Code ready: %s -> %s\n' "$before" "$(version)"
+    exit 0
+  fi
+  sleep 2
+done
+echo 'T3 did not become ready on port 3773.' >&2
+exit 1

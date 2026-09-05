@@ -337,71 +337,13 @@ gaming-check() {
 }
 
 update() {
-    local claude_path codex_path npm_prefix opencode_path
-
-    npm_prefix="$(npm prefix -g 2>/dev/null || printf '%s' "${NPM_CONFIG_PREFIX:-$HOME/.local}")"
+    local ai_update_failed=0
 
     echo "==> system (paru)"
     paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || echo "!!paru failed"
 
-    echo "\n==> Claude Code (native)"
-    if command -v curl &>/dev/null; then
-        if [[ -d "$npm_prefix/lib/node_modules/@anthropic-ai/claude-code" ]]; then
-            npm uninstall -g @anthropic-ai/claude-code || echo "!! old Claude Code npm package cleanup failed"
-        fi
-        if [[ -L "$HOME/.local/bin/claude" ]] && [[ "$(readlink "$HOME/.local/bin/claude")" == "$npm_prefix/bin/claude" ]]; then
-            unlink "$HOME/.local/bin/claude"
-        fi
-
-        claude_path="$(readlink -f "$HOME/.local/bin/claude" 2>/dev/null || true)"
-        if [[ "$claude_path" == "$HOME/.local/share/claude/versions/"* ]] && [[ -x "$claude_path" ]]; then
-            "$HOME/.local/bin/claude" update || echo "!! Claude Code native update failed"
-        else
-            curl -fsSL https://claude.ai/install.sh | bash -s latest || echo "!! Claude Code native install failed"
-        fi
-
-        claude_path="$(readlink -f "$HOME/.local/bin/claude" 2>/dev/null || true)"
-        if [[ "$claude_path" != "$HOME/.local/share/claude/versions/"* ]] || ! "$HOME/.local/bin/claude" --version; then
-            echo "!! Claude Code native installation is not healthy" >&2
-        fi
-    else
-        echo "!! curl is required to install Claude Code" >&2
-    fi
-
-    echo "\n==> Codex CLI"
-    codex_path="$(readlink -f "$(command -v codex 2>/dev/null)" 2>/dev/null || true)"
-    if [[ -n "$codex_path" ]] && command -v pacman &>/dev/null && pacman -Qo "$codex_path" &>/dev/null; then
-        codex --version || echo "!! package-managed Codex check failed"
-    else
-        npm install -g @openai/codex@latest || echo "!!Codex npm update failed"
-        if [[ -x "$npm_prefix/lib/node_modules/@openai/codex/bin/codex.js" ]]; then
-            ln -sf "$npm_prefix/lib/node_modules/@openai/codex/bin/codex.js" "$HOME/.local/bin/codex"
-        fi
-    fi
-
-    echo "\n==> OpenCode (native)"
-    if command -v curl &>/dev/null; then
-        if [[ -d "$npm_prefix/lib/node_modules/opencode-ai" ]]; then
-            npm uninstall -g opencode-ai || echo "!! old OpenCode npm package cleanup failed"
-        fi
-
-        opencode_path="$HOME/.opencode/bin/opencode"
-        if [[ -x "$opencode_path" ]]; then
-            "$opencode_path" upgrade --method curl || echo "!! OpenCode native update failed"
-        else
-            curl -fsSL https://opencode.ai/install | bash -s -- --no-modify-path || echo "!! OpenCode native install failed"
-        fi
-
-        if [[ -x "$opencode_path" ]]; then
-            mkdir -p "$HOME/.local/bin"
-            ln -sfn "$opencode_path" "$HOME/.local/bin/opencode"
-            "$HOME/.local/bin/opencode" --version || echo "!! OpenCode native version check failed"
-        else
-            echo "!! OpenCode native installation is not healthy" >&2
-        fi
-    else
-        echo "!! curl is required to install OpenCode" >&2
-    fi
+    # Both shells use the same installation-aware provider updater.
+    "$HOME/.local/bin/update-ai-clis" || ai_update_failed=1
     hash -r
 
     echo "\n==> flatpak"
@@ -428,6 +370,7 @@ update() {
     echo "\n==> uv tools"
     uv self update 2>/dev/null || true
     uv tool upgrade --all || echo "!!uv failed"
+    return "$ai_update_failed"
 }
 
 gaming-modes() {
