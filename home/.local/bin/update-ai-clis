@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Use each installed CLI's owner. Never migrate or delete installations on update.
+set -euo pipefail
+failed=0
+run() {
+  printf '\n==> %s\n' "$*"
+  "$@" || { printf '!! failed: %s\n' "$*" >&2; failed=1; }
+}
+
+update_npm_cli() {
+  local command_name="$1" package="$2" resolved prefix scripts="$2"
+  command -v "$command_name" >/dev/null 2>&1 || return 0
+  resolved="$(readlink -f "$(command -v "$command_name")")"
+  if command -v pacman >/dev/null 2>&1 && pacman -Qo "$resolved" >/dev/null 2>&1; then
+    printf '%s is managed by pacman.\n' "$command_name"
+  elif [[ "$resolved" == */lib/node_modules/"$package"/* ]]; then
+    prefix="${resolved%%/lib/node_modules/*}"
+    # Gemini's keychain and terminal integrations need their native dependencies.
+    [[ "$package" != @google/gemini-cli ]] || scripts="$package,@github/keytar,node-pty"
+    run npm install --global --prefix "$prefix" "--allow-scripts=$scripts" "$package@latest"
+  else
+    printf '!! %s has an unknown installation owner: %s\n' "$command_name" "$resolved" >&2
+    failed=1
+  fi
+}
+
+update_npm_cli codex @openai/codex
+update_npm_cli gemini @google/gemini-cli
+
+if command -v claude >/dev/null 2>&1; then
+  if [[ "$(readlink -f "$(command -v claude)")" == "$HOME/.local/share/claude/versions/"* ]]; then
+    run claude update
+  else
+    update_npm_cli claude @anthropic-ai/claude-code
+  fi
+fi
+if command -v opencode >/dev/null 2>&1; then
+  if [[ "$(readlink -f "$(command -v opencode)")" == "$HOME/.opencode/bin/opencode" ]]; then
+    run opencode upgrade --method curl
+  else
+    update_npm_cli opencode opencode-ai
+  fi
+fi
+if command -v cursor-agent >/dev/null 2>&1; then
+  run cursor-agent update
+fi
+if command -v grok >/dev/null 2>&1; then
+  # The vendor installer also creates "agent" and edits shell startup files.
+  # Keep its bin directory visible only to this update, after Cursor on PATH.
+  (export SHELL=/bin/false PATH="$PATH:$HOME/.grok/bin"; grok update) || {
+    echo '!! grok update failed' >&2
+    failed=1
+  }
+fi
+printf '\nAntigravity: install/update its ACP runtime in T3 provider settings; agy is separate.\n'
+exit "$failed"
