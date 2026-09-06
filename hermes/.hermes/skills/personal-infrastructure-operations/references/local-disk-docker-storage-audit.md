@@ -56,7 +56,7 @@ LIMIT 10;
 5. Compare database storage against repo/build artifacts and caches. For Rust services, `target/debug` and `target/release` can dwarf the live database and are rebuildable. Check:
 
 ```bash
-du -xhd2 /home/semyon/code/personal/<repo> 2>/dev/null | sort -h | tail -50
+du -xhd3 /home/semyon/code/{owned,contribs,university} 2>/dev/null | sort -h | tail -50
 ```
 
 ## Reporting style
@@ -71,4 +71,4 @@ du -xhd2 /home/semyon/code/personal/<repo> 2>/dev/null | sort -h | tail -50
 
 - The `irish_rail_db` container used PostgreSQL 18/Timescale with `POSTGRES_USER=irish_data`, `POSTGRES_DB=ireland_public`, and `PGDATA=/var/lib/postgresql/18/docker`.
 - The active PG18 data was in an anonymous Docker volume mounted at `/var/lib/postgresql`, while the named `irish-rail-nabber_postgres_data` volume mounted at `/var/lib/postgresql/data` appeared unused/empty. Always verify current mounts rather than assuming the named volume is live.
-- In the checked state, the live DB was about 3.4 GiB, while `/home/semyon/code/personal/irish-rail-nabber/api/target` was about 9.5 GiB. Rust build artifacts were the bigger local Irish Rail storage user.
+- In the checked state, the live DB was about 3.4 GiB, while `/home/semyon/code/owned/tools/irish-rail-nabber/api/target` was about 9.5 GiB. Rust build artifacts were the bigger local Irish Rail storage user.

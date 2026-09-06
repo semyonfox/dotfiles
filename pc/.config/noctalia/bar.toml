@@ -1,0 +1,9 @@
+# Noctalia Bar Configuration for Desktop PC
+# Kept minimal without tray or battery widgets.
+position = "top"
+monitor = "all"
+height = 36
+
+start = ["workspaces"]
+center = ["clock"]
+end = ["privacy"]

@@ -15,7 +15,7 @@ If a fix changes both runtime code and live deployment shape, commit and push bo
 
 1. Inspect app repo status and `server-stacks` status separately.
 2. Make or preserve app changes in the app repo.
-3. Mirror only deployment-relevant Compose changes into `/home/semyon/server-stacks/<stack>/stack.yaml` and the tracked `~/code/personal/server-stacks/<stack>/stack.yaml` copy if that repo exists separately.
+3. Mirror only deployment-relevant Compose changes into `/home/semyon/server-stacks/<stack>/stack.yaml`.
 4. Validate Compose with the real live env file where needed:
 
 ```bash

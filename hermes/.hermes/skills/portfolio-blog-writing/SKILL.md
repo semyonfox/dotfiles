@@ -16,7 +16,7 @@ Use this skill whenever drafting, revising, planning, or critiquing a post for S
 Read the local Markdown corpus before making style claims or drafting:
 
 ```text
-~/code/personal/portfolio/src/content/blog/
+~/code/owned/career/portfolio/src/content/blog/
 ```
 
 Posts use YAML frontmatter followed by Markdown. Inspect the current corpus, especially closely related posts, rather than relying on rendered-page extraction or memory. Existing writing may evolve; the local files are authoritative.

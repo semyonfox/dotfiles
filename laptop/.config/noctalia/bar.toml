@@ -1,0 +1,9 @@
+# Noctalia Bar Configuration for Laptop
+# Includes battery and system tray on laptop only.
+position = "top"
+monitor = "all"
+height = 36
+
+start = ["workspaces"]
+center = ["clock"]
+end = ["privacy", "battery", "tray"]

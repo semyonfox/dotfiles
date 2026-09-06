@@ -3,7 +3,7 @@ name: claude-second-opinion
 description: Use when asked for Claude, Fable, or a second opinion, or when uncertainty, a repeatedly failed fix, or high-risk diagnosis persists — not routine code reading.
 
 metadata:
-  harness: [claude, codex, opencode, cursor]
+  harnesses: [claude, codex, opencode, cursor, gemini, hermes]
 ---
 
 # Claude Second Opinion

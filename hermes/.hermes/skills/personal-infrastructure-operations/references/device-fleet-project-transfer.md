@@ -22,9 +22,9 @@ ssh -o BatchMode=yes -o ConnectTimeout=8 <host> 'hostname; pwd'
 ```bash
 set -o pipefail
 ssh -o BatchMode=yes -o ConnectTimeout=8 pc \
-  'cd /home/semyon/code/personal && tar -czf - go-expenses' \
+  'cd /home/semyon/code/owned/tools && tar -czf - go-expenses' \
 | ssh -o BatchMode=yes -o ConnectTimeout=8 semyon@100.127.128.15 \
-  'mkdir -p /home/semyon/code/personal && tar -C /home/semyon/code/personal -xzf -'
+  'mkdir -p /home/semyon/code/owned/tools && tar -C /home/semyon/code/owned/tools -xzf -'
 ```
 
 7. Verify on the destination with hostname, final path, size, and manifest. If relevant, run the narrow project check (`go test ./...`, `npm test`, etc.) but report plainly when the runtime is not installed/on PATH.

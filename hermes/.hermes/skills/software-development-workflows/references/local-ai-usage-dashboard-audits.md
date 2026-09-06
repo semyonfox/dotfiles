@@ -20,8 +20,8 @@ Use when Semyon asks to inspect or improve local AI usage/spend dashboards built
   - `C:\Users\foxsc\code\personal\swim`
   - `/c/Users/foxsc/code/personal/swim`
   - `/home/semyon/code\personal\swim`
-  - `/home/semyon/code/personal/swim`
-  to one canonical project key, usually `/home/semyon/code/personal/swim` on Linux.
+  - `/home/semyon/code/owned/products/swim`
+  to one canonical project key, usually `/home/semyon/code/owned/products/swim` on Linux.
 - Normalize path separators before grouping keys, but do not blindly fabricate paths from lossy slugs.
 - Roll up ephemeral worktrees such as `~/.t3/worktrees/<repo>/...` and `code/.worktrees/<repo>/...` to the canonical repository when possible.
 - Support explicit multi-root discovery for archived provider data; do not assume `$HOME` scans historical dumps.

@@ -48,7 +48,7 @@ Pass handles and small JSON, not prose dumps:
 ```json
 {
   "repo": "semyonfox/swim",
-  "local_repo": "/home/semyon/code/personal/swim",
+  "local_repo": "/home/semyon/code/owned/products/swim",
   "worktree": "/home/semyon/code/.worktrees/swim/agent-fix-meet-parser",
   "kind": "review",
   "target": {"type": "pr", "number": 18, "base": "dev"},

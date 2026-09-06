@@ -2,7 +2,7 @@
 name: babysit-pr
 description: Use when the user asks to monitor, watch, or babysit a PR.
 metadata:
-  harness: [claude, codex, opencode, cursor]
+  harnesses: [claude, codex, opencode, cursor, gemini, hermes]
 ---
 
 # Babysit PR

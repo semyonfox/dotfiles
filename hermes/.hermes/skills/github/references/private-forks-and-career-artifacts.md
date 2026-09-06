@@ -18,7 +18,7 @@ Use this when dirty local work contains personal materials, private workflow for
 
 ## Jenkins-owned portfolio deployment
 
-- For Semyon's portfolio, the canonical source is `/home/semyon/code/personal/portfolio` on local/Hermes and `origin/main` on GitHub. Jenkins owns production deploy on push.
+- For Semyon's portfolio, the canonical source is `/home/semyon/code/owned/career/portfolio` on local/Hermes and `origin/main` on GitHub. Jenkins owns production deploy on push.
 - Do not rely on stale manual shortcuts that SSH to `~/portfolio` on the server; that path may not be a git checkout. If a manual deploy script exists, make it a local verifier (`check` + `build`) or update it to the real Jenkins/stack flow.
 - After pushing portfolio changes, verify Jenkins saw the GitHub push, wait for the numbered portfolio build to finish, and then probe the live site and key assets.
 - Treat GitHub Dependabot push banners as provisional. Query alerts with `gh api /repos/<owner>/<repo>/dependabot/alerts?state=open` after the push and dependency graph refresh before saying alerts are fixed.

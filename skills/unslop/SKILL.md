@@ -3,7 +3,7 @@ name: unslop
 description: Cut AI tells from any writing. Must always apply.
 
 metadata:
-  harness: [claude, codex, opencode, cursor]
+  harnesses: [claude, codex, opencode, cursor, gemini, hermes]
 ---
 
 # Unslop

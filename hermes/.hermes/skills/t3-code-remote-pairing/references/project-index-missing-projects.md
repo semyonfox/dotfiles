@@ -83,7 +83,7 @@ PY
 Prefer the supported CLI over direct SQLite writes:
 
 ```bash
-~/.local/bin/t3 project add /home/semyon/code/personal/ScrimBrain --title ScrimBrain
+~/.local/bin/t3 project add /home/semyon/code/owned/labs/ScrimBrain --title ScrimBrain
 ```
 
 For folders marked `DELETED_DB` but intended to be visible again, re-add with the CLI rather than manually clearing `deleted_at` unless you have already backed up and intentionally chosen DB surgery.

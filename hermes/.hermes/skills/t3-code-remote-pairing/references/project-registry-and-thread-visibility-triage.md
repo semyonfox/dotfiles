@@ -30,8 +30,8 @@ import sqlite3, json
 from pathlib import Path
 DB = Path.home()/'.t3/userdata/state.sqlite'
 roots = [
-    '/home/semyon/code/personal/swim',
-    '/home/semyon/code/personal/portfolio',
+    '/home/semyon/code/owned/products/swim',
+    '/home/semyon/code/owned/career/portfolio',
     '/home/semyon/code/university/ct216-software-eng/oghmanotes',
 ]
 con = sqlite3.connect(f'file:{DB}?mode=ro', uri=True)

@@ -8,7 +8,7 @@ Do not assume a manual SSH deploy script is authoritative. In this portfolio set
 
 ## Safe workflow
 
-1. Fix and verify the real local repo under `~/code/personal/portfolio`.
+1. Fix and verify the real local repo under `~/code/owned/career/portfolio`.
 2. Run project-native checks locally:
    - `pnpm run check`
    - `pnpm run build`

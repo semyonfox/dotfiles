@@ -35,7 +35,7 @@ ORDER BY e.workspace_id DESC, i.position;
 ssh <host> 'python - <<"PY"
 import sqlite3, pathlib, shutil, time
 zed_db = pathlib.Path("/home/semyon/.local/share/zed/db/0-stable/db.sqlite")
-target = pathlib.Path("/home/semyon/code/personal/go-expenses/main.go")
+target = pathlib.Path("/home/semyon/code/owned/tools/go-expenses/main.go")
 backup = target.with_suffix(target.suffix + ".pre-zed-recovery-" + time.strftime("%Y%m%d-%H%M%S"))
 con = sqlite3.connect(str(zed_db))
 row = con.execute("select contents from editors where buffer_path=?", (str(target),)).fetchone()

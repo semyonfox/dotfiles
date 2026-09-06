@@ -11,8 +11,8 @@ For code block chrome, icon semantics matter as much as highlighting quality. A 
 Installed source inspected at:
 
 ```text
-/home/semyon/code/external/t3code/apps/web/src/components/ChatMarkdown.tsx
-/home/semyon/code/external/t3code/apps/web/src/index.css
+/home/semyon/code/contribs/t3code/apps/web/src/components/ChatMarkdown.tsx
+/home/semyon/code/contribs/t3code/apps/web/src/index.css
 ```
 
 Relevant stack in T3 Code web:

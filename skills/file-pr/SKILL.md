@@ -3,7 +3,7 @@ name: file-pr
 description: Use when the user asks to file, open, or create a PR.
 
 metadata:
-  harness: [claude, codex, opencode, cursor]
+  harnesses: [claude, codex, opencode, cursor, gemini, hermes]
 ---
 
 # File PR

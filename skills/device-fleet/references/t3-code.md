@@ -93,7 +93,19 @@ WantedBy=default.target
 - `t3-code-headless-update.path`: exists at `/home/semyon/.config/systemd/user/t3-code-headless-update.path`, but was disabled and inactive on 2026-07-03. It watches T3 CLI paths and triggers `t3-code-headless-restart.service`.
 - `t3-code-headless-restart.service`: static oneshot that runs `systemctl --user try-restart t3-code-headless.service`.
 - `t3code-hyperion.service`: exists for a dev instance but was disabled and inactive on 2026-07-03.
-- `t3code-hyperion` wrapper defaults: repo `/home/semyon/code/personal/t3code-hyperion`, home `/home/semyon/.t3-code-hyperion`, server port `14773`, web port `6733`, bind host `0.0.0.0`.
+- The legacy-named `t3code-hyperion` wrapper now defaults to the canonical checkout at `/home/semyon/code/contribs/t3code`; its separate home remains `/home/semyon/.t3-code-hyperion`, with server port `14773`, web port `6733`, and bind host `0.0.0.0`.
+
+### 2026-08-24 update: paths changed
+
+The service is still `t3-code-headless.service` (enabled, active), but the
+current wrapper `/home/semyon/bin/t3-headless-run` uses lock
+`/home/semyon/.t3/t3-headless.lock` and no longer passes `--base-dir`; the old
+`~/.t3-code` tree is gone and runtime state now lives under `~/.t3/userdata`
+(including `state.sqlite`, which projects T3 threads/messages; provider event
+logs under `~/.t3/userdata/logs/provider/events.<threadId>.log`). T3 now runs an
+internal `opencode serve` child process. Thread IDs in T3 map to opencode
+session IDs (`ses_...`) recorded in the event logs and in
+`~/.local/share/opencode/opencode.db`.
 
 ### Home Workspace Checkpoint Caveat
 
@@ -126,7 +138,18 @@ systemctl --user enable --now t3-code-headless.service
 systemctl --user disable --now t3-code-headless.service
 ```
 
-## Other Devices
+## Server provider installation ownership, verified 2026-09-05
+
+- Bash and Zsh use `~/.local/bin/update-ai-clis`, stowed from `home/.local/bin/update-ai-clis`.
+- Codex and Gemini use npm under NVM Node 24.16.0. Claude uses its native `~/.local/share/claude/versions` installation; OpenCode uses `~/.opencode/bin/opencode`; Cursor uses native `cursor-agent`; Grok uses `~/.grok/bin/grok` through `~/.local/bin/grok`.
+- Keep `agent` pointing to Cursor. Grok's official installer also writes `agent` and shell startup files. Invoke its installer/updater with `SHELL=/bin/false` and `~/.grok/bin` appended to the subprocess PATH, exposing only `grok` on the normal PATH.
+- Cursor's update endpoint returned unauthenticated even after its public installer installed the current build. Account sign-in is still needed for that update path; do not claim installation verifies authentication.
+- T3 has six built-in drivers: Codex, Claude, Cursor, Grok, OpenCode, Antigravity. Antigravity's installed ACP runtime is managed under `~/.t3/tools/antigravity-acp`; standalone `agy` is separate. Do not replace it with an npm package.
+- Removed duplicate NVM npm packages for Claude and T3. NVM bin compatibility symlinks now lead to the retained native Claude and `~/.local` npm T3, preserving `/usr/local/bin` callers. Provider data directories were not removed.
+- `~/bin/t3-headless-update` now points to the stowed `server/bin/t3-headless-update`. The old script is retained as `~/bin/t3-headless-update.before-provider-switchover-20260905`.
+- Disabled `t3-code-headless-update.path` to avoid mid-install restarts. The explicit updater restarts only on a version change and checks service/port readiness. Invoke it outside the T3 service cgroup. No T3 restart was performed during this migration.
+
+## Other device audit
 
 Verified on 2026-07-03:
 

@@ -4,7 +4,7 @@ Use this when Semyon says projects are missing from T3 Code, asks whether projec
 
 ## Core lesson
 
-T3's SQLite DB is a project/thread registry, not the canonical source of truth for Semyon's projects. A folder under `~/code` or a GitHub remote does **not** imply a `projection_projects` row. Many repos may only appear as text mentions in messages/tool output under broad projects such as `/home/semyon`, `/home/semyon/code/personal`, `portfolio`, `obsidian`, or `oghmanotes`.
+T3's SQLite DB is a project/thread registry, not the canonical source of truth for Semyon's projects. A folder under `~/code` or a GitHub remote does **not** imply a `projection_projects` row. Many repos may only appear as text mentions in messages/tool output under broad projects such as `/home/semyon`, `/home/semyon/code/owned`, `portfolio`, `obsidian`, or `oghmanotes`.
 
 Distinguish these states:
 
@@ -132,7 +132,7 @@ PY
 5. Re-add missing/deleted real repos through the supported CLI:
 
 ```bash
-~/.local/bin/t3 project add '/home/semyon/code/personal/ScrimBrain' --title 'ScrimBrain'
+~/.local/bin/t3 project add '/home/semyon/code/owned/labs/ScrimBrain' --title 'ScrimBrain'
 ```
 
 Avoid direct DB edits unless the CLI cannot represent the intended state and Semyon explicitly approves a surgical repair.

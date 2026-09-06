@@ -3,7 +3,7 @@ name: html-communication
 description: Create a standalone HTML document when the user wants a plan, report, comparison, or mockup to read outside the terminal, not product HTML.
 
 metadata:
-  harness: [claude, codex, opencode, cursor]
+  harnesses: [claude, codex, opencode, cursor, gemini, hermes]
 ---
 
 # HTML communication

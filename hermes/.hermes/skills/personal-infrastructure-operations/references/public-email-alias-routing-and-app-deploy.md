@@ -20,8 +20,8 @@ Use this for a public-site support-address migration where Semyon wants inbound 
 
 ## Semyon deployment specifics
 
-- Portfolio source: `~/code/personal/portfolio`; public alias change is deployed through its Docker stack/tunnel.
-- Swim source: `~/code/personal/swim`; public client runs as `swim-client`, API as `swim-backend`, on Docker network `swim`.
+- Portfolio source: `~/code/owned/career/portfolio`; public alias change is deployed through its Docker stack/tunnel.
+- Swim source: `~/code/owned/products/swim`; public client runs as `swim-client`, API as `swim-backend`, on Docker network `swim`.
 - Swim runtime environment: `~/server-stacks/uisce/stack.env`; `CONTACT_EMAIL` must be `hello@semyon.ie` and the backend must be recreated to apply it.
 - Swim client-only edits can be safely deployed by building the client from a clean worktree at the committed revision and replacing only `swim-client`; confirm `https://swim.semyon.ie/contact` and `http://127.0.0.1:4000/health` afterward.
 - Swim uses jj. Preserve unrelated Git-LFS image status noise: inspect `jj status` and `jj diff` rather than committing image files merely because Git reports smudge/stat modifications.

@@ -43,7 +43,7 @@ The PG18 Timescale container mounts its real data at `/var/lib/postgresql`; an o
 docker inspect irish_rail_db --format '{{range .Mounts}}{{.Name}} -> {{.Destination}} {{.Source}}{{println}}{{end}}'
 ```
 
-In the June 2026 cleanup, NABBER DB was ~3.4 GiB while `/home/semyon/code/personal/irish-rail-nabber/api/target` was ~9.5 GiB. So when the repo is large, first suspect Rust `target/` build output before blaming the live DB.
+In the June 2026 cleanup, NABBER DB was ~3.4 GiB while `/home/semyon/code/owned/tools/irish-rail-nabber/api/target` was ~9.5 GiB. So when the repo is large, first suspect Rust `target/` build output before blaming the live DB.
 
 ## Safe cleanup pattern when approved
 
@@ -52,7 +52,7 @@ Respect explicit exclusions. If Semyon says not to delete AI logs/sessions, avoi
 Common approved disposable targets:
 
 ```bash
-rm -rf /home/semyon/code/personal/irish-rail-nabber/api/target
+rm -rf /home/semyon/code/owned/tools/irish-rail-nabber/api/target
 find /data/compose/51/data/uploads -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 mkdir -p /data/compose/51/data/uploads
 rm -rf \

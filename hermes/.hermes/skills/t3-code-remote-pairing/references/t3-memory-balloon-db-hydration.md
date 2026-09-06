@@ -28,7 +28,7 @@ print('installed bin', p, 'idx', idx)
 print(s[idx:idx+700] if idx != -1 else 'not found')
 PY
 
-git -C /home/semyon/code/external/t3code diff -- \
+git -C /home/semyon/code/contribs/t3code diff -- \
   apps/server/src/orchestration/Layers/ProviderRuntimeIngestion.ts \
   apps/server/src/orchestration/Layers/ProviderRuntimeIngestion.test.ts
 ```

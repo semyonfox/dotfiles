@@ -102,7 +102,7 @@ When changing persistent stack config, update both relevant locations if both ex
 
 ```text
 /home/semyon/server-stacks/oghma/stack.yaml                # live stack copy
-/home/semyon/code/personal/server-stacks/oghma/stack.yaml  # tracked repo copy
+/home/semyon/server-stacks/oghma/stack.yaml  # tracked live stack
 ```
 
 Then commit/push via the `server-stacks` repo. For cautious rollout, push to `origin/dev`, open a PR to `main`, wait for GitHub checks, then merge.
