@@ -9,6 +9,7 @@ DRY_RUN=false
 BACKUP_DIR=""
 PROFILE=""
 PACKAGES=()
+PACKAGES_EXPLICIT=false
 
 profile_packages() {
     case "$1" in
@@ -57,12 +58,25 @@ detect_profile() {
 }
 
 resolve_packages() {
-    if [[ ${#PACKAGES[@]} -gt 0 ]]; then
-        return 0
+    local packages package
+
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        [[ "$PACKAGES_EXPLICIT" == false ]] || error "--packages list is empty"
+        [[ -n "$PROFILE" ]] || PROFILE="$(detect_profile)"
+        # capture first so an unknown profile fails here instead of becoming package names
+        packages="$(profile_packages "$PROFILE")" || error "Unknown profile: $PROFILE"
+        read -r -a PACKAGES <<< "$packages"
+        [[ ${#PACKAGES[@]} -gt 0 ]] || error "Profile resolved to no packages: $PROFILE"
     fi
 
-    [[ -n "$PROFILE" ]] || PROFILE="$(detect_profile)"
-    read -r -a PACKAGES <<< "$(profile_packages "$PROFILE")"
+    for package in "${PACKAGES[@]}"; do
+        # only plain top-level package names, not paths or repo support dirs
+        case "$package" in
+            ''|.*|*/*|lib|docs|tests|skills)
+                error "Invalid package name: '$package'" ;;
+        esac
+        [[ -d "$SCRIPT_DIR/$package" ]] || error "Package not found: $package"
+    done
 }
 
 rollback() {
@@ -92,6 +106,10 @@ ensure_stow() {
     local os base_os
     os="$(detect_os)"
     base_os="$(get_base_os)"
+
+    if [[ "$DRY_RUN" == true ]]; then
+        error "stow not installed. Install it first, dry runs never install packages."
+    fi
 
     info "Installing stow..."
 
@@ -266,6 +284,7 @@ main() {
             --packages)
                 [[ $# -ge 2 ]] || error "--packages requires a value"
                 IFS=', ' read -r -a PACKAGES <<< "$2"
+                PACKAGES_EXPLICIT=true
                 shift 2 ;;
             --help|-h)
                 print_help
@@ -289,6 +308,8 @@ main() {
     set -E
     trap rollback ERR
 
+    # validate package input before anything can install stow
+    resolve_packages
     ensure_stow
     echo ""
     deploy_dotfiles

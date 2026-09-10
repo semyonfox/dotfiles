@@ -21,7 +21,7 @@ git clone git@github.com:semyonfox/dotfiles.git "$HOME/dotfiles"
 cd "$HOME/dotfiles"
 ```
 
-Install GNU Stow before running `setup.sh`. The script may attempt to install it with `sudo` even in dry-run mode, so install it deliberately first:
+Install GNU Stow before running `setup.sh`. A normal run tries to install it with `sudo` if it is missing; `--dry-run` stops with an error instead. Installing it deliberately first avoids both:
 
 ```bash
 # Arch / CachyOS
