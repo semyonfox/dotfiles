@@ -85,7 +85,7 @@ Tracked examples may use placeholders only. See [docs/public-safety.md](docs/pub
 Read the output: the installer deliberately continues after the final simulated Stow invocation so a zero exit code alone is not a proof that Stow found no conflicts. For a strict non-interactive preview with Stow's exit status, run the matching package list directly:
 
 ```bash
-stow --no-folding --simulate --verbose home claude hyprland waybar swaync rofi pc
+stow --no-folding --simulate --verbose home claude hyprland noctalia pc
 ```
 
 ## Deploy
@@ -121,7 +121,7 @@ To remove links, unstow the **same package list** used for deployment:
 
 ```bash
 # Example: undo the PC profile links
-stow --no-folding -D home claude hyprland waybar swaync rofi pc
+stow --no-folding -D home claude hyprland noctalia pc
 ```
 
 Unstowing removes managed symlinks only. It does not uninstall packages, disable services or restore prior files. If the installer created a backup, restore it after unstowing:

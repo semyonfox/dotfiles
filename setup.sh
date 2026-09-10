@@ -69,7 +69,9 @@ rollback() {
     if [[ -n "$BACKUP_DIR" && -d "$BACKUP_DIR" ]]; then
         warn "Rolling back changes..."
         cd "$SCRIPT_DIR"
-        stow --no-folding -D "${PACKAGES[@]}" 2>/dev/null || true
+        if [[ ${#PACKAGES[@]} -gt 0 ]]; then
+            stow --no-folding -D "${PACKAGES[@]}" 2>/dev/null || true
+        fi
 
         if [[ -n "$(find "$BACKUP_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]]; then
             cp -a "$BACKUP_DIR"/. "$HOME"/ 2>/dev/null || true
@@ -81,8 +83,6 @@ rollback() {
         error "Setup failed. No backup to restore."
     fi
 }
-
-trap rollback ERR
 
 ensure_stow() {
     if command -v stow &>/dev/null; then
@@ -229,7 +229,9 @@ verify_installation() {
     done
 
     echo "  Verified symlinks: $verified"
-    [[ $failed -gt 0 ]] && echo "  Missing or unmanaged paths: $failed"
+    if [[ $failed -gt 0 ]]; then
+        echo "  Missing or unmanaged paths: $failed"
+    fi
 }
 
 print_help() {
@@ -279,7 +281,13 @@ main() {
     echo "================================"
     echo ""
 
-    [[ "$DRY_RUN" == true ]] && warn "DRY RUN MODE"
+    if [[ "$DRY_RUN" == true ]]; then
+        warn "DRY RUN MODE"
+    fi
+
+    # errtrace lets the ERR trap fire inside nested functions
+    set -E
+    trap rollback ERR
 
     ensure_stow
     echo ""
@@ -289,10 +297,13 @@ main() {
     if [[ "$DRY_RUN" == false ]]; then
         verify_installation
         trap - ERR
+        set +E
         echo ""
         success "Setup complete!"
         info "Restart terminal or run: source ~/.bashrc"
     else
+        trap - ERR
+        set +E
         success "Dry run complete"
     fi
     echo ""

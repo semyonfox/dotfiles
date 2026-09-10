@@ -5,8 +5,8 @@ Shared Hyprland configuration for the PC and laptop.
 Deploy it with a host overlay:
 
 ```bash
-stow --no-folding home claude hyprland waybar swaync rofi pc
-stow --no-folding home claude hyprland waybar swaync rofi laptop
+stow --no-folding home claude hyprland noctalia pc
+stow --no-folding home claude hyprland noctalia laptop
 ```
 
 The shared package owns:
