@@ -103,8 +103,6 @@ collect_sources() {
   add "$HOME/.config/obs-studio/plugin_config"
   add "$HOME/.config/systemd/user"
   add "$HOME/.config/hypr"
-  add "$HOME/.config/waybar"
-  add "$HOME/.config/swaync"
   add "$HOME/.config/zed/settings.json"
   add "$HOME/.config/zed/keymap.json"
   add "$HOME/.config/zed/tasks.json"

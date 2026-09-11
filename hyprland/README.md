@@ -6,19 +6,17 @@ Deploy it with a host overlay:
 
 ```bash
 stow --no-folding home claude hyprland waybar swaync rofi pc
-stow --no-folding home claude hyprland waybar swaync rofi laptop
+stow --no-folding home claude hyprland noctalia laptop
 ```
 
 The shared package owns:
 
 - `~/.config/hypr/hyprland.conf`
 - keybindings, animations, window rules, and theme files
-- lock screen text/config files
 - shared scripts under `~/.local/share/bin`
 
 Host overlays own:
 
-- `~/.config/hypr/hypridle.conf`
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
