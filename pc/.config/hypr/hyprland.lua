@@ -237,6 +237,9 @@ hl.layer_rule({
 })
 
 -- Key bindings.
+-- T3 Code window capture uses the native Lua dispatcher (Hyprland 0.56+).
+hl.bind("CTRL + SHIFT + 2", hl.dsp.global("com.t3tools.T3Code:capture-window"))
+
 local main = "SUPER"
 local term = "kitty"
 local file_manager = "nemo"
