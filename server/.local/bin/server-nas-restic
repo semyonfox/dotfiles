@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Encrypted snapshot of the server's home recovery set into the NAS restic repo.
+# Replaces the plaintext rsync generations under backups/server/generations.
+# The config-only job (server-stacks-config-backup.sh) writes to the same repo
+# with its own tag, so shared files are stored once.
+set -euo pipefail
+umask 077
+
+export RESTIC_REPOSITORY="${RESTIC_REPOSITORY:-/mnt/media/users/semyon/backups/restic/server}"
+export RESTIC_PASSWORD_FILE="${RESTIC_PASSWORD_FILE:-$HOME/.config/restic/server-nas.password}"
+RESTIC="${RESTIC:-$HOME/.local/bin/restic}"
+TAG=server-home
+host="$(hostname -s)"
+
+lock_file="${XDG_RUNTIME_DIR:-/tmp}/server-nas-restic.lock"
+exec 9>"$lock_file"
+flock -n 9 || { echo "backup already running" >&2; exit 1; }
+
+if ! timeout 15 findmnt -T /mnt/media -n -o FSTYPE | grep -q '^nfs'; then
+  echo "/mnt/media is not an active NFS mount; refusing to run" >&2
+  exit 1
+fi
+
+# never create a repo implicitly; a wrong path must fail loudly
+"$RESTIC" cat config >/dev/null || { echo "restic repo unreachable: $RESTIC_REPOSITORY" >&2; exit 1; }
+
+# small host state that lives outside $HOME, staged locally then backed up
+stage="$(mktemp -d /var/tmp/server-recovery.XXXXXX)"
+trap 'rm -rf "$stage"' EXIT
+for path in /etc/fstab /etc/hosts /etc/hostname /etc/ssh/sshd_config; do
+  if [[ -r "$path" ]]; then
+    install -D -m 600 "$path" "$stage/system$path"
+  else
+    printf 'skipped_unreadable=%s\n' "$path" >> "$stage/system/SKIPPED-PATHS.txt"
+  fi
+done
+crontab -l > "$stage/system/user-crontab.txt" 2>/dev/null || true
+{
+  echo "# Server recovery inventory"
+  echo
+  echo "Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo "Host: $host"
+  echo
+  echo "## OS"; uname -a; test -r /etc/os-release && cat /etc/os-release
+  echo; echo "## Filesystems"; findmnt --real
+  echo; echo "## Block devices"; lsblk -o NAME,SIZE,FSTYPE,FSVER,LABEL,UUID,MOUNTPOINTS
+  echo; echo "## Enabled user units"; systemctl --user list-unit-files --state=enabled --no-pager || true
+  echo; echo "## Enabled system units"; systemctl list-unit-files --state=enabled --no-pager || true
+  echo; echo "## Docker containers"; docker ps -a --format '{{.Names}}\t{{.Image}}\t{{.Status}}' || true
+  echo; echo "## Docker images"; docker image ls --digests --format '{{.Repository}}:{{.Tag}}\t{{.Digest}}\t{{.ID}}' || true
+  echo; echo "## Packages"; dpkg-query -W -f='${binary:Package}\t${Version}\n' 2>/dev/null || true
+} > "$stage/system/RECOVERY-INVENTORY.txt"
+[[ -s "$stage/system/RECOVERY-INVENTORY.txt" ]] || { echo "Missing recovery inventory" >&2; exit 1; }
+
+# same set the rsync job carried, plus the credential stores it used to miss
+sources=(
+  .claude .claude.json .codex .hermes .t3 .cursor .gemini .copilot
+  code projects obsidian dotfiles Scripts scripts server-stacks
+  compsoc life-admin jenkins observability swim-api odysseus robin artificial
+  .config/systemd .config/restic .config/schoolbooks .config/gh .config/rclone
+  .local/share/server-recovery-system .local/share/ai-sessions-archive .local/bin
+  .ssh .gnupg .aws .cloudflared .docker .wrangler .terraform.d .gam .doppler
+  .npmrc credentials secrets .secrets
+)
+existing=()
+for s in "${sources[@]}"; do
+  [[ -e "$HOME/$s" ]] && existing+=("$HOME/$s")
+done
+[[ ${#existing[@]} -gt 0 ]] || { echo "no source paths found" >&2; exit 1; }
+
+# exit 3 means some files could not be read (live files changing, permissions);
+# the snapshot is still written, so warn and carry on to retention
+set +e
+"$RESTIC" backup --quiet --host "$host" --tag "$TAG" \
+  --exclude='**/node_modules' \
+  --exclude='**/.venv' --exclude='**/venv' --exclude='**/.venv-*' \
+  --exclude='**/__pycache__' \
+  --exclude='**/target/debug' --exclude='**/target/release' \
+  --exclude='**/.next' --exclude='**/.cache' \
+  --exclude="$HOME/.codex/tmp" --exclude="$HOME/.codex/.tmp" \
+  --exclude="$HOME/.claude/backups" \
+  --exclude="$HOME/.hermes/audio_cache" --exclude="$HOME/.hermes/image_cache" \
+  --exclude="$HOME/.hermes/cron/output" --exclude="$HOME/.hermes/state-snapshots" \
+  --exclude="$HOME/.hermes/skills/.curator_backups" \
+  --exclude="$HOME/.t3/userdata/logs" --exclude="$HOME/.t3/deploy-backups" \
+  --exclude="$HOME/server-stacks/data/**/cache" \
+  --exclude="$HOME/server-stacks/data/dormant-services" \
+  --exclude="$HOME/server-stacks/data/pi-hole-recovery-*" \
+  --exclude="$HOME/server-stacks/data/uisce/backups" \
+  --exclude="$HOME/server-stacks/data/servarr/**/logs.db*" \
+  --exclude="$HOME/server-stacks/data/servarr/**/*.db-shm" \
+  --exclude="$HOME/server-stacks/data/servarr/**/*.db-wal" \
+  --exclude="$HOME/server-stacks/data/matrix/postgres" \
+  --exclude="$HOME/server-stacks/data/temporal/postgresql" \
+  --exclude="$HOME/server-stacks/data/resolve/postgres" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/http" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/auth" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/auth_provider.homeassistant" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/core.config" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/core.uuid" \
+  --exclude="$HOME/server-stacks/data/homeassistant/config/.storage/onboarding" \
+  --exclude="$HOME/server-stacks/data/pi-hole/etc-pihole/logrotate" \
+  "${existing[@]}" "$stage"
+rc=$?
+set -e
+if [ "$rc" -eq 3 ]; then echo "warning: some source files could not be read" >&2
+elif [ "$rc" -ne 0 ]; then echo "restic backup failed (rc=$rc)" >&2; exit "$rc"; fi
+
+# policy is per tag so the config job's snapshots are untouched
+"$RESTIC" forget --retry-lock 30m --quiet --host "$host" --tag "$TAG" --group-by host,tags \
+  --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --keep-yearly 3
+
+if [ "$(date +%u)" = "7" ]; then
+  "$RESTIC" prune --retry-lock 30m --quiet
+fi
+
+latest=$("$RESTIC" snapshots --tag "$TAG" --json | python3 -c 'import json,sys
+s=max(json.load(sys.stdin),key=lambda x:x["time"]); print(s["short_id"],s["time"][:19])')
+echo "server-home backup complete: $latest"

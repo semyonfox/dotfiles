@@ -1,8 +1,8 @@
 [Unit]
-Description=Weekly server backup to NAS
+Description=Daily encrypted server backup to NAS
 
 [Timer]
-OnCalendar=Sun *-*-* 03:15:00
+OnCalendar=*-*-* 03:15:00
 Persistent=true
 RandomizedDelaySec=30m
 
