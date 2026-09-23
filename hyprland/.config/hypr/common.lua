@@ -226,6 +226,7 @@ function M.setup()
     hl.bind(main .. " + V", M.exec(home .. "/.local/bin/yank --palette"))
     hl.bind(main .. " + SHIFT + V", M.exec(home .. "/.local/bin/yank --palette"))
     hl.bind("CTRL + SHIFT + Space", M.exec(home .. "/.local/bin/yank --palette"))
+    hl.bind("CTRL + SHIFT + 2", hl.dsp.global("com.t3tools.T3Code:capture-window"))
     hl.bind(main .. " + C", M.exec(home .. "/.local/bin/t3code-nightly"))
 
     -- Launcher menus
