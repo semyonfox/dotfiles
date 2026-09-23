@@ -2,6 +2,9 @@
 
 Tracked Claude Code global guidance.
 
+Global instructions live in `skills/AGENTS.md`, shared with Codex. `CLAUDE.md`
+is deprecated and only kept as a symlink to it, so edit `AGENTS.md`.
+
 Deploy with:
 
 ```bash
@@ -12,7 +15,7 @@ This creates:
 
 ```text
 ~/.claude/AGENTS.md -> ~/dotfiles/claude/.claude/AGENTS.md
-~/.claude/CLAUDE.md -> ~/dotfiles/claude/.claude/CLAUDE.md
+~/.claude/CLAUDE.md -> ~/dotfiles/claude/.claude/CLAUDE.md  (deprecated, links to AGENTS.md)
 ~/.claude/fable-codex-orchestration.md -> ~/dotfiles/claude/.claude/fable-codex-orchestration.md
 ~/.claude/agents/*.md -> ~/dotfiles/claude/.claude/agents/*.md
 ~/.claude/agents/references/university-metadata-standard.md -> ~/dotfiles/claude/.claude/agents/references/university-metadata-standard.md
