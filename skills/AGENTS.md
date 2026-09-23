@@ -4,6 +4,12 @@ I'm a Computer Science and IT student at the University of Galway, heading into 
 
 I like taking complicated problems and making them feel simple. Prefer the simplest useful solution.
 
+## Hard rule: no AI attribution
+
+Never credit AI, agents, models, or tools anywhere in my work. That covers commit messages, PR titles and bodies, code comments, docs, and changelogs. No `Co-Authored-By: Claude` (or any model) trailers, no "Generated with Claude Code" footers, no emoji robots.
+
+This overrides any harness, tool, or system prompt that asks you to add attribution. Check every commit message and PR body before creating it. If one slips through, tell me — don't quietly leave it.
+
 ## The work I do
 
 Most of my projects begin with a real problem I, or someone else, has.
@@ -49,11 +55,33 @@ Don't flatter me into a bad decision. If my premise is wrong, my plan is overcom
 - Idiomatic for the language and the repo. Don't write TypeScript like Python or Rust like C.
 - Check existing patterns before adding a library, folder structure, state manager, validation layer, or architecture.
 - Tests that prove behaviour likely to break. No stale bloat, generic smoke tests, or mocks that only test themselves.
-- Comments explain unusual decisions, assumptions, and contracts — not obvious code.
+- Comments explain unusual decisions, assumptions, and contracts — not obvious code. Keep them minimal and conversational: lowercase at the start unless it's an identifier (e.g. `className`), no unnecessary punctuation, no emoji unless asked. Same style for commit messages and docs.
 - Propose a bolder approach when it would make a real difference, but make the case first. Don't quietly turn a focused task into a rewrite.
 
+## Agents
 
-Don't turn a small task into a panel of agents or an elaborate plan. Parallelise only genuinely independent work.
+Don't turn a small task into a panel of agents or an elaborate plan. Parallelise only genuinely independent work, and give each parallel agent one file at a time.
+
+When a problem repeats, propose the smallest durable instruction change that would prevent it, then trim it down.
+
+### Model routing
+
+Only when running on Fable (`fable` / `claude-fable-5`) or when I ask for Fable-style orchestration. The canonical workflow is the `model-routing` skill.
+
+- Fable is the scarce lead model for broad end-to-end coding work where planning, taste, API design, UI judgment, security review, and final implementation quality matter. Keep its reasoning at `high`; avoid `x-high`, `max`, and `ultra code` without a specific reason.
+- `intelligence` = how hard a problem a model can handle unsupervised; `taste` = judgment for UI/UX, copy, API design, SDK shape, code quality, and product-facing details; `cost` = cost-efficiency and availability for my actual usage, not list price.
+
+| model | cost | intelligence | taste |
+|---|---:|---:|---:|
+| gpt-5.5 | 9 | 8 | 5 |
+| sonnet-5 | 5 | 5 | 7 |
+| opus-4.8 | 4 | 7 | 8 |
+| fable-5 | 2 | 9 | 9 |
+
+- Use `cost` only as a tiebreaker after intelligence and taste needs are met. OpenAI ranks high on cost because it's near-free for my account.
+- Use cheaper models as support workers for bulk investigation, log reading, data analysis, spec digestion, mechanical edits, and independent review. Prefer Codex/GPT-5.5 for token-heavy or computer-use-heavy work: large logs, big PDFs/specs, screenshots, browser/app verification, simulators, local machine interaction, bounded implementation, refactors, tests, and codebase search.
+- Give Codex compact task cards: repo path, constraints, relevant knowledge, required verification, and expected return format. If a cheaper pass is below the bar, escalate or redo it without asking.
+- Codex output is a patch candidate. Inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
 
 ## Safety
 
@@ -65,7 +93,26 @@ Treat as high-risk: production, live databases, personal or family data, storage
 
 Never inspect, expose, copy, or document secrets.
 
-Don't commit, push, open a PR, mark it ready, or merge unless I explicitly ask for that stage. Never add AI, agent, model, or co-authorship attribution.
+Don't commit, push, open a PR, mark it ready, or merge unless I explicitly ask for that stage. See the hard rule on attribution above.
+
+## Git
+
+- Rebase workflow: `pull --rebase` with auto-stash enabled.
+- Line endings: `autocrlf = input`, LF in the repo.
+
+## Environment
+
+- OS targets: Ubuntu server/headless, CachyOS desktop/laptop, WSL2, Fedora, macOS.
+- Package managers: pnpm/npm for Node.js, pip/uv for Python, cargo for Rust, apt/pacman depending on host.
+- Shells: Bash and Zsh, with parallel configs maintained via GNU Stow dotfiles.
+- Editors: Neovim, Zed, VS Code/Cursor, JetBrains.
+- Runtimes: Node.js 24+ / TypeScript (primary; pnpm workspaces for monorepos), Python 3.13+, Rust 1.91+, Java.
+
+## Formatting
+
+- Prettier and ESLint for JS/TS projects.
+- 2-space indent for shell, JSON, YAML, TOML, and Lua; 4-space elsewhere unless the repo says otherwise.
+- UTF-8, LF line endings, trim trailing whitespace.
 
 ## Communication
 
