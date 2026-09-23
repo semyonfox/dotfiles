@@ -3,9 +3,9 @@
 set -e
 
 # Source common functions and other scripts
+# install-deps.sh is run as a subprocess instead, it owns its own prompts and logging
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.sh"
-source "$SCRIPT_DIR/install-deps.sh"
 source "$SCRIPT_DIR/setup.sh"
 source "$SCRIPT_DIR/switch-to-zsh.sh"
 
@@ -20,10 +20,10 @@ main() {
     local os=$(detect_os)
     info "OS: $os"
 
-    is_wsl && {
+    if is_wsl; then
         warn "WSL detected"
         info "Use Windows Terminal instead of Linux terminal emulators"
-    }
+    fi
 
     echo ""
     echo "This installer will guide you through:"
@@ -34,7 +34,9 @@ main() {
 
     read -p "Continue? (y/n) " -n 1 -r
     echo
-    [[ ! $REPLY =~ ^[Yy]$ ]] && error "Cancelled"
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        error "Cancelled"
+    fi
 
     # Step 1: Dependencies
     echo ""
@@ -43,13 +45,8 @@ main() {
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
-        install_core_packages
-        echo ""
-        read -p "Install optional tools (thefuck, pyenv)? (y/n) " -n 1 -r
-        echo
-        [[ $REPLY =~ ^[Yy]$ ]] && install_optional_tools
-        echo ""
-        install_tpm
+        # install-deps.sh handles its own prompts, package selection, TPM and oh-my-zsh
+        "$SCRIPT_DIR/install-deps.sh"
     else
         command -v stow &>/dev/null || error "stow required. Install it first."
     fi
@@ -62,7 +59,12 @@ main() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
         ensure_stow
+        # errtrace lets the ERR trap fire inside deploy_dotfiles
+        set -E
+        trap rollback ERR
         deploy_dotfiles
+        trap - ERR
+        set +E
     fi
 
     # Step 3: Switch to zsh

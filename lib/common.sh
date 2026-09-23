@@ -51,8 +51,12 @@ error() {
 }
 
 # Log message (to file only, no stdout)
+# always succeeds so callers running under set -e are not aborted when LOG_FILE is unset
 log() {
-    [[ -n "$LOG_FILE" ]] && echo "$1" >> "$LOG_FILE"
+    if [[ -n "$LOG_FILE" ]]; then
+        echo "$1" >> "$LOG_FILE"
+    fi
+    return 0
 }
 
 # ======================================================================
