@@ -5,7 +5,8 @@ Desktop-specific notes and machine profile for this PC.
 ## Profile
 
 - Machine profile: `pc`
-- Hypridle: lock after 10 minutes, display off after 15 minutes, no automatic suspend
+- Lock screen: Noctalia must be installed; Super+L locks the session
+- Hypridle: lock through Noctalia after 10 minutes, display off after 15 minutes, no automatic suspend
 - Power helper: `~/.local/bin/power-mode.sh auto` applies performance-first CPU/GPU policy
 - GPU tuning owner: LACT daemon, not Waybar
 

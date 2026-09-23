@@ -9,9 +9,7 @@ stow --no-folding home claude hyprland noctalia laptop
 ```
 
 This package owns host-specific files:
-
 - `~/.config/dotfiles/machine-profile`
-- `~/.config/hypr/hypridle.conf`
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
