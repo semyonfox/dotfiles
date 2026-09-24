@@ -1,0 +1,10 @@
+[
+  {
+    "adapter": "Java",
+    "request": "launch",
+    "label": "Debug Java",
+    "stopOnEntry": true,
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "javaExec": "/home/semyon/.local/share/jdks/current/bin/java"
+  }
+]

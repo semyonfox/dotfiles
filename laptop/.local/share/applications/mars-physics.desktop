@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Mars Physics (Unity 6.6)
+Comment=Open the force-driven Mars orbit demo
+Exec=/home/semyon/Unity/Hub/Editor/6000.6.0f1/Editor/Unity -projectPath /home/semyon/Unity/StarTrekEnterprise -executeMethod StarTrekEnterprise.Editor.CreateMarsPhysicsScene.Open
+Icon=unityhub-unity-editor
+Terminal=false
+Categories=Development;

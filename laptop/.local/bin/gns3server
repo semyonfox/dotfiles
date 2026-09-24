@@ -1,0 +1,3 @@
+#!/bin/sh
+set -e
+exec /home/semyon/.local/share/gns3-ct3531/bin/gns3server "$@"

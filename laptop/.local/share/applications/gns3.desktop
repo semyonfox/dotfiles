@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GNS3 CT3531 (2.2.54)
+Comment=Network labs using the university GNS3 server
+Exec=/home/semyon/.local/bin/gns3 %f
+Icon=network-wired
+Terminal=false
+Categories=Education;
+MimeType=application/x-gns3;

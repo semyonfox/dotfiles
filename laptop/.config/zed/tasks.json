@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Java: run current file",
+    "command": "/home/semyon/.local/share/jdks/current/bin/java",
+    "args": [
+      "\"$ZED_FILE\""
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "reveal": "always"
+  },
+  {
+    "label": "Java: compile current file",
+    "command": "/home/semyon/.local/share/jdks/current/bin/javac",
+    "args": [
+      "\"$ZED_FILE\""
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "use_new_terminal": false,
+    "reveal": "always"
+  }
+]

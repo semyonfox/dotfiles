@@ -264,3 +264,9 @@ export PATH="/home/semyon/.local/bin:$PATH"
 # KDB-X Installation Configuration - Sun 13 Sep 15:41:41 IST 2026
 export PATH="/home/semyon/.kx/bin:$PATH"
 # End KDB-X Installation Configuration
+
+# Use the user-installed JDK when present.
+if [ -x "$HOME/.local/share/jdks/current/bin/javac" ]; then
+  export JAVA_HOME="$HOME/.local/share/jdks/current"
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi

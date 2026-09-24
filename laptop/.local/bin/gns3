@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+export QT_QPA_PLATFORM=xcb
+exec /home/semyon/.local/share/gns3-ct3531/bin/gns3 "$@"

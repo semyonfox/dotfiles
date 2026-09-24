@@ -198,3 +198,9 @@ export PATH="/home/semyon/.local/bin:$PATH"
 
 # opencode
 export PATH=/home/semyon/.opencode/bin:$PATH
+
+# Use the user-installed JDK when present.
+if [ -x "$HOME/.local/share/jdks/current/bin/javac" ]; then
+  export JAVA_HOME="$HOME/.local/share/jdks/current"
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi
