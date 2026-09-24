@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Upgrade healthy pipx environments without one corrupt metadata file aborting all.
+set -uo pipefail
+
+pipx_home="${PIPX_HOME:-$HOME/.local/share/pipx}"
+venvs_dir="$pipx_home/venvs"
+
+if [[ ! -d "$venvs_dir" ]]; then
+    exit 0
+fi
+
+while IFS=$'\t' read -r status venv detail; do
+    case "$status" in
+        healthy)
+            if ! pipx upgrade "$venv"; then
+                printf '!!pipx failed to upgrade %s\n' "$venv" >&2
+            fi
+            ;;
+        corrupt)
+            printf '!!pipx skipped corrupt environment: %s (%s)\n' "$venv" "$detail" >&2
+            printf '   Repair it with: rm -rf %q && pipx install %q\n' \
+                "$venvs_dir/$venv" "$venv" >&2
+            ;;
+    esac
+done < <(
+    python3 - "$venvs_dir" <<'PY'
+import json
+import pathlib
+import sys
+
+for venv_dir in sorted(pathlib.Path(sys.argv[1]).iterdir()):
+    if not venv_dir.is_dir():
+        continue
+    metadata = venv_dir / "pipx_metadata.json"
+    try:
+        raw = json.loads(metadata.read_text(encoding="utf-8"))
+        package = raw.get("main_package", {}).get("package_or_url")
+        if not isinstance(package, str) or not package:
+            raise ValueError("missing main package")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"corrupt\t{venv_dir.name}\t{exc}")
+    else:
+        print(f"healthy\t{venv_dir.name}\t{package}")
+PY
+)
