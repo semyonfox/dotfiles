@@ -80,147 +80,85 @@ fi
 # FUNCTIONS - SYSTEM MAINTENANCE
 # ======================================================================
 
-# Comprehensive system cleanup for Arch Linux
+# prune rebuildable package caches without touching installed tools or Docker data
 cleanup() {
-    local before after freed step=0 total=17
+    if [[ $# -gt 1 ]]; then
+        printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
+        return 2
+    fi
+    case "${1:-}" in
+        --help|-h)
+            printf 'Usage: cleanup [--dry-run|--deep|--help]\n'
+            printf 'Default: prune package caches. --deep also clears idle Gradle, Playwright and npx caches.\n'
+            return 0
+            ;;
+        --dry-run|--deep|"") ;;
+        *)
+            printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
+            return 2
+            ;;
+    esac
 
-    echo -e "\n\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    echo -e "\e[96m│\e[0m  \e[1;97mSystem Cleanup\e[0m                              \e[96m│\e[0m"
-    echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m\n"
+    printf 'Cache sizes before cleanup:\n'
+    du -sh "$HOME/.cache/uv" "$HOME/.npm/_cacache" "$HOME/.cache/pnpm" \
+        "$HOME/.cache/pip" "$HOME/.gradle/caches" \
+        "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx" 2>/dev/null || true
+    [[ ${1:-} == --dry-run ]] && return 0
 
-    before=$(df --output=used / | tail -1 | tr -d ' ')
-
-    # ── System ───────────────────────────────────────────────────────────
-    echo -e "\e[96m── System ──────────────────────────────────────────\e[0m"
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing pacman cache (keeping last 3)..."
-    if command -v paccache &>/dev/null; then
-        sudo paccache -rk3 2>/dev/null
-    else
-        sudo pacman -Sc --noconfirm
+    local failed=0
+    if command -v uv >/dev/null 2>&1; then
+        if ! command -v pgrep >/dev/null 2>&1; then
+            printf '\nSkipping uv cache: cannot check for active uv processes\n'
+        elif pgrep -u "$(id -u)" -x uv >/dev/null 2>&1; then
+            printf '\nSkipping uv cache: uv is running\n'
+        else
+            printf '\nPruning uv cache...\n'
+            uv cache prune || failed=1
+        fi
+    fi
+    if command -v npm >/dev/null 2>&1; then
+        printf '\nClearing npm download cache...\n'
+        npm cache clean --force || failed=1
+    fi
+    if command -v pnpm >/dev/null 2>&1; then
+        printf '\nPruning pnpm store...\n'
+        pnpm store prune || failed=1
+    fi
+    if command -v pip3 >/dev/null 2>&1; then
+        printf '\nClearing pip download cache...\n'
+        pip3 cache purge || failed=1
     fi
 
-    echo -e "\e[93m[$((++step))/$total]\e[0m Removing orphaned packages..."
-    if orphans=$(pacman -Qtdq 2>/dev/null); then
-        echo "$orphans" | sudo pacman -Rns --noconfirm -
-    else
-        echo "      No orphaned packages found"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing AUR helper cache..."
-    if command -v paru &>/dev/null; then
-        paru -Sc --noconfirm 2>/dev/null
-    elif command -v yay &>/dev/null; then
-        yay -Sc --noconfirm 2>/dev/null
-    elif command -v pikaur &>/dev/null; then
-        pikaur -Sc --noconfirm 2>/dev/null
-    else
-        echo "      No AUR helper found, skipping"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused Flatpak runtimes..."
-    if command -v flatpak &>/dev/null; then
-        flatpak uninstall --unused --noninteractive 2>/dev/null
-    else
-        echo "      flatpak not installed, skipping"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Pruning snapper snapshots (keeping last 3)..."
-    if command -v snapper &>/dev/null; then
-        for cfg in root home; do
-            to_delete=$(snapper -c "$cfg" list --columns number 2>/dev/null \
-                | tail -n +2 \
-                | grep -Ev '^\s*$|^0$' \
-                | sort -n \
-                | head -n -3)
-            if [[ -n "$to_delete" ]]; then
-                echo "      $cfg: removing $(echo "$to_delete" | wc -l | tr -d ' ') snapshot(s)"
-                echo "$to_delete" | xargs -r sudo snapper -c "$cfg" delete
+    if [[ ${1:-} == --deep ]]; then
+        if ! command -v pgrep >/dev/null 2>&1; then
+            printf '\nSkipping large caches: cannot check active processes\n'
+        else
+            local user_id
+            user_id=$(id -u)
+            if pgrep -u "$user_id" -f 'GradleDaemon|gradle-launcher' >/dev/null 2>&1; then
+                printf '\nSkipping Gradle cache: Gradle is running\n'
             else
-                echo "      $cfg: nothing to prune"
+                printf '\nClearing Gradle build cache...\n'
+                rm -rf -- "$HOME/.gradle/caches" || failed=1
             fi
-        done
-    else
-        echo "      snapper not installed, skipping"
+            if pgrep -u "$user_id" -f 'ms-playwright|playwright|chromium|firefox|webkit' >/dev/null 2>&1; then
+                printf '\nSkipping Playwright browsers: a browser or test is running\n'
+            else
+                printf '\nClearing Playwright browser downloads...\n'
+                rm -rf -- "$HOME/.cache/ms-playwright" || failed=1
+            fi
+            if pgrep -u "$user_id" -f "$HOME/.npm/_npx" >/dev/null 2>&1; then
+                printf '\nSkipping npx cache: a cached tool is running\n'
+            else
+                printf '\nClearing npx cache...\n'
+                rm -rf -- "$HOME/.npm/_npx" || failed=1
+            fi
+        fi
     fi
 
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing systemd journal (keeping 3 days)..."
-    sudo journalctl --vacuum-time=3d 2>/dev/null
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing temporary files..."
-    sudo systemd-tmpfiles --clean 2>/dev/null
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing user cache..."
-    rm -rf ~/.cache/* 2>/dev/null
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing thumbnails and trash..."
-    rm -rf ~/.thumbnails/* ~/.local/share/Trash/* 2>/dev/null
-
-    # ── Docker ───────────────────────────────────────────────────────────
-    echo -e "\n\e[96m── Docker ──────────────────────────────────────────\e[0m"
-
-    if command -v docker &>/dev/null; then
-        echo -e "\e[93m[$((++step))/$total]\e[0m Removing stopped containers..."
-        docker container prune -f 2>/dev/null
-
-        echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused images..."
-        docker image prune -af 2>/dev/null
-
-        echo -e "\e[93m[$((++step))/$total]\e[0m Removing unused volumes..."
-        docker volume prune -f 2>/dev/null
-
-        echo -e "\e[93m[$((++step))/$total]\e[0m Clearing build cache..."
-        docker builder prune -af 2>/dev/null
-    else
-        step=$((step + 4))
-        echo "      docker not installed, skipping"
-    fi
-
-    # ── Dev tools ────────────────────────────────────────────────────────
-    echo -e "\n\e[96m── Dev tools ───────────────────────────────────────\e[0m"
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing npm cache..."
-    if command -v npm &>/dev/null; then
-        npm cache clean --force 2>/dev/null
-    else
-        echo "      npm not installed, skipping"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Pruning pnpm store..."
-    if command -v pnpm &>/dev/null; then
-        pnpm store prune 2>/dev/null
-    else
-        echo "      pnpm not installed, skipping"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing uv cache..."
-    if command -v uv &>/dev/null; then
-        uv cache clean 2>/dev/null
-    else
-        echo "      uv not installed, skipping"
-    fi
-
-    echo -e "\e[93m[$((++step))/$total]\e[0m Clearing pip cache and Python user packages..."
-    if command -v pip3 &>/dev/null; then
-        pip3 cache purge 2>/dev/null
-    fi
-    rm -rf ~/.local/lib/python*/site-packages 2>/dev/null
-
-    after=$(df --output=used / | tail -1 | tr -d ' ')
-    freed=$((before - after))
-
-    echo -e "\n\e[96m╭─────────────────────────────────────────────────╮\e[0m"
-    echo -e "\e[96m│\e[0m  \e[92mCleanup Complete!\e[0m                           \e[96m│\e[0m"
-    if [[ $freed -gt 0 ]]; then
-        printf "\e[96m│\e[0m  \e[92mSpace freed: %-33s\e[96m│\e[0m\n" "$(numfmt --to=iec --suffix=B $((freed * 1024)))"
-    else
-        echo -e "\e[96m│\e[0m  \e[93mSpace freed: 0B (or negligible)\e[0m            \e[96m│\e[0m"
-    fi
-    echo -e "\e[96m╰─────────────────────────────────────────────────╯\e[0m\n"
-
-    echo -e "\e[93mTop 10 largest directories:\e[0m\n"
-    du -h --max-depth=1 ~/ 2>/dev/null | sort -rh | sed -n '2,11p' | nl -w2 -s'. '
-    echo
+    printf '\nRoot filesystem free: '
+    df -h / | awk 'NR == 2 {print $4}'
+    return "$failed"
 }
 
 # ======================================================================
