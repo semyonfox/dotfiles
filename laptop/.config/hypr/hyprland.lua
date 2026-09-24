@@ -3,6 +3,7 @@
 
 local home = os.getenv("HOME")
 local scripts = home .. "/.local/share/bin"
+package.path = home .. "/.config/hypr/?.lua;" .. package.path
 
 -- Laptop display topology (ThinkPad internal display + dual external Dell monitors)
 hl.monitor({
@@ -63,7 +64,6 @@ hl.on("hyprland.start", function()
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "dbus-update-activation-environment --systemd --all",
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
-        "systemctl --user restart vicinae.service",
         scripts .. "/polkitkdeauth.sh",
         "noctalia --daemon",
         "blueman-applet",
@@ -79,7 +79,7 @@ end)
 
 -- Load shared Hyprland configuration (layouts, theme, rules, common binds)
 local common = require("common")
-common.setup()
+common.setup({legacy_shell_binds = false})
 
 -- Laptop-only power mode shortcuts
 local main = "SUPER"
@@ -88,6 +88,7 @@ hl.bind(main .. " + F11", common.exec(home .. "/.local/bin/power-mode.sh ac"))
 hl.bind(main .. " + F12", common.exec(home .. "/.local/bin/power-mode.sh beast"))
 hl.bind(main .. " + SHIFT + F12", common.exec(home .. "/.local/bin/power-mode.sh cycle"))
 
--- Laptop-only OpenWhispr push-to-talk binds (F8 transparent pass-through)
-hl.bind("F8", common.exec("dbus-send --session --type=method_call --dest=com.openwhispr.App /com/openwhispr/App com.openwhispr.App.PttDown"), {transparent = true})
-hl.bind("F8", common.exec("dbus-send --session --type=method_call --dest=com.openwhispr.App /com/openwhispr/App com.openwhispr.App.PttUp"), {release = true, transparent = true})
+-- Keep this literal require in the entrypoint: Noctalia's template hook detects it.
+common.apply_noctalia_theme(function()
+    return require("noctalia")
+end)
