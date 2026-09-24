@@ -1,0 +1,18 @@
+# desktop is always on mains power, so lock and blank without the battery gate
+# and never suspend automatically
+[idle]
+behavior_order = ["lock", "screen-off"]
+pre_action_fade_seconds = 0.0
+
+[idle.behavior.lock]
+timeout = 600
+action = "command"
+enabled = true
+command = "~/.local/bin/noctalia-lock"
+
+[idle.behavior.screen-off]
+timeout = 900
+action = "command"
+enabled = true
+command = "hyprctl dispatch dpms off"
+resume_command = "hyprctl dispatch dpms on"
