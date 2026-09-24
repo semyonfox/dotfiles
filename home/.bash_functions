@@ -369,7 +369,7 @@ update() {
         hash -r
     fi
     if command -v pipx &>/dev/null; then
-        pipx upgrade-all || echo "!!pipx failed"
+        "$HOME/.local/bin/update-pipx-venvs" || echo "!!pipx failed"
     else
         echo "!!pipx unavailable (uv not installed)"
     fi

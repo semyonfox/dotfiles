@@ -1,0 +1,10 @@
+[Unit]
+Description=Archive Claude/Codex transcripts hourly without automatic deletion
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

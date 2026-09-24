@@ -24,7 +24,49 @@ function M.move_active_window(direction, x, y)
     end
 end
 
-function M.setup()
+function M.apply_noctalia_theme(load_generated_theme)
+    local loaded, noctalia = pcall(load_generated_theme)
+    if loaded and type(noctalia) == "table" and type(noctalia.apply_theme) == "function" then
+        noctalia.apply_theme()
+        return
+    end
+
+    -- Preserve the checked-in legacy palette on a clean deployment before
+    -- Noctalia has generated ~/.config/hypr/noctalia.lua.
+    hl.config({
+        general = {
+            col = {
+                active_border = "rgb(89b4fa)",
+                inactive_border = "rgb(1e1e2e)",
+            },
+        },
+        group = {
+            col = {
+                border_active = "rgb(b4befe)",
+                border_inactive = "rgb(1e1e2e)",
+                border_locked_active = "rgb(f38ba8)",
+                border_locked_inactive = "rgb(1e1e2e)",
+            },
+            groupbar = {
+                col = {
+                    active = "rgb(b4befe)",
+                    inactive = "rgb(1e1e2e)",
+                    locked_active = "rgb(f38ba8)",
+                    locked_inactive = "rgb(1e1e2e)",
+                },
+                text_color = "rgb(1e1e2e)",
+                text_color_inactive = "rgb(cdd6f4)",
+                text_color_locked_active = "rgb(1e1e2e)",
+                text_color_locked_inactive = "rgb(cdd6f4)",
+            },
+        },
+    })
+end
+
+function M.setup(options)
+    options = options or {}
+    local legacy_shell_binds = options.legacy_shell_binds ~= false
+
     -- Environment variables
     hl.env("PATH", os.getenv("PATH") .. ":" .. scripts)
     hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
@@ -47,6 +89,7 @@ function M.setup()
     hl.config({
         input = {
             kb_layout = "us",
+            kb_variant = "altgr-intl",
             kb_model = "pc105",
             kb_rules = "evdev",
             follow_mouse = 1,
@@ -127,13 +170,6 @@ function M.setup()
                 special = true,
             },
         },
-        render = {
-            cm_enabled = true,
-            cm_auto_hdr = 1,
-            send_content_type = true,
-            use_fp16 = 2,
-            keep_unmodified_copy = 2,
-        },
     })
 
     hl.device({
@@ -145,9 +181,9 @@ function M.setup()
     hl.exec_cmd("hyprctl setcursor Bibata-Modern-Ice 20")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Ice'")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-size 20")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface font-name 'Segoe UI 10'")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface document-font-name 'Segoe UI 10'")
-    hl.exec_cmd("gsettings set org.gnome.desktop.interface monospace-font-name 'Segoe UI 10'")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface font-name 'Cantarell 10'")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface document-font-name 'Cantarell 10'")
+    hl.exec_cmd("gsettings set org.gnome.desktop.interface monospace-font-name 'CaskaydiaCove Nerd Font Mono 9'")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface font-antialiasing 'rgba'")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface font-hinting 'full'")
     hl.exec_cmd("gsettings set org.gnome.desktop.interface icon-theme 'Tela-circle-dracula'")
@@ -215,13 +251,15 @@ function M.setup()
     hl.bind(main .. " + L", M.exec(home .. "/.local/bin/noctalia-lock"))
     hl.bind(main .. " + SHIFT + F", M.exec(scripts .. "/windowpin.sh"))
     hl.bind(main .. " + Backspace", M.exec(scripts .. "/logoutlaunch.sh"))
-    hl.bind("CTRL + ALT + W", M.exec("killall waybar || (env reload_flag=1 " .. scripts .. "/wbarconfgen.sh)"))
+    if legacy_shell_binds then
+        hl.bind("CTRL + ALT + W", M.exec("killall waybar || (env reload_flag=1 " .. scripts .. "/wbarconfgen.sh)"))
+    end
 
     -- Core applications
     hl.bind(main .. " + T", M.exec(term))
     hl.bind(main .. " + E", M.exec(file_manager))
     hl.bind(main .. " + B", M.exec(browser))
-    hl.bind(main .. " + Space", M.exec(home .. "/.local/bin/vicinae toggle"))
+    hl.bind(main .. " + Space", M.exec("vicinae toggle"))
     hl.bind(main .. " + O", M.exec("obsidian"))
     hl.bind(main .. " + V", M.exec(home .. "/.local/bin/yank --palette"))
     hl.bind(main .. " + SHIFT + V", M.exec(home .. "/.local/bin/yank --palette"))
@@ -231,9 +269,11 @@ function M.setup()
 
     -- Launcher menus
     hl.bind("CTRL + SHIFT + Escape", M.exec(scripts .. "/sysmonlaunch.sh"))
-    hl.bind(main .. " + A", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh d"))
-    hl.bind(main .. " + Tab", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh w"))
-    hl.bind(main .. " + SHIFT + E", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh f"))
+    if legacy_shell_binds then
+        hl.bind(main .. " + A", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh d"))
+        hl.bind(main .. " + Tab", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh w"))
+        hl.bind(main .. " + SHIFT + E", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh f"))
+    end
 
     -- Audio controls
     local audio = scripts .. "/audio-control.sh"
@@ -266,8 +306,11 @@ function M.setup()
     hl.bind("Print", M.exec(scripts .. "/screenshot.sh p"))
 
     -- Script utilities
-    local script_binds = {
-        {main .. " + ALT + G", scripts .. "/gamemode.sh"},
+    hl.bind(main .. " + ALT + G", M.exec(scripts .. "/gamemode.sh"))
+    hl.bind(main .. " + K", M.exec(scripts .. "/keyboardswitch.sh"))
+    hl.bind(main .. " + slash", M.exec("pkill -x rofi || " .. scripts .. "/keybinds_hint.sh c"))
+
+    local legacy_script_binds = {
         {main .. " + ALT + Right", scripts .. "/hyprpaper-cycle.sh next"},
         {main .. " + ALT + Left", scripts .. "/hyprpaper-cycle.sh prev"},
         {main .. " + ALT + Up", scripts .. "/wbarconfgen.sh n"},
@@ -277,12 +320,12 @@ function M.setup()
         {main .. " + SHIFT + A", "pkill -x rofi || " .. scripts .. "/rofiselect.sh"},
         {main .. " + SHIFT + X", "pkill -x rofi || " .. scripts .. "/themestyle.sh"},
         {main .. " + SHIFT + W", "pkill -x rofi || " .. scripts .. "/hyprpaper-cycle.sh select"},
-        {main .. " + K", scripts .. "/keyboardswitch.sh"},
-        {main .. " + slash", "pkill -x rofi || " .. scripts .. "/keybinds_hint.sh c"},
         {main .. " + ALT + A", "pkill -x rofi || " .. scripts .. "/animations.sh"},
     }
-    for _, binding in ipairs(script_binds) do
-        hl.bind(binding[1], M.exec(binding[2]))
+    if legacy_shell_binds then
+        for _, binding in ipairs(legacy_script_binds) do
+            hl.bind(binding[1], M.exec(binding[2]))
+        end
     end
 
     -- Focus navigation

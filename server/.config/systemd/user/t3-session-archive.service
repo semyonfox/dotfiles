@@ -1,0 +1,12 @@
+[Unit]
+Description=Preserve native host and preview Claude/Codex transcripts without pruning
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/t3-session-archive
+UMask=0077
+Nice=15
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+TimeoutStartSec=infinity

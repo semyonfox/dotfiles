@@ -151,6 +151,35 @@ systemctl --user disable --now t3-code-headless.service
 
 ## Other device audit
 
+### Preview and proxy fully retired, verified 2026-09-18
+
+User requested the original installation only, an incremental data merge, and
+removal of experimental volumes/full backups. Normal `t3-code-headless.service`
+is active on 3773 with original direct Codex, Claude and OpenCode binary paths.
+Proxy services disabled; ports 3774, 8317 and 8318 closed. Preview/proxy/test
+containers, image tags, launchers and experimental data volumes removed.
+
+Five missing messages across two existing threads were added as v1-compatible
+`thread.message-sent` events in a stopped-service SQLite transaction. Normal
+T3 was restarted and its own projector populated them. Exact text, IDs and
+thread IDs were verified, plus HTTP 200. No existing messages were replaced.
+Five native Codex logs and one Claude transcript were copied into the original
+host `.codex/sessions` and `.claude/projects` without overwriting existing files.
+
+Small merge record only: `~/.local/share/t3-preview-merge-20260918`, containing
+five-message delta, inserted event IDs, affected thread metadata and verification.
+The whole `~/t3-orchestrator-v2` staging tree, full SQLite snapshots, duplicate
+recovery transcripts, source checkout and release artifacts were deleted after
+verification, as were both named preview/proxy volumes and the retired native
+gateway state/key/versioned binary. Original `~/.cli-proxy-api` logs remain.
+
+`t3-session-archive.timer` remains enabled with no expiration/pruning. It now
+captures only the main native logs, without any Docker dependency. Previously
+archived preview records remain preserved. Storage is
+`~/.local/share/t3-session-archive`; capture stops below 2 GiB free. Claude
+retention is 36500 days; archival copies have no expiry. Same-disk storage does
+not protect against disk failure.
+
 Verified on 2026-07-03:
 
 - `nas`: no `t3` binary, no T3 user units, no listener on `3773`, `14773`, or `6733`.
@@ -158,3 +187,4 @@ Verified on 2026-07-03:
 - `pc`: no `t3` binary, no T3 user units, no listener on `3773`, `14773`, or `6733`.
 - `pc`: user linger was `Linger=yes`.
 - `laptop`: unreachable over `ssh semyon@100.127.128.15` during the second audit. An earlier same-day probe saw T3 Code listening on `0.0.0.0:3773`, but the startup mechanism was not verified. Re-audit before documenting or changing laptop T3 startup.
+
