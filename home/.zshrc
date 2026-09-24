@@ -260,3 +260,7 @@ esac
 
 # Added by Antigravity CLI installer
 export PATH="/home/semyon/.local/bin:$PATH"
+
+# KDB-X Installation Configuration - Sun 13 Sep 15:41:41 IST 2026
+export PATH="/home/semyon/.kx/bin:$PATH"
+# End KDB-X Installation Configuration
