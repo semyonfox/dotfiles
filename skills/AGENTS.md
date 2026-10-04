@@ -66,22 +66,13 @@ When a problem repeats, propose the smallest durable instruction change that wou
 
 ### Model routing
 
-Only when running on Fable (`fable` / `claude-fable-5`) or when I ask for Fable-style orchestration. The canonical workflow is the `model-routing` skill.
+Use the `model-routing` skill before delegating, picking a model, or escalating effort. It holds the current lanes and billing.
 
-- Fable is the scarce lead model for broad end-to-end coding work where planning, taste, API design, UI judgment, security review, and final implementation quality matter. Keep its reasoning at `high`; avoid `x-high`, `max`, and `ultra code` without a specific reason.
-- `intelligence` = how hard a problem a model can handle unsupervised; `taste` = judgment for UI/UX, copy, API design, SDK shape, code quality, and product-facing details; `cost` = cost-efficiency and availability for my actual usage, not list price.
-
-| model | cost | intelligence | taste |
-|---|---:|---:|---:|
-| gpt-5.5 | 9 | 8 | 5 |
-| sonnet-5 | 5 | 5 | 7 |
-| opus-4.8 | 4 | 7 | 8 |
-| fable-5 | 2 | 9 | 9 |
-
-- Use `cost` only as a tiebreaker after intelligence and taste needs are met. OpenAI ranks high on cost because it's near-free for my account.
-- Use cheaper models as support workers for bulk investigation, log reading, data analysis, spec digestion, mechanical edits, and independent review. Prefer Codex/GPT-5.5 for token-heavy or computer-use-heavy work: large logs, big PDFs/specs, screenshots, browser/app verification, simulators, local machine interaction, bounded implementation, refactors, tests, and codebase search.
-- Give Codex compact task cards: repo path, constraints, relevant knowledge, required verification, and expected return format. If a cheaper pass is below the bar, escalate or redo it without asking.
-- Codex output is a patch candidate. Inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
+- Claude is flat-rate and limit-bound; Codex is metered credits at API prices. Don't assume Codex is free.
+- Fable and GPT-6 Astra are request-only.
+- Effort is medium or high. Never low, max, or ultrathink; xhigh only after a failed pass with a stated gap.
+- Give delegated agents compact task cards with model and effort set explicitly.
+- Delegated output is a patch candidate. Inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
 
 ## Safety
 

@@ -16,7 +16,6 @@ This creates:
 ```text
 ~/.claude/AGENTS.md -> ~/dotfiles/claude/.claude/AGENTS.md
 ~/.claude/CLAUDE.md -> ~/dotfiles/claude/.claude/CLAUDE.md  (deprecated, links to AGENTS.md)
-~/.claude/fable-codex-orchestration.md -> ~/dotfiles/claude/.claude/fable-codex-orchestration.md
 ~/.claude/agents/*.md -> ~/dotfiles/claude/.claude/agents/*.md
 ~/.claude/agents/references/university-metadata-standard.md -> ~/dotfiles/claude/.claude/agents/references/university-metadata-standard.md
 ```
