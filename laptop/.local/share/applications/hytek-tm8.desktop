@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Hy-Tek Team Manager 8
+Comment=Open Team Manager in the Windows 11 VM
+Exec=/home/semyon/.local/bin/hytek-windows11
+Icon=virt-manager
+Terminal=false
+StartupWMClass=virt-viewer
+Categories=Education;Sports;
+Keywords=Hy-Tek;HyTek;TM8;Team Manager;Swimming;Windows;

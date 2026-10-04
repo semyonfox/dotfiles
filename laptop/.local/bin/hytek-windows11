@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+uri=qemu:///session
+name=HyTek-Windows11
+
+case "$(virsh -c "$uri" domstate "$name")" in
+  "shut off") virsh -c "$uri" start "$name" >/dev/null ;;
+  running) ;;
+  *)
+    printf "The Hy-Tek VM is not ready to open. Check it in Virtual Machine Manager.\n" >&2
+    exit 1
+    ;;
+esac
+
+exec virt-viewer --attach -c "$uri" --wait --reconnect "$name"
