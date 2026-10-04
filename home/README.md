@@ -103,7 +103,6 @@ localip   # Show local IP
 df        # Disk usage (human-readable)
 du        # Directory size (human-readable)
 ports     # Show listening ports
-update    # sudo pacman -Syu
 ```
 
 #### Safe Operations
@@ -226,7 +225,7 @@ reload    # source ~/.bashrc (bash) or ~/.zshrc (zsh)
 
 ```bash
 mkcd <dir>          # mkdir + cd in one command
-backup <file>       # Create timestamped .bak copy
+backup <file>       # Copy to <file>.bak, replacing an existing backup
 f <pattern>         # Find files by name
 ftext <pattern>     # Search text in files
 extract <archive>   # Extract any archive format (tar, zip, 7z, etc.)
@@ -241,15 +240,13 @@ sssh <host>         # SSH with completion (see config for details)
 #### System
 
 ```bash
-cleanup             # 7-step Arch cleanup:
-                    # 1. pacman cache cleanup
-                    # 2. AUR package cleanup
-                    # 3. Systemd journal cleanup
-                    # 4. Temp files cleanup
-                    # 5. Package removal
-                    # 6. Broken symlinks cleanup
-                    # 7. Database cleanup
+update              # Update system packages and developer tools
+cleanup             # Prune available uv, npm, pnpm, and pip caches
+cleanup --dry-run   # Show cache sizes without changing anything
+cleanup --deep      # Also clear Gradle, Playwright, and npx directories
 ```
+
+`update` runs `paru`, the AI CLI updater, Flatpak, rustup, pnpm, pipx, and uv. It is Arch-oriented because it calls `paru` unconditionally. `cleanup --deep` checks for matching processes before removing its extra directories. Cleanup does not remove installed packages or Docker data.
 
 #### Gaming Helpers
 
@@ -413,44 +410,16 @@ Both shells maintain comprehensive history:
 
 ## Extending Configuration
 
-### Add Custom Aliases
+### Local overrides
 
-Create shell-specific files for local overrides:
-
-```bash
-# Bash
-echo "alias myalias='my command'" >> ~/.bash_aliases.local
-
-# Zsh
-echo "alias myalias='my command'" >> ~/.zsh_aliases.local
-```
-
-### Add Custom Functions
+Put machine-specific aliases, functions, and settings in `~/.bashrc.local` for Bash or `~/.zshrc.local` for Zsh. Each shell sources its local file after the shared aliases and functions.
 
 ```bash
-# Bash
-cat >> ~/.bash_functions.local << 'EOF'
+# ~/.bashrc.local or ~/.zshrc.local
+alias myalias='my command'
 myfunc() {
-    echo "Do something"
+    echo 'Do something'
 }
-EOF
-
-# Zsh
-cat >> ~/.zsh_functions.local << 'EOF'
-myfunc() {
-    echo "Do something"
-}
-EOF
-```
-
-### Local Machine Config
-
-Create `~/.bashrc.local` or `~/.zshrc.local` for machine-specific settings:
-
-```bash
-# ~/.bashrc.local (sourced at end of .bashrc)
-export MY_VAR="value"
-alias myalias="command"
 ```
 
 ## Troubleshooting
@@ -494,12 +463,9 @@ git clone https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
 ```
 
-## Performance Notes
+## Startup notes
 
-- **Bash startup**: ~200ms (includes all completions)
-- **Zsh startup**: ~300ms (includes Oh My Zsh framework)
-- **Tool integration**: All tools are conditionally loaded (only if installed)
-- **FZF**: Configured to use `fd` if available for 10x faster fuzzy finding
+Bash loads its completion files when available. Zsh loads Oh My Zsh. Both shells initialize optional tools when their commands or setup files are present.
 
 ## References & Attribution
 
@@ -514,13 +480,7 @@ Special thanks to the Arch Linux, Catppuccin, and Starship communities for inspi
 
 ## Platform Support
 
-Tested and working on:
-
-- ✅ Arch Linux (primary development environment)
-- ✅ Ubuntu 20.04+
-- ✅ Fedora 35+
-- ✅ macOS 12+
-- ✅ WSL2 (Windows Subsystem for Linux)
+The package targets Arch/CachyOS, Ubuntu, Fedora, macOS, and WSL2. The interactive welcome meter reads Linux `/proc` files and calls `nproc`, so it needs a platform guard before it can work on macOS.
 
 ## Next Steps
 

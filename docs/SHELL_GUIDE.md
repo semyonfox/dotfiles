@@ -66,7 +66,6 @@ Both shells follow a consistent sourcing pattern:
 | **Glob patterns**   | Basic                  | ✅ Extended                           | Better pattern matching           |
 | **Theming**         | Via Starship           | ✅ Via Starship + Oh My Zsh           | Both use Starship (recommended)   |
 | **Aliases**         | 140+ directly          | 140+ (some via Oh My Zsh)             | Different delegation strategy     |
-| **Startup time**    | ~200ms                 | ~300ms                                | Minimal difference                |
 | **Scripting**       | ✅ Better              | ✅ Good                               | Bash better for POSIX portability |
 | **Interactive use** | Good                   | ✅ Better                             | Zsh superior for daily use        |
 
@@ -222,7 +221,7 @@ Both shells now have:
     ftext()     # Search text
     extract()   # Multi-format extraction
     sssh()      # SSH with completion
-    cleanup()   # 7-step system cleanup
+    cleanup()   # Package cache pruning, with optional deeper cleanup
     ```
 
 3. **Identical Environment Variables**
@@ -245,9 +244,8 @@ Both shells now have:
 Some features are shell-optimized:
 
 1. **Welcome Message**
-    - **Bash**: CPU/RAM progress bars (system-aware)
-    - **Zsh**: Time-aware greeting (interactive-aware)
-    - Use `_welcome_bar` function in both (different implementations)
+    - Both shells use `_welcome_bar` for a time-aware greeting and CPU, RAM, and disk meters
+    - Each shell has its own implementation
 
 2. **Completion System**
     - **Bash**: COMPREPLY array (traditional)
@@ -425,7 +423,7 @@ zsh -x -c "source ~/.zshrc" 2>&1 | head -20
 
 #### 3. Slow Startup
 
-**Bash** (~200ms expected):
+**Bash**:
 
 ```bash
 # Profile startup
@@ -435,7 +433,7 @@ time bash -i -c exit
 bash -x -i -c exit 2>&1 | grep -oE '[0-9]+\.[0-9]+ bash' | sort -rn | head -5
 ```
 
-**Zsh** (~300ms expected):
+**Zsh**:
 
 ```bash
 # Profile startup
@@ -635,25 +633,9 @@ alias myserver='ssh user@192.168.1.100'
 export MY_PROJECT_PATH="/home/user/projects/myproject"
 ```
 
-### Alias Overrides
+### Alias overrides
 
-Create machine-specific alias files:
-
-```bash
-# ~/.bash_aliases.local (bash)
-echo "alias myalias='custom command'" >> ~/.bash_aliases.local
-
-# ~/.zsh_aliases.local (zsh)
-echo "alias myalias='custom command'" >> ~/.zsh_aliases.local
-```
-
-Then source them in `.bashrc`/`.zshrc`:
-
-```bash
-# Add to .bashrc/.zshrc after sourcing main aliases
-[[ -f ~/.bash_aliases.local ]] && source ~/.bash_aliases.local
-[[ -f ~/.zsh_aliases.local ]] && source ~/.zsh_aliases.local
-```
+Add machine-specific aliases to `~/.bashrc.local` or `~/.zshrc.local`. The corresponding shell startup file already sources it after the shared aliases and functions.
 
 ## References
 

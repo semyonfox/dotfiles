@@ -13,7 +13,7 @@ Each shared skill is linked from the relevant provider package:
 
 ```text
 claude/.claude/skills/<skill-name>  -> canonical skills/<skill-name>
-codex/.agents/skills/<skill-name>   -> canonical skills/<skill-name> (planned)
+codex/.agents/skills/<skill-name>   -> canonical skills/<skill-name>
 hermes/.hermes/skills/<skill-name>  -> canonical skills/<skill-name>
 ```
 
@@ -25,7 +25,7 @@ When those packages are deployed, their runtime targets are:
 ~/.hermes/skills/<skill-name>
 ```
 
-The repository still contains an older `codex/.codex/skills` layout. Treat it as a migration target, not the desired long-term location. Codex's current documented user-level discovery path is `~/.agents/skills`.
+The checked-in Codex package uses `codex/.agents/skills`. The old runtime `~/.codex/skills` tree is not managed by this package. Inspect its ownership separately before changing it.
 
 ## What belongs in a skill directory
 
@@ -80,7 +80,7 @@ Do not bulk-move every installed skill. First classify it as shared-owned, runti
 
 1. Keep `/home/semyon/dotfiles/skills/` as the one editable source tree.
 2. Add a provider allowlist or manifest before automating link creation.
-3. Move the Codex package toward `.agents/skills` and remove stale `.codex/skills` assumptions after checking live ownership.
+3. Keep the Codex package under `.agents/skills`; inspect any older runtime tree separately before migrating it.
 4. Keep the Hermes corpus separate and link only selected skills into normal development providers.
 5. Add a small audit/deploy helper that creates links, refuses to overwrite real directories, validates targets, and runs Stow dry-runs.
 6. Re-scan all live provider directories before calling the migration complete.

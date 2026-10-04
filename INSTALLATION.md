@@ -22,19 +22,24 @@ Complete guide to installing and managing dependencies for the dotfiles reposito
 ./install.sh
 ```
 
-The installer will:
-1. Detect your OS and package manager
-2. Show system information
-3. Ask which shell you want (Bash or Zsh)
-4. Ask which optional tools to install
-5. Ask which development tools to install
-6. Ask whether to install Hyprland/Waybar (desktop environment)
-7. Display all packages before installing
-8. Install packages with clear progress
-9. Run post-installation setup (TPM, Oh My Zsh)
-10. Show a summary with next steps
+`install-deps.sh` is the dependency installer. It detects the OS and package manager, shows system information, then interactively asks about the shell, optional tools, development tools, the desktop stack, and gaming packages. It displays the selected package list and asks for confirmation before installation, then runs post-install setup and shows a summary. A log file is created at `~/.dotfiles-install-YYYYMMDD_HHMMSS.log`.
 
-A log file is automatically created at `~/.dotfiles-install-YYYYMMDD_HHMMSS.log` for reference.
+`install.sh` is a separate guided wrapper. It first asks whether to run `install-deps.sh`, then separately asks whether to deploy dotfiles with Stow, and finally whether to switch to Zsh if it is installed. Declining dependency installation requires Stow to already be available if deployment is selected. The wrapper does not accept `setup.sh` profile options; its sourced setup flow detects the profile from the hostname. Run `setup.sh --profile NAME` separately when you need to choose a profile explicitly.
+
+`install-deps.sh` requires Bash 4 or newer. macOS's bundled Bash 3.2 is unsupported; invoke the script with a Bash 4+ installation. On apt-based systems, it refreshes package lists with a separate `sudo apt update` before installing packages.
+
+
+## Stow deployment safety
+
+Preview a profile before deployment:
+
+```bash
+./setup.sh --dry-run --profile server
+```
+
+`setup.sh` passes `--target="$HOME"` to Stow, so the selected account's home directory is the explicit link target. If Stow's simulation fails, the dry run exits with a nonzero status. Review the output before deploying with the corresponding `./setup.sh --profile NAME` command.
+
+When a target path conflicts with a regular file, setup offers to move it into a uniquely named backup under `$HOME`. It refuses to back up through a symlinked parent directory. If deployment later fails, rollback removes only links created by that run, preserves links that existed before it, and restores backed-up files without overwriting a path that has appeared since. The setup regression checks cover failed dry runs, pre-existing links, symlinked parents, and directory modes (`tests/setup.sh`).
 
 ## Installation Process
 
@@ -80,13 +85,14 @@ Decide which development environments to install:
 
 Install only what you need. These take up significant disk space.
 
-#### Desktop Environment (Arch/Linux only)
-If not on WSL2 or macOS, you'll be offered to install:
+#### Desktop Environment
+
+On hosts other than WSL2 and macOS, the current `install-deps.sh` offers the optional legacy combination:
 - **Hyprland** - Wayland window manager
 - **Waybar** - Status bar
 - **Swaync** - Notification center
 
-Skip on non-Hyprland systems.
+This dependency prompt does not install the repository's current Noctalia shell package or deploy a Stow profile. For current host profile package lists and Noctalia deployment, follow the repository `README.md`. Skip this prompt on systems where this legacy desktop combination is not wanted.
 
 ### Step 3: Package Review
 
@@ -106,10 +112,9 @@ The installer separates packages into two categories:
 - Examples: zsh, bash, git, tmux, fzf
 - If a critical package fails, installation stops immediately with an error
 
-**Optional packages** (can fail gracefully):
-- Nice to have, but not required
+**Optional packages** (not required by the shell configuration):
 - Examples: lazygit, pomodoro-tui
-- If optional packages fail, installation continues with a warning
+- Failed optional packages are recorded and skipped so installation can continue. The final summary lists those failures.
 
 ### Step 5: Post-Installation Setup
 
@@ -201,9 +206,9 @@ rustup update         # Update toolchain
 rustup toolchain list # Show installed toolchains
 ```
 
-### Desktop Environment Packages (Arch/Linux only)
+### Desktop Environment Packages
 
-Only offered on Arch/Fedora/Ubuntu (skipped on WSL2 and macOS):
+The current `install-deps.sh` offers these packages on hosts other than WSL2 and macOS. The prompt is not the current Noctalia shell deployment; use the repository `README.md` for the supported Stow profile package lists.
 
 | Package | Purpose | Dependencies |
 |---------|---------|---------------|
