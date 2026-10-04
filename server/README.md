@@ -23,3 +23,8 @@ After first deploy, enable the T3 user service manually:
 systemctl --user daemon-reload
 systemctl --user enable --now t3-code-headless.service
 ```
+
+The server NAS backup timer runs `server-nas-restic`. If restic creates a partial
+snapshot because it cannot read some source files, the job exits with status 3
+and skips retention for that run. The partial snapshot remains available for
+inspection; a complete run resumes normal retention.

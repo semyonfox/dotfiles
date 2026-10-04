@@ -27,6 +27,7 @@ fi
 # small host state that lives outside $HOME, staged locally then backed up
 stage="$(mktemp -d /var/tmp/server-recovery.XXXXXX)"
 trap 'rm -rf "$stage"' EXIT
+mkdir -p "$stage/system"
 for path in /etc/fstab /etc/hosts /etc/hostname /etc/ssh/sshd_config; do
   if [[ -r "$path" ]]; then
     install -D -m 600 "$path" "$stage/system$path"
@@ -69,7 +70,7 @@ done
 [[ ${#existing[@]} -gt 0 ]] || { echo "no source paths found" >&2; exit 1; }
 
 # exit 3 means some files could not be read (live files changing, permissions);
-# the snapshot is still written, so warn and carry on to retention
+# the partial snapshot is kept, but retention must wait for a complete backup
 set +e
 "$RESTIC" backup --quiet --host "$host" --tag "$TAG" \
   --exclude='**/node_modules' \
@@ -103,7 +104,7 @@ set +e
   "${existing[@]}" "$stage"
 rc=$?
 set -e
-if [ "$rc" -eq 3 ]; then echo "warning: some source files could not be read" >&2
+if [ "$rc" -eq 3 ]; then echo "restic backup incomplete: some source files could not be read; skipping retention" >&2; exit "$rc"
 elif [ "$rc" -ne 0 ]; then echo "restic backup failed (rc=$rc)" >&2; exit "$rc"; fi
 
 # policy is per tag so the config job's snapshots are untouched
