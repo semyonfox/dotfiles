@@ -76,6 +76,88 @@ complete -F _sssh_complete sssh
 # FUNCTIONS - SYSTEM MAINTENANCE
 # ====================================================================== 
 
+# boxed output shared by update and cleanup, in the style of the old omarchy cleanup
+# box content stays ASCII so bash and zsh pad it to the same width
+_maint_box() {
+    local colour=$1 title=$2 line rule
+    shift 2
+    rule=$(printf '%49s' '' | sed 's/ /─/g')
+    printf '\n\e[96m╭%s╮\e[0m\n' "$rule"
+    printf '\e[96m│\e[0m  \e[%sm%-47s\e[0m\e[96m│\e[0m\n' "$colour" "$title"
+    for line in "$@"; do
+        printf '\e[96m│\e[0m  %-47s\e[96m│\e[0m\n' "$line"
+    done
+    printf '\e[96m╰%s╯\e[0m\n' "$rule"
+}
+
+_maint_step() {
+    printf '\n\e[93m[%s/%s]\e[0m %s\n' "$1" "$2" "$3"
+}
+
+_maint_human() {
+    awk -v kb="${1:-0}" 'BEGIN {
+        size = kb < 0 ? -kb : kb; i = 1
+        while (size >= 1024 && i < 4) { size /= 1024; i++ }
+        printf "%s%.1f%s", (kb < 0 ? "-" : ""), size, substr("KMGT", i, 1)
+    }'
+}
+
+_maint_disk() {
+    # prints "used available" for / in KiB
+    df -Pk / 2>/dev/null | awk 'NR == 2 {print $3, $4}'
+}
+
+# 0 when nothing matches, 1 when a matching process runs, 2 when the check fails
+_maint_idle() {
+    command -v pgrep >/dev/null 2>&1 || return 2
+    pgrep -u "$(id -u)" "$@" >/dev/null 2>&1
+    case $? in
+        1) return 0 ;;
+        0) return 1 ;;
+        *) return 2 ;;
+    esac
+}
+
+_maint_cache_sizes() {
+    local dir size
+    for dir in "$@"; do
+        [[ -e $dir ]] || continue
+        size=$(du -sk "$dir" 2>/dev/null | awk '{print $1}')
+        [[ -n $size ]] && printf '%s\t%s\n' "$size" "$dir"
+    done
+}
+
+_maint_size_diff() {
+    if [[ -z $1 ]]; then
+        printf '  no package caches found\n'
+        return 0
+    fi
+    awk -F'\t' -v home="$HOME" '
+        function human(kb, i) {
+            i = 1
+            while (kb >= 1024 && i < 4) { kb /= 1024; i++ }
+            return sprintf("%.1f%s", kb, substr("KMGT", i, 1))
+        }
+        NR == FNR { if ($2 != "") before[$2] = $1; next }
+        $2 != "" { after[$2] = $1 }
+        END {
+            for (dir in before) {
+                name = dir
+                if (index(dir, home) == 1) name = "~" substr(dir, length(home) + 1)
+                if (only_before) printf "  %-26s %8s\n", name, human(before[dir])
+                else printf "  %-26s %8s -> %s\n", name, human(before[dir]), human((dir in after) ? after[dir] : 0)
+            }
+        }' only_before="${3:-}" <(printf '%s\n' "$1") <(printf '%s\n' "$2") | sort
+}
+
+_maint_reboot_reason() {
+    if [[ -f /var/run/reboot-required ]]; then
+        printf 'yes, packages asked for it'
+    elif [[ -d /usr/lib/modules && ! -d /usr/lib/modules/$(uname -r) ]]; then
+        printf 'yes, new kernel installed'
+    fi
+}
+
 # prune rebuildable package caches without touching installed tools or Docker data
 cleanup() {
     if [[ $# -gt 1 ]]; then
@@ -95,91 +177,97 @@ cleanup() {
             ;;
     esac
 
-    printf 'Cache sizes before cleanup:\n'
-    du -sh "$HOME/.cache/uv" "$HOME/.npm/_cacache" "$HOME/.cache/pnpm" \
-        "$HOME/.cache/pip" "$HOME/.gradle/caches" \
-        "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx" 2>/dev/null || true
-    [[ ${1:-} == --dry-run ]] && return 0
+    local mode=${1:-} failed=0 step=0 total=4 title='System cleanup'
+    local before_sizes after_sizes before_used after_used avail disk
+    local -a caches=("$HOME/.cache/uv" "$HOME/.npm/_cacache" "$HOME/.cache/pnpm"
+        "$HOME/.cache/pip" "$HOME/.gradle/caches" "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx")
+    [[ $mode == --deep ]] && total=7 title='System cleanup (deep)'
+    [[ $mode == --dry-run ]] && title='System cleanup (dry run)'
 
-    local failed=0 process_status
-    if command -v uv >/dev/null 2>&1; then
-        if ! command -v pgrep >/dev/null 2>&1; then
-            printf '\nSkipping uv cache: cannot check for active uv processes\n'
-            failed=1
-        elif pgrep -u "$(id -u)" -x uv >/dev/null 2>&1; then
-            printf '\nSkipping uv cache: uv is running\n'
-        else
-            process_status=$?
-            if [[ $process_status -eq 1 ]]; then
-                printf '\nPruning uv cache...\n'
-                uv cache prune || failed=1
-            else
-                printf '\nSkipping uv cache: process check failed\n'
-                failed=1
-            fi
-        fi
+    _maint_box '1;97' "$title"
+    before_sizes=$(_maint_cache_sizes "${caches[@]}")
+    if [[ $mode == --dry-run ]]; then
+        printf '\nCache sizes:\n'
+        _maint_size_diff "$before_sizes" "" sizes-only
+        return 0
     fi
+    disk=$(_maint_disk)
+    before_used=${disk%% *}
+
+    _maint_step $((++step)) "$total" 'uv cache'
+    if ! command -v uv >/dev/null 2>&1; then
+        printf '      uv not installed, skipping\n'
+    else
+        _maint_idle -x uv
+        case $? in
+            0) uv cache prune || failed=1 ;;
+            1) printf '      skipped: uv is running\n' ;;
+            *) printf '      skipped: could not check for running uv\n'; failed=1 ;;
+        esac
+    fi
+
+    _maint_step $((++step)) "$total" 'npm download cache'
     if command -v npm >/dev/null 2>&1; then
-        printf '\nClearing npm download cache...\n'
         npm cache clean --force || failed=1
+    else
+        printf '      npm not installed, skipping\n'
     fi
+
+    _maint_step $((++step)) "$total" 'pnpm store'
     if command -v pnpm >/dev/null 2>&1; then
-        printf '\nPruning pnpm store...\n'
         pnpm store prune || failed=1
+    else
+        printf '      pnpm not installed, skipping\n'
     fi
+
+    _maint_step $((++step)) "$total" 'pip download cache'
     if command -v pip3 >/dev/null 2>&1; then
-        printf '\nClearing pip download cache...\n'
         pip3 cache purge || failed=1
+    else
+        printf '      pip3 not installed, skipping\n'
     fi
 
-    if [[ ${1:-} == --deep ]]; then
-        if ! command -v pgrep >/dev/null 2>&1; then
-            printf '\nSkipping large caches: cannot check active processes\n'
-            failed=1
-        else
-            local user_id
-            user_id=$(id -u)
-            if pgrep -u "$user_id" -f 'GradleDaemon|gradle-launcher' >/dev/null 2>&1; then
-                printf '\nSkipping Gradle cache: Gradle is running\n'
-            else
-                process_status=$?
-                if [[ $process_status -eq 1 ]]; then
-                    printf '\nClearing Gradle build cache...\n'
-                    rm -rf -- "$HOME/.gradle/caches" || failed=1
-                else
-                    printf '\nSkipping Gradle cache: process check failed\n'
-                    failed=1
-                fi
-            fi
-            if pgrep -u "$user_id" -f 'ms-playwright|playwright|chromium|firefox|webkit' >/dev/null 2>&1; then
-                printf '\nSkipping Playwright browsers: a browser or test is running\n'
-            else
-                process_status=$?
-                if [[ $process_status -eq 1 ]]; then
-                    printf '\nClearing Playwright browser downloads...\n'
-                    rm -rf -- "$HOME/.cache/ms-playwright" || failed=1
-                else
-                    printf '\nSkipping Playwright browsers: process check failed\n'
-                    failed=1
-                fi
-            fi
-            if pgrep -u "$user_id" -f "$HOME/.npm/_npx" >/dev/null 2>&1; then
-                printf '\nSkipping npx cache: a cached tool is running\n'
-            else
-                process_status=$?
-                if [[ $process_status -eq 1 ]]; then
-                    printf '\nClearing npx cache...\n'
-                    rm -rf -- "$HOME/.npm/_npx" || failed=1
-                else
-                    printf '\nSkipping npx cache: process check failed\n'
-                    failed=1
-                fi
-            fi
-        fi
+    if [[ $mode == --deep ]]; then
+        _maint_step $((++step)) "$total" 'Gradle build cache'
+        _maint_idle -f 'GradleDaemon|gradle-launcher'
+        case $? in
+            0) rm -rf -- "$HOME/.gradle/caches" || failed=1 ;;
+            1) printf '      skipped: Gradle is running\n' ;;
+            *) printf '      skipped: could not check for running Gradle\n'; failed=1 ;;
+        esac
+
+        _maint_step $((++step)) "$total" 'Playwright browser downloads'
+        _maint_idle -f 'ms-playwright|playwright|chromium|firefox|webkit'
+        case $? in
+            0) rm -rf -- "$HOME/.cache/ms-playwright" || failed=1 ;;
+            1) printf '      skipped: a browser or test is running\n' ;;
+            *) printf '      skipped: could not check for running browsers\n'; failed=1 ;;
+        esac
+
+        _maint_step $((++step)) "$total" 'npx cache'
+        _maint_idle -f "$HOME/.npm/_npx"
+        case $? in
+            0) rm -rf -- "$HOME/.npm/_npx" || failed=1 ;;
+            1) printf '      skipped: a cached tool is running\n' ;;
+            *) printf '      skipped: could not check for running npx tools\n'; failed=1 ;;
+        esac
     fi
 
-    printf '\nRoot filesystem free: '
-    df -h / | awk 'NR == 2 {print $4}'
+    after_sizes=$(_maint_cache_sizes "${caches[@]}")
+    disk=$(_maint_disk)
+    after_used=${disk%% *}
+    avail=${disk##* }
+    local -a lines=(
+        "Freed:      $(_maint_human $(( ${before_used:-0} - ${after_used:-0} )))"
+        "Free on /:  $(_maint_human "${avail:-0}")"
+    )
+    if [[ $failed -ne 0 ]]; then
+        _maint_box '1;93' 'Cleanup finished with skipped steps' "${lines[@]}"
+    else
+        _maint_box '1;92' 'Cleanup complete' "${lines[@]}"
+    fi
+    printf '\nCache sizes, before -> after:\n'
+    _maint_size_diff "$before_sizes" "$after_sizes"
     return "$failed"
 }
 
@@ -304,68 +392,82 @@ gaming-check() {
 }
 
 update() {
-    local failed=0
-    local -a failed_steps=()
+    local failed=0 step=0 total=7 disk before_used after_used reboot
+    local -a failed_steps=() skipped=()
     # record a failed step so one bad updater never hides the others
-    _update_failed() { echo "!!$1 failed"; failed=1; failed_steps+=("$1"); }
+    _update_failed() { printf '!! %s failed\n' "$1"; failed=1; failed_steps+=("$1"); }
+    _update_skip() { printf '      %s not installed, skipping\n' "$1"; skipped+=("$1"); }
 
-    echo "==> system (paru)"
+    _maint_box '1;97' 'System update'
+    disk=$(_maint_disk)
+    before_used=${disk%% *}
+
+    _maint_step $((++step)) "$total" 'system packages (paru)'
     if command -v paru &>/dev/null; then
         paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || _update_failed paru
     else
-        echo "paru not installed"
+        _update_skip paru
     fi
 
-    # Both shells use the same installation-aware provider updater.
-    "$HOME/.local/bin/update-ai-clis" || _update_failed "AI CLIs"
+    # both shells use the same installation-aware provider updater
+    _maint_step $((++step)) "$total" 'AI CLIs'
+    "$HOME/.local/bin/update-ai-clis" || _update_failed 'AI CLIs'
     hash -r
 
-    printf '\n==> flatpak\n'
+    _maint_step $((++step)) "$total" 'flatpak'
     if command -v flatpak &>/dev/null; then
         flatpak update -y || _update_failed flatpak
     else
-        echo "flatpak not installed"
+        _update_skip flatpak
     fi
 
-    printf '\n==> rustup\n'
+    _maint_step $((++step)) "$total" 'rustup'
     if command -v rustup &>/dev/null; then
         rustup update || _update_failed rustup
     else
-        echo "rustup not installed"
+        _update_skip rustup
     fi
 
-    printf '\n==> pnpm\n'
+    _maint_step $((++step)) "$total" 'pnpm'
     if command -v pnpm &>/dev/null; then
-        pnpm self-update || _update_failed "pnpm self-update"
+        pnpm self-update || _update_failed 'pnpm self-update'
         pnpm update -g || _update_failed pnpm
     else
-        echo "pnpm not installed"
+        _update_skip pnpm
     fi
 
-    printf '\n==> pipx\n'
+    _maint_step $((++step)) "$total" 'pipx'
     if ! command -v pipx &>/dev/null && command -v uv &>/dev/null; then
-        uv tool install pipx || _update_failed "pipx install"
+        uv tool install pipx || _update_failed 'pipx install'
         hash -r
     fi
     if command -v pipx &>/dev/null; then
         "$HOME/.local/bin/update-pipx-venvs" || _update_failed pipx
     else
-        echo "pipx not installed"
+        _update_skip pipx
     fi
 
-    printf '\n==> uv tools\n'
+    _maint_step $((++step)) "$total" 'uv tools'
     if command -v uv &>/dev/null; then
         uv self update 2>/dev/null || true
         uv tool upgrade --all || _update_failed uv
     else
-        echo "uv not installed"
+        _update_skip uv
     fi
 
-    unset -f _update_failed
-    if (( ${#failed_steps[@]} )); then
-        printf '\n!! update finished with failures: %s\n' "${failed_steps[*]}"
+    unset -f _update_failed _update_skip
+    disk=$(_maint_disk)
+    after_used=${disk%% *}
+    reboot=$(_maint_reboot_reason)
+    local -a lines=()
+    (( ${#failed_steps[@]} )) && lines+=("Failed:   ${failed_steps[*]}")
+    (( ${#skipped[@]} )) && lines+=("Skipped:  ${skipped[*]}")
+    lines+=("Disk:     $(_maint_human $(( ${after_used:-0} - ${before_used:-0} ))) change on /")
+    lines+=("Reboot:   ${reboot:-not needed}")
+    if [[ $failed -ne 0 ]]; then
+        _maint_box '1;91' 'Update finished with failures' "${lines[@]}"
     else
-        printf '\n==> everything is up to date\n'
+        _maint_box '1;92' 'Everything is up to date' "${lines[@]}"
     fi
     return "$failed"
 }

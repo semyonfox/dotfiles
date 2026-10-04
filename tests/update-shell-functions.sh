@@ -33,7 +33,7 @@ printf 'pipx-helper\n' >> "$TRACE"
 EOF
 chmod +x "$HOME/.local/bin/update-ai-clis" "$HOME/.local/bin/update-pipx-venvs"
 
-awk '/^update\(\) \{/{copy=1} copy {print} copy && /^\}/{exit}' "$source_file" > "$test_root/update.function"
+awk '/^(update|_maint_[a-z_]+)\(\) \{/{copy=1} copy {print} copy && /^\}/{copy=0}' "$source_file" > "$test_root/update.function"
 source "$test_root/update.function"
 
 paru() { printf 'paru\n' >> "$TRACE"; [[ "$TEST_FAIL_STEP" != paru ]]; }
@@ -79,7 +79,7 @@ saved_path=$PATH
 PATH="$test_root/empty-path"
 if update > "$test_root/output" 2>&1; then update_exit=0; else update_exit=$?; fi
 PATH=$saved_path
-if [[ $update_exit -ne 0 ]] || ! grep -q 'flatpak not installed' "$test_root/output" || ! grep -q 'everything is up to date' "$test_root/output"; then
+if [[ $update_exit -ne 0 ]] || ! grep -q 'flatpak not installed' "$test_root/output" || ! grep -q 'Everything is up to date' "$test_root/output"; then
     printf 'FAIL: missing flatpak returned %s or was not reported as skipped\n' "$update_exit" >&2
     exit 1
 fi

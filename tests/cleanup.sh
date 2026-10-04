@@ -21,7 +21,7 @@ export HOME="$test_root/home"
 export TRACE="$test_root/trace"
 
 # Only the cleanup definition is loaded, so no startup code or unrelated functions run.
-awk '/^cleanup\(\) \{/{copy=1} copy {print} copy && /^\}/{exit}' "$source_file" > "$test_root/cleanup.function"
+awk '/^(cleanup|_maint_[a-z_]+)\(\) \{/{copy=1} copy {print} copy && /^\}/{copy=0}' "$source_file" > "$test_root/cleanup.function"
 source "$test_root/cleanup.function"
 
 du() { :; }
