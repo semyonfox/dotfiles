@@ -52,5 +52,11 @@ if command -v grok >/dev/null 2>&1; then
     failed=1
   }
 fi
+if command -v hermes >/dev/null 2>&1; then
+  # One default-profile multiplexer owns the fleet. Let Hermes preserve local
+  # changes, take its configured backup, and coordinate supervised restarts.
+  # Do not git-pull the running checkout or bypass live-process safety guards.
+  run hermes --profile default update --branch main
+fi
 printf '\nAntigravity: install/update its ACP runtime in T3 provider settings; agy is separate.\n'
 exit "$failed"

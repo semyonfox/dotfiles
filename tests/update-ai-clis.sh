@@ -18,15 +18,17 @@ gemini() { :; }
 claude() { printf 'MOCK claude %s\n' "$*"; }
 opencode() { printf 'MOCK opencode %s\n' "$*"; }
 cursor-agent() { echo 'MOCK cursor update'; return "${CURSOR_FAILURE:-0}"; }
+hermes() { printf 'MOCK hermes %s\n' "$*"; }
 grok() {
   [[ "$SHELL" == /bin/false && "$PATH" == *":$HOME/.grok/bin" ]]
   printf 'MOCK grok %s\n' "$*"
 }
-export -f readlink pacman npm codex gemini claude opencode cursor-agent grok
+export -f readlink pacman npm codex gemini claude opencode cursor-agent hermes grok
 output="$(bash "$repo/home/.local/bin/update-ai-clis")"
 [[ "$output" == *'--prefix /test/node --allow-scripts=@openai/codex @openai/codex@latest'* ]]
 [[ "$output" == *'--allow-scripts=@google/gemini-cli,@github/keytar,node-pty'* ]]
 [[ "$output" == *'MOCK claude update'* && "$output" == *'MOCK opencode upgrade --method curl'* ]]
+[[ "$output" == *'MOCK hermes --profile default update --branch main'* ]]
 [[ "$output" != *'npm uninstall'* && "$output" != *'@anthropic-ai/claude-code@latest'* ]]
 if output="$(CURSOR_FAILURE=1 bash "$repo/home/.local/bin/update-ai-clis" 2>&1)"; then
   echo 'Expected failed Cursor update to return nonzero.' >&2
