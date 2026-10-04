@@ -7,7 +7,10 @@ Usage:
 """
 
 import os
+import shutil
+import stat
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import List
 
@@ -114,7 +117,8 @@ def compress_file(filepath: Path) -> bool:
         print("Skipping (not natural language)")
         return False
 
-    original_text = filepath.read_text(errors="ignore")
+    original_bytes = filepath.read_bytes()
+    original_text = original_bytes.decode("utf-8")
     backup_path = filepath.with_name(filepath.stem + ".original.md")
 
     # Check if backup already exists to prevent accidental overwriting
@@ -124,39 +128,53 @@ def compress_file(filepath: Path) -> bool:
         print("Aborting to prevent data loss. Please remove or rename the backup file if you want to proceed.")
         return False
 
-    # Step 1: Compress
-    print("Compressing with Claude...")
-    compressed = call_claude(build_compress_prompt(original_text))
+    with tempfile.TemporaryDirectory(prefix=".caveman-", dir=filepath.parent) as temp_dir:
+        original_path = Path(temp_dir) / "original"
+        candidate_path = Path(temp_dir) / "candidate"
+        original_path.write_bytes(original_bytes)
 
-    # Save original as backup, write compressed to original path
-    backup_path.write_text(original_text)
-    filepath.write_text(compressed)
+        print("Compressing with Claude...")
+        compressed = call_claude(build_compress_prompt(original_text))
 
-    # Step 2: Validate + Retry
-    for attempt in range(MAX_RETRIES):
-        print(f"\nValidation attempt {attempt + 1}")
+        for attempt in range(MAX_RETRIES):
+            candidate_path.write_text(compressed, encoding="utf-8")
+            print(f"\nValidation attempt {attempt + 1}")
+            result = validate(original_path, candidate_path)
 
-        result = validate(backup_path, filepath)
+            if result.is_valid:
+                print("Validation passed")
+                break
 
-        if result.is_valid:
-            print("Validation passed")
-            break
+            print("❌ Validation failed:")
+            for err in result.errors:
+                print(f"   - {err}")
 
-        print("❌ Validation failed:")
-        for err in result.errors:
-            print(f"   - {err}")
+            if attempt == MAX_RETRIES - 1:
+                print("❌ Failed after retries — original unchanged")
+                return False
 
-        if attempt == MAX_RETRIES - 1:
-            # Restore original on failure
-            filepath.write_text(original_text)
-            backup_path.unlink(missing_ok=True)
-            print("❌ Failed after retries — original restored")
-            return False
+            print("Fixing with Claude...")
+            compressed = call_claude(
+                build_fix_prompt(original_text, compressed, result.errors)
+            )
 
-        print("Fixing with Claude...")
-        compressed = call_claude(
-            build_fix_prompt(original_text, compressed, result.errors)
-        )
-        filepath.write_text(compressed)
+        if filepath.read_bytes() != original_bytes:
+            raise RuntimeError(f"File changed during compression: {filepath}")
+
+        original_mode = stat.S_IMODE(filepath.stat().st_mode)
+        shutil.copymode(filepath, candidate_path)
+        created_backup = False
+        try:
+            backup_fd = os.open(
+                backup_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, original_mode
+            )
+            created_backup = True
+            with os.fdopen(backup_fd, "wb") as backup_file:
+                backup_file.write(original_bytes)
+            os.replace(candidate_path, filepath)
+        except BaseException:
+            if created_backup:
+                backup_path.unlink(missing_ok=True)
+            raise
 
     return True

@@ -22,10 +22,10 @@ Claude read `CLAUDE.md` on every session start. If file big, cost big. Caveman m
 
 ```
 CLAUDE.md          ← compressed (Claude reads this — fewer tokens every session)
-CLAUDE.original.md ← human-readable backup (you edit this)
+CLAUDE.original.md ← byte-exact backup
 ```
 
-Original never lost. You can read and edit `.original.md`. Run skill again to re-compress after edits.
+The backup contains the original bytes. The CLI rejects text it cannot decode as UTF-8 before calling the model. Failed validation or repair leaves `CLAUDE.md` unchanged. If its bytes have changed by the time validation finishes, the CLI stops before replacing it. An existing `.original.md` blocks another run so the backup cannot be overwritten; preserve or rename it before recompressing.
 
 ## Benchmarks
 
@@ -40,7 +40,7 @@ Real results on real project files:
 | `mixed-with-code.md` | 888 | 574 | **35.4%** |
 | **Average** | **898** | **494** | **45%** |
 
-All validations passed ✅ — headings, code blocks, URLs, file paths preserved exactly.
+These benchmark runs reported passing validation. The current validator rejects changed fenced code blocks, URL sets, and heading counts; it warns about changes to heading text, paths, and bullet counts.
 
 ## Before / After
 
@@ -128,7 +128,7 @@ Only two things use tokens: initial compression + targeted fix if validation fai
 
 ## What Is Preserved
 
-Caveman compress natural language. It never touch:
+Caveman compresses natural language. Its prompt asks the model to preserve:
 
 - Code blocks (` ``` ` fenced or indented)
 - Inline code (`` `backtick content` ``)

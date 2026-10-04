@@ -28,7 +28,7 @@ def benchmark_pair(orig_path: Path, comp_path: Path):
 
     orig_tokens = count_tokens(orig_text)
     comp_tokens = count_tokens(comp_text)
-    saved = 100 * (orig_tokens - comp_tokens) / orig_tokens
+    saved = 100 * (orig_tokens - comp_tokens) / orig_tokens if orig_tokens else None
     result = validate(orig_path, comp_path)
 
     return (comp_path.name, orig_tokens, comp_tokens, saved, result.is_valid)
@@ -38,7 +38,8 @@ def print_table(rows):
     print("\n| File | Original | Compressed | Saved % | Valid |")
     print("|------|----------|------------|---------|-------|")
     for r in rows:
-        print(f"| {r[0]} | {r[1]} | {r[2]} | {r[3]:.1f}% | {'✅' if r[4] else '❌'} |")
+        saved = f"{r[3]:.1f}%" if r[3] is not None else "n/a"
+        print(f"| {r[0]} | {r[1]} | {r[2]} | {saved} | {'✅' if r[4] else '❌'} |")
 
 
 def main():
