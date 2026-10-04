@@ -92,3 +92,4 @@ hl.bind(main .. " + SHIFT + F12", common.exec(home .. "/.local/bin/power-mode.sh
 common.apply_noctalia_theme(function()
     return require("noctalia")
 end)
+pcall(require, "/home/semyon/.config/hypr/openwhispr-binds.lua")
