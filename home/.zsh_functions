@@ -105,15 +105,22 @@ cleanup() {
         "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx" 2>/dev/null || true
     [[ ${1:-} == --dry-run ]] && return 0
 
-    local failed=0
+    local failed=0 process_status
     if command -v uv >/dev/null 2>&1; then
         if ! command -v pgrep >/dev/null 2>&1; then
             printf '\nSkipping uv cache: cannot check for active uv processes\n'
+            failed=1
         elif pgrep -u "$(id -u)" -x uv >/dev/null 2>&1; then
             printf '\nSkipping uv cache: uv is running\n'
         else
-            printf '\nPruning uv cache...\n'
-            uv cache prune || failed=1
+            process_status=$?
+            if [[ $process_status -eq 1 ]]; then
+                printf '\nPruning uv cache...\n'
+                uv cache prune || failed=1
+            else
+                printf '\nSkipping uv cache: process check failed\n'
+                failed=1
+            fi
         fi
     fi
     if command -v npm >/dev/null 2>&1; then
@@ -132,26 +139,45 @@ cleanup() {
     if [[ ${1:-} == --deep ]]; then
         if ! command -v pgrep >/dev/null 2>&1; then
             printf '\nSkipping large caches: cannot check active processes\n'
+            failed=1
         else
             local user_id
             user_id=$(id -u)
             if pgrep -u "$user_id" -f 'GradleDaemon|gradle-launcher' >/dev/null 2>&1; then
                 printf '\nSkipping Gradle cache: Gradle is running\n'
             else
-                printf '\nClearing Gradle build cache...\n'
-                rm -rf -- "$HOME/.gradle/caches" || failed=1
+                process_status=$?
+                if [[ $process_status -eq 1 ]]; then
+                    printf '\nClearing Gradle build cache...\n'
+                    rm -rf -- "$HOME/.gradle/caches" || failed=1
+                else
+                    printf '\nSkipping Gradle cache: process check failed\n'
+                    failed=1
+                fi
             fi
             if pgrep -u "$user_id" -f 'ms-playwright|playwright|chromium|firefox|webkit' >/dev/null 2>&1; then
                 printf '\nSkipping Playwright browsers: a browser or test is running\n'
             else
-                printf '\nClearing Playwright browser downloads...\n'
-                rm -rf -- "$HOME/.cache/ms-playwright" || failed=1
+                process_status=$?
+                if [[ $process_status -eq 1 ]]; then
+                    printf '\nClearing Playwright browser downloads...\n'
+                    rm -rf -- "$HOME/.cache/ms-playwright" || failed=1
+                else
+                    printf '\nSkipping Playwright browsers: process check failed\n'
+                    failed=1
+                fi
             fi
             if pgrep -u "$user_id" -f "$HOME/.npm/_npx" >/dev/null 2>&1; then
                 printf '\nSkipping npx cache: a cached tool is running\n'
             else
-                printf '\nClearing npx cache...\n'
-                rm -rf -- "$HOME/.npm/_npx" || failed=1
+                process_status=$?
+                if [[ $process_status -eq 1 ]]; then
+                    printf '\nClearing npx cache...\n'
+                    rm -rf -- "$HOME/.npm/_npx" || failed=1
+                else
+                    printf '\nSkipping npx cache: process check failed\n'
+                    failed=1
+                fi
             fi
         fi
     fi
@@ -275,40 +301,41 @@ gaming-check() {
 }
 
 update() {
-    local ai_update_failed=0
+    local failed=0
 
     echo "==> system (paru)"
-    paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || echo "!!paru failed"
+    paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || { echo "!!paru failed"; failed=1; }
 
     # Both shells use the same installation-aware provider updater.
-    "$HOME/.local/bin/update-ai-clis" || ai_update_failed=1
+    "$HOME/.local/bin/update-ai-clis" || failed=1
     hash -r
 
     echo "\n==> flatpak"
-    flatpak update -y || echo "!!flatpak failed"
+    flatpak update -y || { echo "!!flatpak failed"; failed=1; }
 
     echo "\n==> rustup"
-    rustup update || echo "!!rustup failed"
+    rustup update || { echo "!!rustup failed"; failed=1; }
 
     echo "\n==> pnpm"
-    pnpm self-update || echo "!!pnpm self-update failed"
-    pnpm update -g || echo "!!pnpm failed"
+    pnpm self-update || { echo "!!pnpm self-update failed"; failed=1; }
+    pnpm update -g || { echo "!!pnpm failed"; failed=1; }
 
     echo "\n==> pipx"
     if ! command -v pipx &>/dev/null && command -v uv &>/dev/null; then
-        uv tool install pipx || echo "!!pipx install failed"
+        uv tool install pipx || { echo "!!pipx install failed"; failed=1; }
         hash -r
     fi
     if command -v pipx &>/dev/null; then
-        "$HOME/.local/bin/update-pipx-venvs" || echo "!!pipx failed"
+        "$HOME/.local/bin/update-pipx-venvs" || { echo "!!pipx failed"; failed=1; }
     else
         echo "!!pipx unavailable (uv not installed)"
+        failed=1
     fi
 
     echo "\n==> uv tools"
     uv self update 2>/dev/null || true
-    uv tool upgrade --all || echo "!!uv failed"
-    return "$ai_update_failed"
+    uv tool upgrade --all || { echo "!!uv failed"; failed=1; }
+    return "$failed"
 }
 
 gaming-modes() {
