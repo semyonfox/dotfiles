@@ -6,6 +6,9 @@ set -e
 # Source common functions and package lists
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.sh"
+if (( BASH_VERSINFO[0] < 4 )); then
+    error "Bash 4 or newer is required to load package lists"
+fi
 source "$SCRIPT_DIR/lib/package-lists.sh"
 
 # ======================================================================
@@ -34,7 +37,15 @@ show_system_info() {
     local os=$(detect_os)
     local base_os=$(get_base_os)
     PKG_MANAGER=$(detect_package_manager)
-    INSTALL_CMD=$(get_install_command "$PKG_MANAGER")
+    if ! INSTALL_CMD=$(get_install_command "$PKG_MANAGER"); then
+        error "Unsupported package manager for $base_os"
+    fi
+
+    [[ -n "$INSTALL_CMD" ]] || error "Unsupported package manager for $base_os"
+    command -v "$PKG_MANAGER" &>/dev/null || error "$PKG_MANAGER is required to install dependencies"
+    if [[ "$PKG_MANAGER" == "apt" || "$PKG_MANAGER" == "dnf" || "$PKG_MANAGER" == "pacman" ]]; then
+        command -v sudo &>/dev/null || error "sudo is required to install dependencies"
+    fi
     
     info "Operating System: $os"
     info "Base OS: $base_os"
@@ -370,6 +381,11 @@ install_packages() {
     echo "╚════════════════════════════════════════════════════════════╝"
     echo ""
     
+    if [[ "$PKG_MANAGER" == "apt" ]]; then
+        info "Refreshing apt package lists..."
+        sudo apt update >> "$LOG_FILE" 2>&1 || error "Failed to refresh apt package lists"
+    fi
+
     # Install CRITICAL packages (exit on failure)
     info "Installing critical packages..."
     for pkg in "${CRITICAL_PACKAGES[@]}"; do
@@ -400,7 +416,7 @@ install_packages() {
     if [[ ${#remaining_packages[@]} -gt 0 ]]; then
         info "Installing optional packages..."
         for pkg in "${remaining_packages[@]}"; do
-            install_package_optional "$pkg" "$PKG_MANAGER" "$INSTALL_CMD"
+            install_package_optional "$pkg" "$PKG_MANAGER" "$INSTALL_CMD" || :
         done
     fi
 }
@@ -437,7 +453,7 @@ post_install_setup() {
     if [[ "$INSTALL_OMZ" == "true" ]]; then
         if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
             info "Installing Oh My Zsh..."
-            if sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended >> "$LOG_FILE" 2>&1; then
+            if install_omz_remote >> "$LOG_FILE" 2>&1; then
                 success "Oh My Zsh installed"
             else
                 warn "Failed to install Oh My Zsh"

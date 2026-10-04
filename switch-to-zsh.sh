@@ -19,7 +19,7 @@ install_omz() {
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         info "Installing oh-my-zsh..."
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+        install_omz_remote || error "Failed to install oh-my-zsh"
         success "oh-my-zsh installed"
     fi
 }

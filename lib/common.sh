@@ -135,7 +135,7 @@ get_install_command() {
             echo "sudo pacman -S --needed --noconfirm"
             ;;
         apt)
-            echo "sudo apt update && sudo apt install -y"
+            echo "sudo apt install -y"
             ;;
         dnf)
             echo "sudo dnf install -y"
@@ -143,7 +143,30 @@ get_install_command() {
         brew)
             echo "brew install"
             ;;
+        *)
+            return 1
+            ;;
     esac
+}
+
+# fetch the installer before running it so a failed download cannot look successful
+install_omz_remote() {
+    local installer status
+    installer=$(mktemp) || return 1
+
+    if ! curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "$installer"; then
+        rm -f "$installer"
+        return 1
+    fi
+
+    if sh "$installer" --unattended; then
+        status=0
+    else
+        status=$?
+    fi
+
+    rm -f "$installer" || return 1
+    return "$status"
 }
 
 # ======================================================================

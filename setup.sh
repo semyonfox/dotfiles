@@ -10,6 +10,9 @@ BACKUP_DIR=""
 PROFILE=""
 PACKAGES=()
 PACKAGES_EXPLICIT=false
+DEPLOY_STARTED=false
+PREEXISTING_LINKS=()
+BACKED_UP_FILES=()
 
 profile_packages() {
     case "$1" in
@@ -80,15 +83,46 @@ resolve_packages() {
 }
 
 rollback() {
+    if [[ "$DRY_RUN" == true ]]; then
+        error "Dry run failed."
+    fi
+
+    if [[ "$DEPLOY_STARTED" == true ]]; then
+        local package source rel target prior preexisting
+        for package in "${PACKAGES[@]}"; do
+            while IFS= read -r source; do
+                rel="${source#"$SCRIPT_DIR/$package/"}"
+                target="$HOME/$rel"
+                preexisting=false
+                for prior in "${PREEXISTING_LINKS[@]}"; do
+                    if [[ "$prior" == "$target" ]]; then
+                        preexisting=true
+                        break
+                    fi
+                done
+                if [[ "$preexisting" == false && -L "$target" && "$target" -ef "$source" ]]; then
+                    rm -- "$target" || warn "Could not remove new link: $target"
+                fi
+            done < <(package_files "$package")
+        done
+    fi
+
     if [[ -n "$BACKUP_DIR" && -d "$BACKUP_DIR" ]]; then
         warn "Rolling back changes..."
-        cd "$SCRIPT_DIR"
-        if [[ ${#PACKAGES[@]} -gt 0 ]]; then
-            stow --no-folding -D "${PACKAGES[@]}" 2>/dev/null || true
+        local file restore_failed=false
+        for file in "${BACKED_UP_FILES[@]}"; do
+            if [[ -e "$HOME/$file" || -L "$HOME/$file" ]]; then
+                warn "Cannot restore $file: destination already exists"
+                restore_failed=true
+            elif ! mv -- "$BACKUP_DIR/$file" "$HOME/$file"; then
+                warn "Could not restore $file"
+                restore_failed=true
+            fi
+        done
+        if [[ "$restore_failed" == true ]]; then
+            error "Restore incomplete. Original files remain in $BACKUP_DIR"
         fi
-
-        if [[ -n "$(find "$BACKUP_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]]; then
-            cp -a "$BACKUP_DIR"/. "$HOME"/ 2>/dev/null || true
+        if [[ ${#BACKED_UP_FILES[@]} -gt 0 ]]; then
             success "Restored files from backup"
         fi
 
@@ -171,7 +205,8 @@ package_files() {
 
 backup_existing() {
     local files_to_backup=()
-    local file
+    local file ancestor part index
+    local parts=()
 
     mapfile -t files_to_backup < <(package_conflicts)
 
@@ -180,10 +215,22 @@ backup_existing() {
         return 0
     fi
 
-    BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+    for file in "${files_to_backup[@]}"; do
+        IFS=/ read -r -a parts <<< "$file"
+        ancestor="$HOME"
+        for ((index=0; index<${#parts[@]}-1; index++)); do
+            part="${parts[$index]}"
+            ancestor="$ancestor/$part"
+            if [[ -L "$ancestor" ]]; then
+                error "Cannot back up $file through symlinked directory: $ancestor"
+            fi
+        done
+    done
+
+    local backup_template="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)_XXXXXX"
 
     if [[ "$DRY_RUN" == true ]]; then
-        info "[DRY RUN] Would backup ${#files_to_backup[@]} files to $BACKUP_DIR"
+        info "[DRY RUN] Would backup ${#files_to_backup[@]} files to $backup_template"
         return 0
     fi
 
@@ -192,10 +239,12 @@ backup_existing() {
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        mkdir -p "$BACKUP_DIR"
+        BACKUP_DIR="$(mktemp -d "$backup_template")"
+        BACKED_UP_FILES=()
         for file in "${files_to_backup[@]}"; do
             mkdir -p "$BACKUP_DIR/$(dirname "$file")"
             mv "$HOME/$file" "$BACKUP_DIR/$file"
+            BACKED_UP_FILES+=("$file")
         done
         success "Backup created at $BACKUP_DIR"
     else
@@ -205,6 +254,18 @@ backup_existing() {
 
 deploy_dotfiles() {
     resolve_packages
+    local package source rel target
+
+    PREEXISTING_LINKS=()
+    for package in "${PACKAGES[@]}"; do
+        while IFS= read -r source; do
+            rel="${source#"$SCRIPT_DIR/$package/"}"
+            target="$HOME/$rel"
+            if [[ -L "$target" ]]; then
+                PREEXISTING_LINKS+=("$target")
+            fi
+        done < <(package_files "$package")
+    done
 
     info "Deploying dotfiles from $SCRIPT_DIR"
     if [[ -n "$PROFILE" ]]; then
@@ -214,18 +275,19 @@ deploy_dotfiles() {
 
     cd "$SCRIPT_DIR"
 
-    if stow --no-folding -n "${PACKAGES[@]}" 2>&1 | grep -q "conflict"; then
+    if stow --target="$HOME" --no-folding -n "${PACKAGES[@]}" 2>&1 | grep -q "conflict"; then
         warn "Conflicts detected"
         backup_existing
     fi
 
     if [[ "$DRY_RUN" == true ]]; then
         info "[DRY RUN] Simulating deployment..."
-        stow --no-folding -n -v "${PACKAGES[@]}" || true
+        stow --target="$HOME" --no-folding -n -v "${PACKAGES[@]}"
         return 0
     fi
 
-    stow --no-folding "${PACKAGES[@]}"
+    DEPLOY_STARTED=true
+    stow --target="$HOME" --no-folding "${PACKAGES[@]}"
     success "Dotfiles deployed"
 }
 
