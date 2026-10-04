@@ -1,15 +1,14 @@
 """Bounded tests for the backup status and retention block; never run the backup script."""
 
+import os
 import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
-SCRIPT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[1] / "server/.local/bin/server-nas-restic"
-if len(sys.argv) > 1:
-    del sys.argv[1]
+# an env override instead of argv, so pytest and unittest flags never become the script path
+SCRIPT = Path(os.environ.get("SERVER_NAS_RESTIC", Path(__file__).resolve().parents[1] / "server/.local/bin/server-nas-restic"))
 
 
 def source_block(source: str) -> str:
