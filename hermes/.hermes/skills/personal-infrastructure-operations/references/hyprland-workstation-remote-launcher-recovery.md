@@ -103,7 +103,7 @@ Inspect the relevant desktop files for stale `Exec=` paths and fix/symlink only 
 
 ```bash
 for f in ~/.local/share/applications/*.desktop /usr/share/applications/*.desktop; do
-  grep -qiE 't3|vocalinux|vicinae' "$f" 2>/dev/null && { echo --"$f"; grep -E '^(Name|Exec|Icon|Categories)=' "$f"; }
+  grep -qiE 't3|murmur|vicinae' "$f" 2>/dev/null && { echo --"$f"; grep -E '^(Name|Exec|Icon|Categories)=' "$f"; }
 done
 ```
 
