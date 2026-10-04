@@ -36,7 +36,7 @@ update() {
     echo ""
     echo "==> pipx"
     if command -v pipx >/dev/null 2>&1; then
-        pipx upgrade-all || { echo "!! pipx failed"; update_failed=1; }
+        "$HOME/.local/bin/update-pipx-venvs" || { echo "!! pipx failed"; update_failed=1; }
     else
         echo "pipx not installed"
     fi
@@ -62,6 +62,12 @@ update() {
         echo "==> reboot required"
         reboot_pkgs="$(cat /var/run/reboot-required.pkgs 2>/dev/null || true)"
         [[ -n "$reboot_pkgs" ]] && echo "$reboot_pkgs"
+    fi
+    echo ""
+    if [[ $update_failed -ne 0 ]]; then
+        echo "!! update finished with failures, see the !! lines above"
+    else
+        echo "==> everything is up to date"
     fi
     return "$update_failed"
 }

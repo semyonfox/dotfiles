@@ -302,39 +302,68 @@ gaming-check() {
 
 update() {
     local failed=0
+    local -a failed_steps=()
+    # record a failed step so one bad updater never hides the others
+    _update_failed() { echo "!!$1 failed"; failed=1; failed_steps+=("$1"); }
 
     echo "==> system (paru)"
-    paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || { echo "!!paru failed"; failed=1; }
+    if command -v paru &>/dev/null; then
+        paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || _update_failed paru
+    else
+        echo "paru not installed"
+    fi
 
     # Both shells use the same installation-aware provider updater.
-    "$HOME/.local/bin/update-ai-clis" || failed=1
+    "$HOME/.local/bin/update-ai-clis" || _update_failed "AI CLIs"
     hash -r
 
-    echo "\n==> flatpak"
-    flatpak update -y || { echo "!!flatpak failed"; failed=1; }
+    printf '\n==> flatpak\n'
+    if command -v flatpak &>/dev/null; then
+        flatpak update -y || _update_failed flatpak
+    else
+        echo "flatpak not installed"
+    fi
 
-    echo "\n==> rustup"
-    rustup update || { echo "!!rustup failed"; failed=1; }
+    printf '\n==> rustup\n'
+    if command -v rustup &>/dev/null; then
+        rustup update || _update_failed rustup
+    else
+        echo "rustup not installed"
+    fi
 
-    echo "\n==> pnpm"
-    pnpm self-update || { echo "!!pnpm self-update failed"; failed=1; }
-    pnpm update -g || { echo "!!pnpm failed"; failed=1; }
+    printf '\n==> pnpm\n'
+    if command -v pnpm &>/dev/null; then
+        pnpm self-update || _update_failed "pnpm self-update"
+        pnpm update -g || _update_failed pnpm
+    else
+        echo "pnpm not installed"
+    fi
 
-    echo "\n==> pipx"
+    printf '\n==> pipx\n'
     if ! command -v pipx &>/dev/null && command -v uv &>/dev/null; then
-        uv tool install pipx || { echo "!!pipx install failed"; failed=1; }
+        uv tool install pipx || _update_failed "pipx install"
         hash -r
     fi
     if command -v pipx &>/dev/null; then
-        "$HOME/.local/bin/update-pipx-venvs" || { echo "!!pipx failed"; failed=1; }
+        "$HOME/.local/bin/update-pipx-venvs" || _update_failed pipx
     else
-        echo "!!pipx unavailable (uv not installed)"
-        failed=1
+        echo "pipx not installed"
     fi
 
-    echo "\n==> uv tools"
-    uv self update 2>/dev/null || true
-    uv tool upgrade --all || { echo "!!uv failed"; failed=1; }
+    printf '\n==> uv tools\n'
+    if command -v uv &>/dev/null; then
+        uv self update 2>/dev/null || true
+        uv tool upgrade --all || _update_failed uv
+    else
+        echo "uv not installed"
+    fi
+
+    unset -f _update_failed
+    if (( ${#failed_steps[@]} )); then
+        printf '\n!! update finished with failures: %s\n' "${failed_steps[*]}"
+    else
+        printf '\n==> everything is up to date\n'
+    fi
     return "$failed"
 }
 
