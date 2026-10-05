@@ -46,11 +46,8 @@ hl.on("hyprland.start", function()
         "dbus-update-activation-environment --systemd --all",
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "systemctl --user restart vicinae.service",
-        scripts .. "/polkitkdeauth.sh",
         "noctalia --daemon",
-        "blueman-applet",
         "udiskie --no-automount --smart-tray",
-        "nm-applet --indicator",
         "playerctl daemon",
     }
     for _, command in ipairs(commands) do
