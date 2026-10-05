@@ -162,6 +162,13 @@ systemctl --user disable --now t3-code-headless.service
 - `~/bin/t3-headless-update` now points to the stowed `server/bin/t3-headless-update`. The old script is retained as `~/bin/t3-headless-update.before-provider-switchover-20260905`.
 - Disabled `t3-code-headless-update.path` to avoid mid-install restarts. The explicit updater restarts only on a version change and checks service/port readiness. Invoke it outside the T3 service cgroup. No T3 restart was performed during this migration.
 
+## Server update and recovery, verified 2026-10-04
+
+- Server T3 is `0.0.46-nightly.20261004.2657`, updated from `0.0.46-nightly.20261003.2623` through `~/bin/t3-headless-update` after explicit update/restart approval.
+- The updater ran outside the T3 service cgroup and restarted `t3-code-headless.service` once at 22:15:45 UTC. Service and port readiness passed; the monitor turn resumed automatically.
+- Startup recovery cleared orphaned runs. Five top-level continuations were automatic; eight remaining original owners received literal `resume` through the authenticated laptop composer. Other externally continued threads were left alone. The existing Irish Rail production-merge approval hold was preserved.
+- Recovery receipts are in `~/.t3/scratch/2026-10-03-monitor-all-running-t3-code-18c74860/t3-update-receipt.json` and `post-update-recovery.json`. No direct database writes, authentication bypass, custom source deployment, or recurring schedule were used.
+
 ## Other device audit
 
 ### Preview and proxy fully retired, verified 2026-09-18
