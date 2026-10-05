@@ -64,11 +64,8 @@ hl.on("hyprland.start", function()
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "dbus-update-activation-environment --systemd --all",
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
-        scripts .. "/polkitkdeauth.sh",
         "noctalia --daemon",
-        "blueman-applet",
         "udiskie --no-automount --smart-tray",
-        "nm-applet --indicator",
         home .. "/.local/bin/power-mode.sh auto",
         "playerctl daemon",
     }

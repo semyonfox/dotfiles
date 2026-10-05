@@ -5,6 +5,8 @@ fingerprint = true
 blurred_desktop = true
 blur_intensity = 0.60
 tint_intensity = 0.38
+# lock natively on lid close, power key and systemctl suspend
+lock_before_suspend = true
 # Show the lock UI only on the laptop panel and blank other displays. When
 # eDP-1 is absent (lid closed, or the pc) Noctalia ignores this and uses all.
 monitors = ["eDP-1"]

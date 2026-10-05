@@ -1,33 +1,30 @@
-# A Mac-inspired lock screen using Noctalia native login and fingerprint behaviour.
-# The player card appears only while media is active.
+# Seed for the lock screen layout made in the Noctalia editor.
+# Noctalia pins every widget to a connector and saves the result to
+# ~/.local/state/noctalia/settings.toml, which then wins over this file. So
+# this only shapes a fresh host, or one whose [lockscreen_widgets] state was
+# removed. Copy editor changes back here so a reset keeps them.
+# A blank output means the first monitor, which is the laptop panel when it is
+# open and the main screen on the pc. Positions are in a 1920x1080 frame and
+# Noctalia rescales them to the real monitor.
+# Login boxes are per output, so each host package adds its own in
+# lockscreen-login.toml. There is no widget_order because Noctalia drops any
+# widget it does not list, which would hide those host boxes.
 [lockscreen_widgets]
 enabled = true
 schema_version = 2
-widget_order = ["lock-date", "lock-clock", "lock-media", "lock-login"]
 
 [lockscreen_widgets.grid]
 visible = false
 cell_size = 16
 major_interval = 4
 
-[lockscreen_widgets.widget.lock-clock]
-type = "clock"
-output = "eDP-1"
-cx = 768.0
-cy = 190.0
-box_width = 500.0
-box_height = 116.0
-rotation = 0.0
-
-[lockscreen_widgets.widget.lock-clock.settings]
-format = "{:%H:%M}"
-background = false
-
 [lockscreen_widgets.widget.lock-date]
 type = "clock"
-output = "eDP-1"
-cx = 768.0
-cy = 135.0
+output = ""
+cx = 960.0
+cy = 152.0
+placement_width = 1920.0
+placement_height = 1080.0
 box_width = 500.0
 box_height = 34.0
 rotation = 0.0
@@ -36,38 +33,55 @@ rotation = 0.0
 format = "{:%A, %B %-d}"
 background = false
 
-[lockscreen_widgets.widget.lock-login]
-type = "login_box"
-output = "eDP-1"
-cx = 768.0
-cy = 780.0
-box_width = 720.0
-box_height = 196.0
+[lockscreen_widgets.widget.lock-clock]
+type = "clock"
+output = ""
+cx = 960.0
+cy = 214.0
+placement_width = 1920.0
+placement_height = 1080.0
+box_width = 500.0
+box_height = 116.0
 rotation = 0.0
 
-[lockscreen_widgets.widget.lock-login.settings]
-background_color = "surface"
-background_opacity = 0.54
-background_radius = 32.0
-input_opacity = 0.94
-input_radius = 22.0
-center_password_text = false
-layout = "regular"
-show_caps_lock = true
-show_keyboard_layout = false
-show_login_button = true
-show_media = false
-show_session_buttons = false
-show_unlock_hint = true
-show_weather = false
+[lockscreen_widgets.widget.lock-clock.settings]
+format = "{:%H:%M}"
+background = false
+
+[lockscreen_widgets.widget.lock-visualizer]
+type = "fancy_audio_visualizer"
+output = ""
+cx = 960.0
+cy = 607.5
+placement_width = 1920.0
+placement_height = 1080.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-visualizer.settings]
+background = false
+bloom_intensity = 1.0
+fade_when_idle = false
+inner_diameter = 0.5
+primary_color = "primary"
+ring_opacity = 1.0
+rotation_speed = 1.0
+secondary_color = "secondary"
+sensitivity = 1.0
+visualization_mode = "all"
+wave_thickness = 1.2
 
 [lockscreen_widgets.widget.lock-media]
 type = "media_player"
-output = "eDP-1"
-cx = 768.0
-cy = 465.0
+output = ""
+cx = 960.0
+cy = 780.0
+placement_width = 1920.0
+placement_height = 1080.0
+box_width = 368.0
+box_height = 160.0
 rotation = 0.0
 
 [lockscreen_widgets.widget.lock-media.settings]
 hide_when_no_media = true
-
+layout = "horizontal"
+shadow = true

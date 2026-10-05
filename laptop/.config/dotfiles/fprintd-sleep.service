@@ -1,0 +1,18 @@
+# System unit, not stowed into systemd. Install once with:
+#   sudo install -m 644 ~/.config/dotfiles/fprintd-sleep.service /etc/systemd/system/
+#   sudo systemctl enable fprintd-sleep.service
+#
+# The lock screen keeps a fingerprint verify open across sleep. fprintd then
+# fails to suspend the sensor, rejects Noctalia's verify on resume with
+# AlreadyInUse, and wedges, so unlock stalls ~30s on a D-Bus timeout. Stopping
+# it first makes Noctalia reclaim a fresh daemon on resume.
+[Unit]
+Description=Stop fprintd before sleep so the lock screen reclaims it on resume
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl stop fprintd.service
+
+[Install]
+WantedBy=sleep.target
