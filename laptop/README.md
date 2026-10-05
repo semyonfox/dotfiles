@@ -12,6 +12,8 @@ This package owns host-specific files:
 - `~/.config/dotfiles/machine-profile`
 - `~/.config/hypr/hyprland.lua`
 - `~/.config/noctalia/idle.toml`
+- `~/.config/noctalia/lockscreen-login.toml`
+- `~/.config/dotfiles/fprintd-sleep.service`, a system unit installed once by hand (see the file)
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`

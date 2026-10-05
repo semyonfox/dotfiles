@@ -1,0 +1,29 @@
+# Login box for the screen that shows the lock UI. Shared widgets live in the
+# noctalia package's lockscreen-widgets.toml.
+# The main AOC screen. DP-2 is inferred from the RustDesk helper, not verified.
+[lockscreen_widgets.widget.lock-login]
+type = "login_box"
+output = "DP-2"
+cx = 960.0
+cy = 898.75
+placement_width = 1920.0
+placement_height = 1080.0
+box_width = 810.0
+box_height = 128.0
+rotation = 0.0
+
+[lockscreen_widgets.widget.lock-login.settings]
+background_color = "surface_variant"
+background_opacity = 0.88
+background_radius = 12.0
+input_opacity = 1.0
+input_radius = 6.0
+center_password_text = false
+layout = "regular"
+show_caps_lock = true
+show_keyboard_layout = true
+show_login_button = false
+show_media = false
+show_session_buttons = true
+show_unlock_hint = false
+show_weather = false
