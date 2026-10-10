@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+# Default is read-only. Explicit --apply affects only this Ubuntu host's APT packages.
+. /etc/os-release
+[[ "$ID" == ubuntu ]] || { printf 'Refusing non-Ubuntu host\n' >&2; exit 2; }
+case "${1:---dry-run}" in
+  --dry-run) [[ $# -le 1 ]] || exit 2; exec apt-get -s upgrade ;;
+  --apply) [[ $# -eq 1 ]] || exit 2; sudo apt-get update; exec sudo apt-get upgrade ;;
+  --help|-h) printf 'update [--dry-run|--apply]\nDefault: apt-get -s upgrade (cached indexes, no sudo). --apply: refresh indexes and interactive APT upgrade only. No autoremove, dist-upgrade, AI tools, Docker, Jenkins or fleet updates.\n' ;;
+  *) printf 'Unknown option; use --help\n' >&2; exit 2 ;;
+esac

@@ -1,0 +1,2 @@
+# Keep the nested Jenkins README: default Stow ignores would omit it.
+^/\.stow-local-ignore$

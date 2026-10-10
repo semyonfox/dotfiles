@@ -1,0 +1,189 @@
+add_newline = false
+command_timeout = 1000
+
+# Catppuccin Mocha themed prompt
+# First line: working context. Second line: input.
+
+palette = "catppuccin_mocha"
+
+format = """
+[╭─](bold lavender) \
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$nodejs\
+$python\
+$rust\
+$golang\
+$status\
+$cmd_duration\
+$username\
+$hostname\
+$line_break\
+$character"""
+
+right_format = "$aws$kubernetes$docker_context"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+# Directory
+[directory]
+style = "bold lavender"
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = "…/"
+read_only = " 🔒"
+read_only_style = "bold red"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+# Git branch
+[git_branch]
+style = "bold peach"
+symbol = " "
+format = "[$symbol$branch]($style) "
+
+# Git state (merge, rebase, etc)
+[git_state]
+style = "bold red"
+format = '[$state( $progress_current/$progress_total)]($style) '
+
+# Git status
+[git_status]
+style = "bold red"
+format = '[\[$all_status$ahead_behind\]]($style) '
+conflicted = "="
+untracked = "?"
+modified = "~"
+staged = "+"
+renamed = "»"
+deleted = "-"
+
+# Docker
+[docker_context]
+style = "subtext0"
+symbol = "docker "
+format = "[$symbol$context]($style)"
+only_with_files = true
+detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
+
+# Kubernetes
+[kubernetes]
+style = "peach"
+symbol = "k8s "
+format = "[$symbol$context]($style) "
+disabled = false
+detect_files = ["k8s"]
+detect_folders = ["k8s", ".kube"]
+
+# AWS
+[aws]
+style = "subtext0"
+symbol = "aws "
+format = "[$symbol($profile )($region)]($style) "
+disabled = false
+
+[aws.region_aliases]
+eu-west-1 = "ireland"
+eu-west-2 = "london"
+eu-north-1 = "stockholm"
+us-east-1 = "virginia"
+
+# Node.js
+[nodejs]
+style = "bold green"
+symbol = "node "
+format = "( [$symbol$version]($style))"
+detect_files = ["package.json", ".node-version", ".nvmrc"]
+detect_folders = ["node_modules"]
+
+# Python
+[python]
+style = "bold peach"
+symbol = "py "
+format = "( [$symbol$version]($style))"
+detect_extensions = ["py"]
+detect_files = [".python-version", "Pipfile", "pyproject.toml", "requirements.txt", "setup.py", "poetry.lock"]
+
+# Rust
+[rust]
+style = "bold peach"
+symbol = "rs "
+format = "( [$symbol$version]($style))"
+detect_files = ["Cargo.toml", "Cargo.lock"]
+
+# Go
+[golang]
+style = "bold sky"
+symbol = "go "
+format = "( [$symbol$version]($style))"
+detect_files = ["go.mod", "go.sum"]
+
+# Failed command status
+[status]
+disabled = false
+style = "bold red"
+symbol = "✘ "
+format = "[$symbol$status]($style) "
+
+# Command duration
+[cmd_duration]
+min_time = 1000
+style = "subtext1"
+format = "took [$duration]($style) "
+show_milliseconds = false
+
+# Username
+[username]
+show_always = false
+style_user = "bold lavender"
+style_root = "bold red"
+format = " [@$user]($style)"
+
+# Hostname
+[hostname]
+ssh_only = true
+style = "bold green"
+format = " on [@$hostname]($style)"
+
+# Prompt character
+[character]
+format = "$symbol "
+success_symbol = "[╰─>](bold lavender)"
+error_symbol = "[╰─>](bold red)"
+vimcmd_symbol = "[╰─<](bold mauve)"
+vimcmd_replace_one_symbol = "[╰─<](bold peach)"
+vimcmd_replace_symbol = "[╰─<](bold peach)"
+vimcmd_visual_symbol = "[╰─<](bold yellow)"

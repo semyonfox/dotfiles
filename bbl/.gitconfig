@@ -1,0 +1,14 @@
+[user]
+  name = Semyon Fox
+  email = semyon.fox@gmail.com
+[core]
+  autocrlf = input
+[diff]
+  algorithm = histogram
+  colorMoved = default
+[rerere]
+  enabled = true
+[pull]
+  rebase = true
+[rebase]
+  autoStash = true

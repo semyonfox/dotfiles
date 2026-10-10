@@ -1,0 +1,489 @@
+# ======================================================================
+# FUNCTIONS - FILE OPERATIONS
+# ======================================================================
+
+# Create directory and enter it
+mkcd() {
+    [[ $# -eq 0 ]] && { echo "Usage: mkcd <directory>"; return 1; }
+    mkdir -p "$1" && cd "$1"
+}
+
+# Create backup of file
+backup() {
+    [[ $# -eq 0 ]] && { echo "Usage: backup <file>"; return 1; }
+    cp "$1"{,.bak} && echo "Backed up: $1 -> $1.bak"
+}
+
+# Find files by name
+f() {
+    [[ $# -eq 0 ]] && { echo "Usage: f <pattern>"; return 1; }
+    find . -name "*$1*" 2>/dev/null
+}
+
+# Search text in files
+ftext() {
+    [[ $# -eq 0 ]] && { echo "Usage: ftext <pattern>"; return 1; }
+    grep -rnw . -e "$1" 2>/dev/null
+}
+
+# Extract various archive formats
+extract() {
+    [[ $# -eq 0 ]] && { echo "Usage: extract <archive>"; return 1; }
+    [[ ! -f "$1" ]] && { echo "Error: '$1' not found"; return 1; }
+
+    case "$1" in
+        *.tar.bz2)  tar xjf "$1" ;;
+        *.tar.gz)   tar xzf "$1" ;;
+        *.tar.xz)   tar xf "$1" ;;
+        *.tar.zst)  tar xf "$1" ;;
+        *.tar)      tar xf "$1" ;;
+        *.tgz)      tar xzf "$1" ;;
+        *.bz2)      bunzip2 "$1" ;;
+        *.gz)       gunzip "$1" ;;
+        *.rar)      unrar x "$1" ;;
+        *.zip)      unzip "$1" ;;
+        *.7z)       7z x "$1" ;;
+        *.deb)      ar x "$1" ;;
+        *)          echo "Error: Unsupported format '$1'" ;;
+    esac
+}
+
+# ======================================================================
+# FUNCTIONS - SSH
+# ======================================================================
+
+# Quick SSH connections
+sssh() {
+    case "$1" in
+        server) ssh server ;;
+        nas)     ssh nas ;;
+        pc)      ssh pc ;;
+        laptop)  ssh laptop ;;
+        "" )      echo "Usage: sssh <server|hostname>"; return 1 ;;
+        *)       ssh "$1" ;;
+    esac
+}
+
+# Zsh completion for sssh
+_sssh_complete() {
+    local hosts custom_hosts
+    custom_hosts="server nas pc laptop"
+    hosts=$(grep "^Host" ~/.ssh/config 2>/dev/null | grep -v "[?*]" | awk '{print $2}')
+    _values 'hosts' $hosts $custom_hosts
+}
+# Only register compdef if completion system is loaded
+if (( $+functions[compdef] )); then
+    compdef _sssh_complete sssh
+fi
+
+# ======================================================================
+# FUNCTIONS - SYSTEM MAINTENANCE
+# ======================================================================
+
+# boxed output shared by update and cleanup, in the style of the old omarchy cleanup
+# box content stays ASCII so bash and zsh pad it to the same width
+_maint_box() {
+    local colour=$1 title=$2 line rule
+    shift 2
+    rule=$(printf '%49s' '' | sed 's/ /─/g')
+    printf '\n\e[96m╭%s╮\e[0m\n' "$rule"
+    printf '\e[96m│\e[0m  \e[%sm%-47s\e[0m\e[96m│\e[0m\n' "$colour" "$title"
+    for line in "$@"; do
+        printf '\e[96m│\e[0m  %-47s\e[96m│\e[0m\n' "$line"
+    done
+    printf '\e[96m╰%s╯\e[0m\n' "$rule"
+}
+
+_maint_step() {
+    printf '\n\e[93m[%s/%s]\e[0m %s\n' "$1" "$2" "$3"
+}
+
+_maint_human() {
+    awk -v kb="${1:-0}" 'BEGIN {
+        size = kb < 0 ? -kb : kb; i = 1
+        while (size >= 1024 && i < 4) { size /= 1024; i++ }
+        printf "%s%.1f%s", (kb < 0 ? "-" : ""), size, substr("KMGT", i, 1)
+    }'
+}
+
+_maint_disk() {
+    # prints "used available" for / in KiB
+    df -Pk / 2>/dev/null | awk 'NR == 2 {print $3, $4}'
+}
+
+# 0 when nothing matches, 1 when a matching process runs, 2 when the check fails
+_maint_idle() {
+    command -v pgrep >/dev/null 2>&1 || return 2
+    pgrep -u "$(id -u)" "$@" >/dev/null 2>&1
+    case $? in
+        1) return 0 ;;
+        0) return 1 ;;
+        *) return 2 ;;
+    esac
+}
+
+_maint_cache_sizes() {
+    local dir size
+    for dir in "$@"; do
+        [[ -e $dir ]] || continue
+        size=$(du -sk "$dir" 2>/dev/null | awk '{print $1}')
+        [[ -n $size ]] && printf '%s\t%s\n' "$size" "$dir"
+    done
+}
+
+_maint_size_diff() {
+    if [[ -z $1 ]]; then
+        printf '  no package caches found\n'
+        return 0
+    fi
+    awk -F'\t' -v home="$HOME" '
+        function human(kb, i) {
+            i = 1
+            while (kb >= 1024 && i < 4) { kb /= 1024; i++ }
+            return sprintf("%.1f%s", kb, substr("KMGT", i, 1))
+        }
+        NR == FNR { if ($2 != "") before[$2] = $1; next }
+        $2 != "" { after[$2] = $1 }
+        END {
+            for (dir in before) {
+                name = dir
+                if (index(dir, home) == 1) name = "~" substr(dir, length(home) + 1)
+                if (only_before) printf "  %-26s %8s\n", name, human(before[dir])
+                else printf "  %-26s %8s -> %s\n", name, human(before[dir]), human((dir in after) ? after[dir] : 0)
+            }
+        }' only_before="${3:-}" <(printf '%s\n' "$1") <(printf '%s\n' "$2") | sort
+}
+
+_maint_reboot_reason() {
+    if [[ -f /var/run/reboot-required ]]; then
+        printf 'yes, packages asked for it'
+    elif [[ -d /usr/lib/modules && ! -d /usr/lib/modules/$(uname -r) ]]; then
+        printf 'yes, new kernel installed'
+    fi
+}
+
+# prune rebuildable package caches without touching installed tools or Docker data
+cleanup() {
+    if [[ $# -gt 1 ]]; then
+        printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
+        return 2
+    fi
+    case "${1:-}" in
+        --help|-h)
+            printf 'Usage: cleanup [--dry-run|--deep|--help]\n'
+            printf 'Default: prune package caches. --deep also clears idle Gradle, Playwright and npx caches.\n'
+            return 0
+            ;;
+        --dry-run|--deep|"") ;;
+        *)
+            printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
+            return 2
+            ;;
+    esac
+
+    local mode=${1:-} failed=0 step=0 total=4 title='System cleanup'
+    local before_sizes after_sizes before_used after_used avail disk
+    local -a caches=("$HOME/.cache/uv" "$HOME/.npm/_cacache" "$HOME/.cache/pnpm"
+        "$HOME/.cache/pip" "$HOME/.gradle/caches" "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx")
+    [[ $mode == --deep ]] && total=7 title='System cleanup (deep)'
+    [[ $mode == --dry-run ]] && title='System cleanup (dry run)'
+
+    _maint_box '1;97' "$title"
+    before_sizes=$(_maint_cache_sizes "${caches[@]}")
+    if [[ $mode == --dry-run ]]; then
+        printf '\nCache sizes:\n'
+        _maint_size_diff "$before_sizes" "" sizes-only
+        return 0
+    fi
+    disk=$(_maint_disk)
+    before_used=${disk%% *}
+
+    _maint_step $((++step)) "$total" 'uv cache'
+    if ! command -v uv >/dev/null 2>&1; then
+        printf '      uv not installed, skipping\n'
+    else
+        _maint_idle -x uv
+        case $? in
+            0) uv cache prune || failed=1 ;;
+            1) printf '      skipped: uv is running\n' ;;
+            *) printf '      skipped: could not check for running uv\n'; failed=1 ;;
+        esac
+    fi
+
+    _maint_step $((++step)) "$total" 'npm download cache'
+    if command -v npm >/dev/null 2>&1; then
+        npm cache clean --force || failed=1
+    else
+        printf '      npm not installed, skipping\n'
+    fi
+
+    _maint_step $((++step)) "$total" 'pnpm store'
+    if command -v pnpm >/dev/null 2>&1; then
+        pnpm store prune || failed=1
+    else
+        printf '      pnpm not installed, skipping\n'
+    fi
+
+    _maint_step $((++step)) "$total" 'pip download cache'
+    if command -v pip3 >/dev/null 2>&1; then
+        pip3 cache purge || failed=1
+    else
+        printf '      pip3 not installed, skipping\n'
+    fi
+
+    if [[ $mode == --deep ]]; then
+        _maint_step $((++step)) "$total" 'Gradle build cache'
+        _maint_idle -f 'GradleDaemon|gradle-launcher'
+        case $? in
+            0) rm -rf -- "$HOME/.gradle/caches" || failed=1 ;;
+            1) printf '      skipped: Gradle is running\n' ;;
+            *) printf '      skipped: could not check for running Gradle\n'; failed=1 ;;
+        esac
+
+        _maint_step $((++step)) "$total" 'Playwright browser downloads'
+        _maint_idle -f 'ms-playwright|playwright|chromium|firefox|webkit'
+        case $? in
+            0) rm -rf -- "$HOME/.cache/ms-playwright" || failed=1 ;;
+            1) printf '      skipped: a browser or test is running\n' ;;
+            *) printf '      skipped: could not check for running browsers\n'; failed=1 ;;
+        esac
+
+        _maint_step $((++step)) "$total" 'npx cache'
+        _maint_idle -f "$HOME/.npm/_npx"
+        case $? in
+            0) rm -rf -- "$HOME/.npm/_npx" || failed=1 ;;
+            1) printf '      skipped: a cached tool is running\n' ;;
+            *) printf '      skipped: could not check for running npx tools\n'; failed=1 ;;
+        esac
+    fi
+
+    after_sizes=$(_maint_cache_sizes "${caches[@]}")
+    disk=$(_maint_disk)
+    after_used=${disk%% *}
+    avail=${disk##* }
+    local -a lines=(
+        "Freed:      $(_maint_human $(( ${before_used:-0} - ${after_used:-0} )))"
+        "Free on /:  $(_maint_human "${avail:-0}")"
+    )
+    if [[ $failed -ne 0 ]]; then
+        _maint_box '1;93' 'Cleanup finished with skipped steps' "${lines[@]}"
+    else
+        _maint_box '1;92' 'Cleanup complete' "${lines[@]}"
+    fi
+    printf '\nCache sizes, before -> after:\n'
+    _maint_size_diff "$before_sizes" "$after_sizes"
+    return "$failed"
+}
+
+# ======================================================================
+# FUNCTIONS - WELCOME MESSAGE
+# ======================================================================
+
+_welcome_bar() {
+    local greeting="Welcome back"
+    local hour=$(date +%H)
+    
+    # Time-based greeting
+    if [[ $hour -ge 5 && $hour -lt 12 ]]; then
+        greeting="Good morning"
+    elif [[ $hour -ge 12 && $hour -lt 17 ]]; then
+        greeting="Good afternoon"
+    elif [[ $hour -ge 17 && $hour -lt 22 ]]; then
+        greeting="Good evening"
+    else
+        greeting="Burning the midnight oil"
+    fi
+
+    # Summarise current load, memory, and root filesystem usage.
+    local cpu_load cpu_cores cpu_pct
+    cpu_load=$(cut -d " " -f1 /proc/loadavg)
+    cpu_cores=$(nproc)
+    cpu_pct=$(awk -v loadavg="$cpu_load" -v cores="$cpu_cores" 'BEGIN {printf "%.0f", (loadavg/cores)*100}')
+    [[ $cpu_pct -gt 100 ]] && cpu_pct=100
+
+    local mem_total mem_available mem_used mem_pct
+    mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    mem_available=$(awk '/MemAvailable/ {print $2}' /proc/meminfo)
+    mem_used=$((mem_total - mem_available))
+    mem_pct=$((mem_used * 100 / mem_total))
+
+    local disk_pct
+    disk_pct=$(df -P / | awk 'NR == 2 {gsub("%", "", $5); print $5}')
+
+    _welcome_meter() {
+        local pct=$1 color=$2 index
+        local filled=$(((pct * 8 + 50) / 100))
+        printf '\e[%sm' "$color"
+        for ((index = 0; index < filled; index++)); do printf '█'; done
+        printf '\e[0;2m'
+        for ((index = filled; index < 8; index++)); do printf '░'; done
+        printf '\e[0m'
+    }
+
+    _welcome_color() {
+        if [[ $1 -gt 85 ]]; then
+            printf '31'
+        elif [[ $1 -ge 60 ]]; then
+            printf '33'
+        else
+            printf '32'
+        fi
+    }
+
+    local label="$greeting, $USER"
+    local cpu_color ram_color disk_color cpu_meter ram_meter disk_meter
+    cpu_color=$(_welcome_color "$cpu_pct")
+    ram_color=$(_welcome_color "$mem_pct")
+    disk_color=$(_welcome_color "$disk_pct")
+    cpu_meter=$(_welcome_meter "$cpu_pct" "$cpu_color")
+    ram_meter=$(_welcome_meter "$mem_pct" "$ram_color")
+    disk_meter=$(_welcome_meter "$disk_pct" "$disk_color")
+    unfunction _welcome_meter _welcome_color
+    echo
+    echo -e "\e[96m╭─────────────────────────────────────╮\e[0m"
+    printf "\e[96m│\e[0m  \e[1;97m%-33s\e[0m  \e[96m│\e[0m\n" "$label"
+    echo -e "\e[96m├─────────────────────────────────────┤\e[0m"
+    printf "\e[96m│\e[0m  \e[2mCPU\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$cpu_meter" "$cpu_color" "$cpu_pct"
+    printf "\e[96m│\e[0m  \e[2mRAM\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$ram_meter" "$ram_color" "$mem_pct"
+    printf "\e[96m│\e[0m  \e[2mDSK\e[0m  [%s] \e[%sm%3s%%\e[0m               \e[96m│\e[0m\n" "$disk_meter" "$disk_color" "$disk_pct"
+    echo -e "\e[96m╰─────────────────────────────────────╯\e[0m"
+    echo
+}
+
+# ======================================================================
+# FUNCTIONS - GUI APPLICATIONS
+# ======================================================================
+
+gaming-check() {
+    local packages=(
+        steam
+        heroic-games-launcher-bin
+        protonplus
+        umu-launcher
+        gamescope
+        mangohud
+        gamemode
+        lib32-gamemode
+    )
+
+    if ! command -v pacman &>/dev/null; then
+        echo "pacman not available"
+        return 0
+    fi
+
+    echo "gaming stack"
+    for pkg in "${packages[@]}"; do
+        if pacman -Q "$pkg" &>/dev/null; then
+            pacman -Q "$pkg"
+        else
+            echo "$pkg not installed"
+        fi
+    done
+
+    echo ""
+    if command -v vulkaninfo &>/dev/null; then
+        vulkaninfo --summary | rg 'deviceName|driverName' || vulkaninfo --summary
+    else
+        echo "vulkaninfo not installed"
+    fi
+}
+
+update() {
+    local failed=0 step=0 total=7 disk before_used after_used reboot
+    local -a failed_steps=() skipped=()
+    # record a failed step so one bad updater never hides the others
+    _update_failed() { printf '!! %s failed\n' "$1"; failed=1; failed_steps+=("$1"); }
+    _update_skip() { printf '      %s not installed, skipping\n' "$1"; skipped+=("$1"); }
+
+    _maint_box '1;97' 'System update'
+    disk=$(_maint_disk)
+    before_used=${disk%% *}
+
+    _maint_step $((++step)) "$total" 'system packages (paru)'
+    if command -v paru &>/dev/null; then
+        paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || _update_failed paru
+    else
+        _update_skip paru
+    fi
+
+    # both shells use the same installation-aware provider updater
+    _maint_step $((++step)) "$total" 'AI CLIs'
+    "$HOME/.local/bin/update-ai-clis" || _update_failed 'AI CLIs'
+    hash -r
+
+    _maint_step $((++step)) "$total" 'flatpak'
+    if command -v flatpak &>/dev/null; then
+        flatpak update -y || _update_failed flatpak
+    else
+        _update_skip flatpak
+    fi
+
+    _maint_step $((++step)) "$total" 'rustup'
+    if command -v rustup &>/dev/null; then
+        rustup update || _update_failed rustup
+    else
+        _update_skip rustup
+    fi
+
+    _maint_step $((++step)) "$total" 'pnpm'
+    if command -v pnpm &>/dev/null; then
+        pnpm self-update || _update_failed 'pnpm self-update'
+        pnpm update -g || _update_failed pnpm
+    else
+        _update_skip pnpm
+    fi
+
+    _maint_step $((++step)) "$total" 'pipx'
+    if ! command -v pipx &>/dev/null && command -v uv &>/dev/null; then
+        uv tool install pipx || _update_failed 'pipx install'
+        hash -r
+    fi
+    if command -v pipx &>/dev/null; then
+        "$HOME/.local/bin/update-pipx-venvs" || _update_failed pipx
+    else
+        _update_skip pipx
+    fi
+
+    _maint_step $((++step)) "$total" 'uv tools'
+    if command -v uv &>/dev/null; then
+        uv self update 2>/dev/null || true
+        uv tool upgrade --all || _update_failed uv
+    else
+        _update_skip uv
+    fi
+
+    unset -f _update_failed _update_skip
+    disk=$(_maint_disk)
+    after_used=${disk%% *}
+    reboot=$(_maint_reboot_reason)
+    local -a lines=()
+    (( ${#failed_steps[@]} )) && lines+=("Failed:   ${failed_steps[*]}")
+    (( ${#skipped[@]} )) && lines+=("Skipped:  ${skipped[*]}")
+    lines+=("Disk:     $(_maint_human $(( ${after_used:-0} - ${before_used:-0} ))) change on /")
+    lines+=("Reboot:   ${reboot:-not needed}")
+    if [[ $failed -ne 0 ]]; then
+        _maint_box '1;91' 'Update finished with failures' "${lines[@]}"
+    else
+        _maint_box '1;92' 'Everything is up to date' "${lines[@]}"
+    fi
+    return "$failed"
+}
+
+gaming-modes() {
+    cat <<'EOF'
+normal
+  launch directly from Steam or Heroic with no wrapper
+
+gamescope mode
+  gamescope -f -- %command%
+  use when a game has fullscreen or focus issues
+
+performance mode
+  gamemoderun mangohud %command%
+  use when you want FPS and frametime stats or extra scheduling help
+
+battery-friendly mode
+  MANGOHUD_CONFIG=fps_limit=40,no_display mangohud %command%
+  use for lighter games on the Iris Xe iGPU
+EOF
+}

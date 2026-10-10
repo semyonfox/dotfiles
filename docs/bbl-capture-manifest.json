@@ -1,0 +1,98 @@
+[
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.bashrc",
+    "destination": "bbl/.bashrc",
+    "sha256": "b7da2a0f8489dbe2cfd9e90492a979c08edc86879adba9fa4096cc5815eb3464",
+    "bytes": 6946
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.bash_functions",
+    "destination": "bbl/.bash_functions",
+    "sha256": "21d8e1ddc2fc702c6d8e093e3ef983e72afa27f1dac4aa8d69efd849ac153a42",
+    "bytes": 16526
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.bash_aliases",
+    "destination": "bbl/.bash_aliases",
+    "sha256": "9828676151544bf12a4b7b994bdfd460b7756b6dcaa7581a6404a82a2723d7d3",
+    "bytes": 4858
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.zsh_functions",
+    "destination": "bbl/.zsh_functions",
+    "sha256": "ed2cf8475851dc8ed2d18831229da0b4392892ce16101efc7407050dbad67828",
+    "bytes": 16439
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.zsh_aliases",
+    "destination": "bbl/.zsh_aliases",
+    "sha256": "1813ae142d54d2a1d76d0bd68dddeb57a5cb416fbc8dff2614679b617dbf6d34",
+    "bytes": 5832
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.tmux.conf",
+    "destination": "bbl/.tmux.conf",
+    "sha256": "a43f15a7cce49965b961af7c3fcbca64824c82400b89afb6c66601bb7f12926c",
+    "bytes": 2010
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.config/tmux/chadmux.conf",
+    "destination": "bbl/.config/tmux/chadmux.conf",
+    "sha256": "6a16f2af68c989d224a0847224067758550a0557186689c7ee84795c6ea071ed",
+    "bytes": 2275
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.config/starship.toml",
+    "destination": "bbl/.config/starship.toml",
+    "sha256": "ec2f6612234865477e0ea782b6fc753b783006ed3347277de0b22608495e2f1d",
+    "bytes": 3758
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.config/dotfiles/host.bash",
+    "destination": "bbl/.config/dotfiles/host.bash",
+    "sha256": "52ba608edeaf841288f8b02ed6c5a9cf7164152b12667ad4b13fc048d3cfac17",
+    "bytes": 333
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.config/dotfiles/host.zsh",
+    "destination": "bbl/.config/dotfiles/host.zsh",
+    "sha256": "52ba608edeaf841288f8b02ed6c5a9cf7164152b12667ad4b13fc048d3cfac17",
+    "bytes": 333
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.gitconfig",
+    "destination": "bbl/.gitconfig",
+    "sha256": "bfa322460f010a8cc938dad307a5c7add355c565a3298f4c930bc7a3f70a5504",
+    "bytes": 215
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.local/bin/bbl-update",
+    "destination": "bbl/.local/bin/bbl-update",
+    "sha256": "5fcb257588bde4272bb7e6c5a158ce36ea8111437633c36209760d2a399e13e4",
+    "bytes": 694
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/.local/share/jenkins-bbl-prep/README.txt",
+    "destination": "bbl/.local/share/jenkins-bbl-prep/README.txt",
+    "sha256": "ae242e3a2c8115423447a9ee55662e9c3cfcac988085b891cb2119570dd9e138",
+    "bytes": 1552
+  },
+  {
+    "source": "/home/semyon/.local/share/bbl-stow-t_0e922822/home/AGENTS.md",
+    "destination": "bbl/AGENTS.md",
+    "sha256": "8e554a9a17fe4fce4a3206f33e520a7c1ef4c9beb9801f8d37a62f3afd4a70e8",
+    "bytes": 2581
+  },
+  {
+    "source": "/home/semyon/bbl-install-prerequisites.sh",
+    "destination": "bbl/bbl-install-prerequisites.sh",
+    "sha256": "fa3a13216375c227778e318b78bb03326c17b2882f586854a764519e75cfe4dc",
+    "bytes": 1677
+  },
+  {
+    "source": "/home/semyon/.config/gh/config.yml",
+    "destination": "bbl/.config/gh/config.yml",
+    "sha256": "dd7eed57977688cfb877580f3c97b2bbe9e5eb72190cbd4b8719ffb456e117ec",
+    "bytes": 905
+  }
+]
