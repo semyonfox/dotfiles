@@ -78,6 +78,14 @@ end)
 local common = require("common")
 common.setup({legacy_shell_binds = false})
 
+-- laptop panel is less legible than the desktop monitors, so keep windows near opaque
+hl.config({
+    decoration = {
+        active_opacity = 1.0,
+        inactive_opacity = 0.90,
+    },
+})
+
 -- Laptop-only power mode shortcuts
 local main = "SUPER"
 hl.bind(main .. " + F10", common.exec(home .. "/.local/bin/power-mode.sh saver"))
