@@ -63,10 +63,7 @@ function M.apply_noctalia_theme(load_generated_theme)
     })
 end
 
-function M.setup(options)
-    options = options or {}
-    local legacy_shell_binds = options.legacy_shell_binds ~= false
-
+function M.setup()
     -- Environment variables
     hl.env("PATH", os.getenv("PATH") .. ":" .. scripts)
     hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
@@ -249,11 +246,21 @@ function M.setup(options)
     hl.bind(main .. " + G", hl.dsp.group.toggle())
     hl.bind("ALT + Return", hl.dsp.window.fullscreen({action = "toggle"}))
     hl.bind(main .. " + L", M.exec(home .. "/.local/bin/noctalia-lock"))
-    hl.bind(main .. " + SHIFT + F", M.exec(scripts .. "/windowpin.sh"))
-    hl.bind(main .. " + Backspace", M.exec(scripts .. "/logoutlaunch.sh"))
-    if legacy_shell_binds then
-        hl.bind("CTRL + ALT + W", M.exec("killall waybar || (env reload_flag=1 " .. scripts .. "/wbarconfgen.sh)"))
-    end
+    -- pin only applies to floating windows, so float on pin and tile again on unpin
+    hl.bind(main .. " + SHIFT + F", function()
+        local window = hl.get_active_window()
+        if not window then
+            return
+        end
+        if window.pinned then
+            hl.dispatch(hl.dsp.window.pin({action = "unset"}))
+            hl.dispatch(hl.dsp.window.float({action = "unset"}))
+        else
+            hl.dispatch(hl.dsp.window.float({action = "set"}))
+            hl.dispatch(hl.dsp.window.pin({action = "set"}))
+        end
+    end)
+    hl.bind(main .. " + Backspace", M.exec("noctalia msg panel-toggle session"))
 
     -- Core applications
     hl.bind(main .. " + T", M.exec(term))
@@ -268,12 +275,7 @@ function M.setup(options)
     hl.bind(main .. " + C", M.exec(home .. "/.local/bin/t3code-nightly"))
 
     -- Launcher menus
-    hl.bind("CTRL + SHIFT + Escape", M.exec(scripts .. "/sysmonlaunch.sh"))
-    if legacy_shell_binds then
-        hl.bind(main .. " + A", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh d"))
-        hl.bind(main .. " + Tab", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh w"))
-        hl.bind(main .. " + SHIFT + E", M.exec("pkill -x rofi || " .. scripts .. "/rofilaunch.sh f"))
-    end
+    hl.bind("CTRL + SHIFT + Escape", M.exec("pkill -x btop || " .. term .. " -e btop"))
 
     -- Audio controls
     local audio = scripts .. "/audio-control.sh"
@@ -281,7 +283,7 @@ function M.setup(options)
     hl.bind("F11", M.exec(audio .. " down"), {locked = true, repeating = true})
     hl.bind("F12", M.exec(audio .. " up"), {locked = true, repeating = true})
     hl.bind("XF86AudioMute", M.exec(audio .. " mute"), {locked = true})
-    hl.bind("XF86AudioMicMute", M.exec(scripts .. "/volumecontrol.sh -i m"), {locked = true})
+    hl.bind("XF86AudioMicMute", M.exec("noctalia msg mic-mute"), {locked = true})
     hl.bind("XF86AudioLowerVolume", M.exec(audio .. " down"), {locked = true, repeating = true})
     hl.bind("XF86AudioRaiseVolume", M.exec(audio .. " up"), {locked = true, repeating = true})
 
@@ -300,33 +302,14 @@ function M.setup(options)
     hl.bind(main .. " + CTRL + L", hl.dsp.group.next())
 
     -- Screenshots
-    hl.bind(main .. " + P", M.exec(scripts .. "/screenshot.sh s"))
-    hl.bind(main .. " + CTRL + P", M.exec(scripts .. "/screenshot.sh sf"))
-    hl.bind(main .. " + ALT + P", M.exec(scripts .. "/screenshot.sh m"))
-    hl.bind("Print", M.exec(scripts .. "/screenshot.sh p"))
+    hl.bind(main .. " + P", M.exec("noctalia msg screenshot-region"))
+    hl.bind(main .. " + CTRL + P", M.exec("noctalia msg screenshot-annotate"))
+    hl.bind(main .. " + ALT + P", M.exec("noctalia msg screenshot-fullscreen"))
+    hl.bind("Print", M.exec("noctalia msg screenshot-fullscreen all"))
 
     -- Script utilities
     hl.bind(main .. " + ALT + G", M.exec(scripts .. "/gamemode.sh"))
-    hl.bind(main .. " + K", M.exec(scripts .. "/keyboardswitch.sh"))
-    hl.bind(main .. " + slash", M.exec("pkill -x rofi || " .. scripts .. "/keybinds_hint.sh c"))
-
-    local legacy_script_binds = {
-        {main .. " + ALT + Right", scripts .. "/hyprpaper-cycle.sh next"},
-        {main .. " + ALT + Left", scripts .. "/hyprpaper-cycle.sh prev"},
-        {main .. " + ALT + Up", scripts .. "/wbarconfgen.sh n"},
-        {main .. " + ALT + Down", scripts .. "/wbarconfgen.sh p"},
-        {main .. " + SHIFT + R", "pkill -x rofi || " .. scripts .. "/wallbashtoggle.sh -m"},
-        {main .. " + SHIFT + T", "pkill -x rofi || " .. scripts .. "/themeselect.sh"},
-        {main .. " + SHIFT + A", "pkill -x rofi || " .. scripts .. "/rofiselect.sh"},
-        {main .. " + SHIFT + X", "pkill -x rofi || " .. scripts .. "/themestyle.sh"},
-        {main .. " + SHIFT + W", "pkill -x rofi || " .. scripts .. "/hyprpaper-cycle.sh select"},
-        {main .. " + ALT + A", "pkill -x rofi || " .. scripts .. "/animations.sh"},
-    }
-    if legacy_shell_binds then
-        for _, binding in ipairs(legacy_script_binds) do
-            hl.bind(binding[1], M.exec(binding[2]))
-        end
-    end
+    hl.bind(main .. " + K", M.exec("noctalia msg keyboard-layout-cycle"))
 
     -- Focus navigation
     hl.bind(main .. " + Left", hl.dsp.focus({direction = "left"}))

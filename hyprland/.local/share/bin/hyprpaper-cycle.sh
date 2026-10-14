@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# deprecated: no longer bound. noctalia owns wallpapers (noctalia msg wallpaper-next)
 set -euo pipefail
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hyprpaper-cycle"

@@ -2,7 +2,6 @@
 -- Migrated to native Hyprland Lua mode for 0.56+.
 
 local home = os.getenv("HOME")
-local scripts = home .. "/.local/share/bin"
 package.path = home .. "/.config/hypr/?.lua;" .. package.path
 
 -- Laptop display topology (ThinkPad internal display + dual external Dell monitors)
@@ -60,7 +59,6 @@ hl.config({
 -- Session startup daemons
 hl.on("hyprland.start", function()
     local commands = {
-        scripts .. "/resetxdgportal.sh",
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "dbus-update-activation-environment --systemd --all",
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
@@ -76,7 +74,7 @@ end)
 
 -- Load shared Hyprland configuration (layouts, theme, rules, common binds)
 local common = require("common")
-common.setup({legacy_shell_binds = false})
+common.setup()
 
 -- laptop panel is less legible than the desktop monitors, so keep windows near opaque
 hl.config({

@@ -3,7 +3,6 @@
 -- Always runs at maximum performance (no power management / switching).
 
 local home = os.getenv("HOME")
-local scripts = home .. "/.local/share/bin"
 
 -- Outputs. Keep the AOC at 0x0 so portals and RustDesk treat it as primary.
 hl.monitor({
@@ -41,7 +40,6 @@ hl.monitor({
 -- Programs started once with the Hyprland session.
 hl.on("hyprland.start", function()
     local commands = {
-        scripts .. "/resetxdgportal.sh",
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
         "dbus-update-activation-environment --systemd --all",
         "systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",

@@ -28,4 +28,4 @@ Noctalia maps its standard power profiles onto the laptop helper's tuning:
 
 Hyprland remains the compositor and Noctalia owns the shell surfaces. The retired waybar/swaync/rofi stack lives on the `legacy-shell-stack` branch. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).
 
-The Lua entrypoint disables the retired HyDE/Rofi/Waybar/Wallbash selector bindings. Their `.conf` targets remain for rollback, but they do not control the live Lua compositor. Noctalia's generated `~/.config/hypr/noctalia.lua` owns the final palette, with the previous checked-in palette used as a boot-safe fallback.
+The retired HyDE/Rofi/Waybar/Wallbash bindings were removed from `common.lua` on 2026-10-14; see the deprecated section in [the hyprland package README](../hyprland/README.md). Noctalia's generated `~/.config/hypr/noctalia.lua` owns the final palette, with the previous checked-in palette used as a boot-safe fallback.
