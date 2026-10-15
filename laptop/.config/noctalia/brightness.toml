@@ -1,0 +1,3 @@
+# drive the external dells over ddc/ci alongside the panel backlight
+[brightness]
+enable_ddcutil = true

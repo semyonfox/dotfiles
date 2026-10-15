@@ -294,8 +294,8 @@ function M.setup()
     hl.bind("XF86AudioPrev", M.exec("playerctl previous"), {locked = true})
 
     -- Brightness controls
-    hl.bind("XF86MonBrightnessUp", M.exec(home .. "/Scripts/brightness-all.sh i"), {locked = true, repeating = true})
-    hl.bind("XF86MonBrightnessDown", M.exec(home .. "/Scripts/brightness-all.sh d"), {locked = true, repeating = true})
+    hl.bind("XF86MonBrightnessUp", M.exec("noctalia msg brightness-up all 5"), {locked = true, repeating = true})
+    hl.bind("XF86MonBrightnessDown", M.exec("noctalia msg brightness-down all 5"), {locked = true, repeating = true})
 
     -- Groups
     hl.bind(main .. " + CTRL + H", hl.dsp.group.prev())
