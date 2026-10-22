@@ -1,0 +1,420 @@
+#!/usr/bin/env python3
+"""Interactive frontend to the installed, lock-managed native cleaner.
+
+Native uv uses its own mandatory cache lock under the existing cleaner lock.
+Named regenerable caches get a best-effort phase (see best_effort_plan). Source,
+outputs, runners, images and AI history stay blocked as explicit incomplete
+results, never a process/cwd snapshot fallback.
+"""
+import sys
+sys.dont_write_bytecode = True
+import argparse
+import os
+import re
+import stat
+from pathlib import Path
+import subprocess
+
+
+ADMISSION = ("NOT IMPLEMENTED: no authoritative native in-use protection or enforced "
+             "admission covering all consumers/late starts; process/cwd snapshots "
+             "and optional leases are insufficient")
+
+
+def allocated(path):
+    """Allocated inventory, not exclusive/recoverable bytes. Never follow links."""
+    try:
+        if path.is_symlink():
+            return "unknown (symlink preserved)"
+        if not path.exists():
+            return "0 (absent)"
+        # Reject symlink ancestors too; inventory must not walk another estate.
+        if any(p.is_symlink() for p in path.parents):
+            return "unknown (symlink ancestor preserved)"
+        p = subprocess.run(["du", "-sx", "-k", "--", str(path)],
+                           capture_output=True, text=True, timeout=20)
+        if p.returncode:
+            return "unknown (incomplete size visibility)"
+        return str(int(p.stdout.split()[0]) * 1024)
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return "unknown (size inventory failed)"
+
+
+def children(path, pattern):
+    try:
+        return sorted(path.glob(pattern))
+    except OSError:
+        return []  # Parent inventory below still reports visibility failure.
+
+
+def cache_root(home):
+    return Path(os.environ.get("XDG_CACHE_HOME", str(home / ".cache")))
+
+
+def node_compile_paths():
+    configured = Path(os.environ.get("NODE_COMPILE_CACHE",
+                                     str(Path(os.environ.get("TMPDIR", "/tmp")) / "node-compile-cache")))
+    # host default too, since agents rarely inherit the caller's TMPDIR
+    return [configured] if configured == Path("/tmp/node-compile-cache") else [configured, Path("/tmp/node-compile-cache")]
+
+
+def blocked_plan(home, deep):
+    if not deep:
+        return []
+    result = [
+        ("generated-code", home / "code", ADMISSION +
+         "; root inventory includes SOURCE, not a deletion target; tracked build/dist must survive"),
+        ("generated-t3-android", home / "t3code-mobile-work/t3code", ADMISSION +
+         "; outside ~/code discovered; watcher/build/output provenance and retained APK evidence must be certified"),
+        ("generated-task-workspaces", home / ".hermes/kanban/boards", ADMISSION +
+         "; no terminal-state/artifact manifests; workspaces are not cache"),
+        ("runner-discovery", home / "actions-runners", ADMISSION +
+         "; includes installed tools, diagnostics and workspaces, not reclaimable total"),
+    ]
+    for runner in children(home / "actions-runners", "*"):
+        if runner.is_dir() and not runner.is_symlink() and (runner / "home").is_dir():
+            for relative in ("home", "home/.cache/pnpm", "home/.cache/ms-playwright",
+                             "home/.npm/_cacache"):
+                result.append(("runner-" + relative.replace("/", "-") + "-" + runner.name,
+                               runner / relative, ADMISSION +
+                               "; no authoritative runner job admission/current-tool preservation"))
+    result.extend([
+        ("jenkins-export", None, "NOT IMPLEMENTED: export is not daemon cache; no authoritative job admission; /cache/buildx and exports preserved"),
+        ("tagged-images", None, "NOT IMPLEMENTED: no atomic rollback/tag-writer admission; sole-protected-tag race; no image prune -a"),
+        ("ai-checkpoints", None, "NOT IMPLEMENTED: no certified online checkpoint-only retirement for embedded T3 history; no broad Hermes prune or DB backup deletion"),
+    ])
+    return result
+
+
+# best-effort regenerable caches. each is skipped while a matching process runs,
+# but a tool starting mid-clean can still race. Semyon accepted that risk for
+# these: the worst case is a cold re-download or rebuild, never lost work.
+# busy patterns are pgrep -f EREs; None means the consumer tolerates a missing dir.
+# pnpm/npm only touch their store and metadata while resolving or installing,
+# so long-running `pnpm dev` or `npm start` don't count as busy
+PNPM = (r"(^|/)pnpm(\.c?js)? (i|install|add|update|up|upgrade|remove|rm|un|uninstall|dlx|fetch"
+        r"|import|rebuild|rb|dedupe|outdated|patch|store|self-update)( |$)|(^|/)pnpx( |$)")
+NPM = (r"(^|/)npm(-cli\.js)? (i|install|ci|add|update|up|uninstall|rm|un|exec|x|cache|rebuild"
+       r"|dedupe|outdated|view|info|pack|publish)( |$)")
+
+
+def best_effort_plan(home, deep):
+    cache = cache_root(home)
+    plan = [("pnpm-store", home / ".local/share/pnpm/store", PNPM, ["pnpm", "store", "prune"])]
+    for version in children(cache / "pnpm", "v*"):
+        for name in ("metadata", "metadata-full"):
+            plan.append((f"pnpm-{version.name}-{name}", version / name, PNPM, None))
+    plan += [
+        ("npm-downloads", home / ".npm/_cacache", NPM, ["npm", "cache", "clean", "--force"]),
+        ("pip", cache / "pip", r"(^|/)pip3?( |$)|-m pip( |$)", ["pip3", "cache", "purge"]),
+    ]
+    if not deep:
+        return plan
+    plan += [
+        ("pnpm-dlx", cache / "pnpm/dlx", PNPM, None),
+        ("npx", home / ".npm/_npx", r"(^|/)npx(-cli\.js)?( |$)|/_npx/", None),
+        # `bun pm cache rm` refuses to run outside a project, so remove directly
+        ("bun", home / ".bun/install/cache", r"(^|/)bun( |$)|/\.bun/", None),
+        ("go-modules", home / "go/pkg/mod", r"(^|/)(go|gopls)( |$)", ["go", "clean", "-modcache"]),
+        ("gradle", home / ".gradle/caches", r"GradleDaemon|GradleWrapperMain|(^|/)gradlew?( |$)", None),
+        ("playwright", cache / "ms-playwright", r"ms-playwright|(^|/)playwright( |$)", None),
+        ("node-gyp", cache / "node-gyp", r"node-gyp", None),
+        ("staticcheck", cache / "staticcheck", r"(^|/)staticcheck( |$)", None),
+        ("typescript", cache / "typescript", r"tsserver|(^|/)tsc( |$)", None),
+        ("mesa-shaders", cache / "mesa_shader_cache", None, None),
+        ("cargo-downloads", home / ".cargo/registry/cache", r"(^|/)(cargo|rustc|rust-analyzer)( |$)", None),
+    ]
+    for path in children(cache, "jdtls-*"):
+        plan.append((path.name, path, r"jdtls|org\.eclipse\.equinox\.launcher", None))
+    # node only writes its compile cache opportunistically and ignores a missing
+    # dir, and some node process is nearly always running, so no busy check
+    for path in node_compile_paths():
+        plan.append(("node-compile", path, None, None))
+    return plan
+
+
+def busy(pattern):
+    """True/False for a matching process of this user, None when pgrep can't tell."""
+    try:
+        p = subprocess.run(["pgrep", "-u", str(os.getuid()), "-f", "--", pattern],
+                           capture_output=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return {0: True, 1: False}.get(p.returncode)
+
+
+def removable(home, path):
+    # only ever remove inside HOME or the node compile cache, never through links
+    allowed = path.is_relative_to(home) or path in node_compile_paths()
+    return (allowed and path.resolve() == path and not path.is_symlink()
+            and not any(p.is_symlink() for p in path.parents))
+
+
+def codex_retired(home):
+    """Codex app-server releases other than current and the newest previous one."""
+    releases = home / ".codex/packages/app-server-daemon/releases"
+    current = releases.parent / "current"
+    if not releases.is_dir() or not current.is_symlink():
+        return []
+    keep = current.resolve()
+    if keep.parent != releases.resolve():
+        raise ValueError("codex current does not point into releases")
+    others = sorted((p for p in releases.iterdir() if p.is_dir() and not p.is_symlink() and p != keep),
+                    key=lambda p: p.stat().st_mtime, reverse=True)
+    return others[1:]
+
+
+def running_from(root):
+    """True if a process of ours runs a binary under root. cmdline misses
+    processes launched through the old `current` link before it moved."""
+    for exe in Path("/proc").glob("[0-9]*/exe"):
+        try:
+            if Path(os.readlink(exe)).is_relative_to(root):
+                return True
+        except OSError:
+            continue  # other users' processes or ones that just exited
+    return False
+
+
+def cleaner_lock(home):
+    # share the hourly cleaner's lock where it exists, else a local one so
+    # laptops without the Hermes engine still serialise their own runs
+    shared = home / ".hermes/profiles/sean/maintenance/hourly-cache-clean/run.lock"
+    if shared.is_file():
+        return shared.open("rb")
+    local = cache_root(home) / "cleanup-caches.lock"
+    local.parent.mkdir(parents=True, exist_ok=True)
+    return local.open("ab")
+
+
+def best_effort(home, deep, dry):
+    import fcntl
+    import shutil
+    items = best_effort_plan(home, deep)
+    incomplete = failed = False
+    if deep:
+        try:
+            for release in codex_retired(home):
+                if running_from(release):
+                    print(f"CATEGORY=codex-release-{release.name} STATUS=skipped-busy")
+                    incomplete = True
+                    continue
+                items.append(("codex-release-" + release.name, release,
+                              re.escape(str(release)) + "/", None))
+        except (OSError, ValueError) as e:
+            print(f"CATEGORY=codex-retired-releases STATUS=failed-closed reason={str(e)!r}", flush=True)
+            return 1
+    lock = None
+    try:
+        if not dry:
+            lock = cleaner_lock(home)
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                print("BEST_EFFORT STATUS=skipped reason=existing-cleaner-lock-busy")
+                return 75
+        for category, path, pattern, command in items:
+            if not path.exists() and not path.is_symlink():
+                continue
+            before = allocated(path)
+            tool = command and shutil.which(command[0])
+            action = "native " + " ".join(command) if command else "remove"
+            if command and not tool:
+                print(f"CATEGORY={category} STATUS=skipped reason=tool-not-installed")
+                continue
+            if not removable(home, path):
+                print(f"CATEGORY={category} STATUS=failed-closed reason='symlink/noncanonical/outside root'")
+                failed = True
+                continue
+            state = busy(pattern) if pattern else False
+            if state is None:
+                print(f"CATEGORY={category} STATUS=failed-closed reason=process-check-unavailable")
+                failed = True
+                continue
+            if state:
+                print(f"CATEGORY={category} STATUS=skipped-busy BEFORE_BYTES={before}")
+                incomplete = True
+                continue
+            if dry:
+                print(f"CATEGORY={category} DRY_RUN=1 action={action!r} allocated_bytes={before} "
+                      "busy-check=rechecked-at-execution")
+                continue
+            try:
+                if command:
+                    p = subprocess.run([tool, *command[1:]], capture_output=True, text=True, timeout=600,
+                                       env=dict(os.environ, GOFLAGS="", GOENV="off", GOTOOLCHAIN="local",
+                                                GOMODCACHE=str(home / "go/pkg/mod")))
+                    rc = p.returncode
+                    output = (p.stdout + p.stderr).strip()
+                    if output:
+                        print(output[-4096:])
+                else:
+                    shutil.rmtree(path)
+                    rc = 0
+            except (OSError, subprocess.TimeoutExpired) as e:
+                print(f"CATEGORY={category} STATUS=failed reason={str(e)!r}", flush=True)
+                failed = True
+                continue
+            print(f"CATEGORY={category} EXIT_STATUS={rc} STATUS={'ok' if rc == 0 else 'failed'} "
+                  f"action={action!r} BEFORE_BYTES={before} AFTER_BYTES={allocated(path)}", flush=True)
+            failed = failed or rc != 0
+    finally:
+        if lock:
+            lock.close()
+    return 1 if failed else 3 if incomplete else 0
+
+
+def uv_categories(home, deep):
+    paths = [("uv", home / ".cache/uv")]
+    if deep:
+        paths.append(("hermes-uv", home / ".hermes/cache/uv"))
+    return paths
+
+
+def native_uv(home, deep, dry):
+    """Use UV's mandatory native cache lock, NEVER --force or raw eviction.
+
+    UV documents cache-modifying operations blocked by running UV consumers.
+    Installed-version offline probes verify running and late-start protection.
+    """
+    import fcntl
+    incomplete = False
+    failed = False
+    for category, path in uv_categories(home, deep):
+        before = allocated(path)
+        try:
+            if path.resolve() != path or path.is_symlink():
+                raise ValueError("symlink/noncanonical native cache root")
+            if not path.exists():
+                print(f"CATEGORY={category} STATUS=absent PRUNE_EXECUTED=no")
+                continue
+            # Descriptor validation also avoids blocking forever on a FIFO or
+            # following a marker swapped to a symlink between lstat and open.
+            marker_fd = os.open(path / "CACHEDIR.TAG", os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+            with os.fdopen(marker_fd) as marker:
+                if not stat.S_ISREG(os.fstat(marker.fileno()).st_mode):
+                    raise ValueError("cache identity marker is not a regular file")
+                if not marker.read(128).startswith("Signature: 8a477f597d28d172789f06886806bc55"):
+                    raise ValueError("cache identity marker missing/invalid")
+            uv = home / ".local/bin/uv"
+            if not uv.is_file():
+                import shutil
+                found = shutil.which("uv")
+                if not found:
+                    print(f"CATEGORY={category} STATUS=skipped reason=tool-not-installed PRUNE_EXECUTED=no")
+                    continue
+                uv = Path(found)
+            command = [str(uv), "--no-config", "--offline",
+                       "--cache-dir", str(path), "cache", "prune"]
+            print(f"NATIVE_PLAN category={category} allocated_before_bytes={before} command={command!r} "
+                  "safety=existing-run.lock+UV-native-cache-lock UV_LOCK_TIMEOUT=1 force=NEVER", flush=True)
+            if dry:
+                print(f"CATEGORY={category} DRY_RUN=1 PRUNE_EXECUTED=no ELIGIBILITY=native-lock-rechecked-at-execution")
+                continue
+            with cleaner_lock(home) as lock:
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    print(f"CATEGORY={category} STATUS=skipped reason=existing-cleaner-lock-busy PRUNE_EXECUTED=no")
+                    return 1 if failed else 75
+                env = dict(os.environ, UV_LOCK_TIMEOUT="1", UV_NO_CACHE="false",
+                           UV_PYTHON_DOWNLOADS="never")
+                p = subprocess.run(command, env=env, capture_output=True, text=True, timeout=20)
+                output = p.stdout + p.stderr
+                print(output[:65536], end="" if output.endswith("\n") else "\n")
+                # UV timeout=2 is not generally a busy status. Classify only its
+                # explicit native-lock timeout, otherwise retain a real failure.
+                busy = p.returncode != 0 and "when waiting for lock on" in output
+                status = "skipped-native-lock" if busy else "ok" if p.returncode == 0 else "failed"
+                print(f"CATEGORY={category} EXIT_STATUS={p.returncode} STATUS={status} "
+                      f"BEFORE_BYTES={before} AFTER_BYTES={allocated(path)} "
+                      "MEASUREMENT=allocated-inventory-not-unique-physical-reclaim", flush=True)
+                incomplete = incomplete or busy
+                failed = failed or (p.returncode != 0 and not busy)
+        except (OSError, ValueError, subprocess.TimeoutExpired) as e:
+            print(f"CATEGORY={category} STATUS=failed-closed reason={str(e)!r}", flush=True)
+            failed = True
+    return 1 if failed else 3 if incomplete else 0
+
+
+def available():
+    try:
+        s = os.statvfs("/")
+        return s.f_bavail * s.f_frsize
+    except OSError:
+        return None
+
+
+def main():
+    parser = argparse.ArgumentParser(allow_abbrev=False, description=(
+        "Run approved native caches through the existing shared lock. "
+        "--deep adds more regenerable caches plus explicit discovery/blockers, NOT source/output eviction. "
+        "Exit 3 means incomplete coverage; 1 native failure; 75 lock busy; 2 usage."))
+    parser.add_argument("--deep", action="store_true")
+    parser.add_argument("--dry-run", action="store_true", help="non-mutating exact selected native plan plus blocked categories")
+    args = parser.parse_args()
+    # Reject duplicates as well as unknown arguments: no accidental mode ambiguity.
+    if len(sys.argv[1:]) != len(set(sys.argv[1:])):
+        parser.error("duplicate flags")
+    home = Path.home()
+    engine = home / ".hermes/profiles/sean/scripts/hourly-build-cache-clean.sh"
+    print("Cleanup mode=" + ("deep" if args.deep else "baseline") +
+          " preview=" + str(args.dry_run).lower(), flush=True)
+    print("Native selection: Jenkins buildctl prune --all (separate daemon); "
+          "docker builder prune -af (default); docker image prune -f (dangling ONLY); go clean -cache; "
+          "native uv cache prune (~/.cache/uv; deep also ~/.hermes/cache/uv, mandatory native lock); "
+          "best-effort pnpm/npm/pip caches (deep adds dlx/npx/bun/Go modules/Gradle/Playwright/language caches/"
+          "Cargo downloads/node compile cache/retired Codex releases), each skipped while its tool runs.")
+    print("Volumes, tagged rollback images, source, releases, APK/evidence, installed tools, "
+          "personal files and all AI history/databases/backups are excluded.")
+    print("Inventory allocated_bytes are NOT recoverable estimates, may overlap/hard-link, "
+          "and are NEVER summed. unknown is not zero.")
+    blocked = blocked_plan(home, args.deep)
+    for category, path, reason in blocked:
+        size = "unknown (native/lifecycle inventory required)" if path is None else allocated(path)
+        print(f"SKIPPED category={category} path={str(path)!r} allocated_bytes={size} reason={reason}", flush=True)
+    before = available()
+    if engine.is_file():
+        command = ["bash", str(engine), "--native-only", "--stdout"]
+        if args.dry_run:
+            command.append("--dry-run")
+        print("Guarded native engine (shared run.lock; re-evaluates at execution): " + repr(command), flush=True)
+        # Pin native roots to the engine's reported/approved store, not arbitrary
+        # inherited Go caches or alternate Docker context configuration.
+        native_env = dict(os.environ, GOCACHE=str(home / ".cache/go-build"),
+                          GOENV="off", GOFLAGS="", GOTOOLCHAIN="local",
+                          DOCKER_CONFIG=str(home / ".docker"))
+        try:
+            rc = subprocess.run(command, check=False, env=native_env).returncode
+        except OSError as e:
+            print(f"FAILED: engine unavailable: {e}", file=sys.stderr)
+            rc = 1
+    else:
+        # the Docker/Jenkins engine only exists on the server; other hosts still
+        # get the uv and best-effort phases
+        print(f"SKIPPED native engine not installed on this host: {engine}", flush=True)
+        rc = 0
+    print(f"Native engine exit_status={rc}", flush=True)
+    uv_rc = 75 if rc == 75 else native_uv(home, args.deep, args.dry_run)
+    print(f"Native uv phase exit_status={uv_rc}", flush=True)
+    be_rc = 75 if 75 in (rc, uv_rc) else best_effort(home, args.deep, args.dry_run)
+    print(f"Best-effort phase exit_status={be_rc}", flush=True)
+    after = available()
+    if args.dry_run:
+        print("PREVIEW ONLY: no native prune executed; native sizes/eligibility are rolling inventory, not a reclamation promise.")
+    print(f"Root available before_bytes={before} after_bytes={after} "
+          f"net_change_bytes={after - before if before is not None and after is not None else 'unknown'} "
+          "(concurrent filesystem activity included; NOT attributed cleanup recovery)")
+    if blocked:
+        print(f"INCOMPLETE: {len(blocked)} category records blocked/unimplemented; "
+              "native exit/reclaim is separate. No shared expansion gate bypassed.")
+    # Preserve actual failures even when a subsequent phase contends.
+    if rc not in (0, 75) or 1 in (uv_rc, be_rc):
+        return 1
+    if 75 in (rc, uv_rc, be_rc):
+        return 75
+    return 3 if blocked or 3 in (uv_rc, be_rc) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
