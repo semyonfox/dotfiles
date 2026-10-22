@@ -66,8 +66,6 @@ Don't flatter me into a bad decision. If my premise is wrong, my plan is overcom
 
 Do not use subagents or delegate work unless I explicitly ask. When requested, parallelise only genuinely independent work and give each parallel agent one file at a time.
 
-When controlling my browser, try Marionette on the existing tab first. If it is unavailable or any step fails, inspect a fresh screenshot and fall back to physical clicks through Hyprland. Never open consoles, extra tabs or windows. Do not inject JavaScript or use other direct DOM/API automation unless I explicitly authorize it.
-
 When a problem repeats, propose the smallest durable instruction change that would prevent it, then trim it down.
 
 ### Model routing
