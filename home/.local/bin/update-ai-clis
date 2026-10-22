@@ -24,8 +24,84 @@ update_npm_cli() {
   fi
 }
 
+# Resolve launcher chains without GNU-only readlink -f (also works on macOS).
+resolve_t3_launcher() {
+  local target=$1 link hops=0
+  while [[ -L $target ]]; do
+    ((hops += 1))
+    [[ $hops -le 40 ]] || return 1
+    link=$(readlink "$target") || return 1
+    if [[ $link == /* ]]; then target=$link; else target=${target%/*}/$link; fi
+  done
+  (cd -P "${target%/*}" && printf '%s/%s\n' "$PWD" "${target##*/}")
+}
+
+update_t3() {
+  local dry_run=${1:-} launcher resolved version tag prefix result=0
+  # The approved custom service has one runtime owner. Never independently
+  # update npm or invoke upstream service management on this host.
+  if [[ -f $HOME/.config/systemd/user/t3-code-headless.service && -x $HOME/bin/update-t3-nightly ]]; then
+    if [[ $dry_run == --dry-run ]]; then
+      "$HOME/bin/update-t3-nightly" --check
+    else
+      "$HOME/bin/update-t3-nightly" --apply
+    fi
+    return $?
+  fi
+  command -v t3 >/dev/null 2>&1 || return 0
+  launcher=$(command -v t3)
+  resolved=$(resolve_t3_launcher "$launcher") || return 1
+  version=$(t3 --version) || return 1
+  printf '\nT3 launcher: %s\nT3 executable: %s\n%s\n' "$launcher" "$resolved" "$version"
+  # This custom unit bypasses both PATH and upstream's t3code.service manager.
+  # Never claim a CLI update updated it; changing it requires maintenance approval.
+  if [[ -f $HOME/.config/systemd/user/t3-code-headless.service ]]; then
+    printf '!! Custom t3-code-headless.service is configured; its pinned runtime is NOT updated here.\n' >&2
+    printf '!! A separately approved runtime switch/restart is required; no service changes made.\n' >&2
+    result=1
+  fi
+  if command -v pacman >/dev/null 2>&1 && pacman -Qo "$resolved" >/dev/null 2>&1; then
+    printf 'T3 is managed by pacman; update it with the system packages.\n'
+  elif [[ $resolved == */lib/node_modules/t3/* ]]; then
+    # npm's JS shim spawns its matching optional platform package. Native
+    # `t3 update` downloads GitHub archives but deliberately cannot repoint it.
+    # Update the owner, in the existing prefix, preserving the installed train.
+    case $version in
+      't3 v'*'-nightly.'*) tag=nightly ;;
+      't3 v'*'-'*) printf '!! Unrecognised/prerelease T3 train; select an explicit version manually.\n' >&2; return 1 ;;
+      't3 v'[0-9]*.[0-9]*.[0-9]*) tag=latest ;;
+      *) printf '!! Cannot identify T3 version/train.\n' >&2; return 1 ;;
+    esac
+    prefix=${resolved%%/lib/node_modules/*}
+    printf 'T3 route: npm install --global --prefix %s --allow-scripts=t3 t3@%s\n' "$prefix" "$tag"
+    if [[ $dry_run != --dry-run ]]; then
+      npm install --global --prefix "$prefix" --allow-scripts=t3 "t3@$tag" || return 1
+      t3 --version || return 1
+    fi
+  elif [[ $resolved == "${T3CODE_HOME:-$HOME/.t3}/runtime/versions/"*/t3 && -L $launcher ]]; then
+    printf 'T3 route: native t3 update (GitHub releases; no --yes)\n'
+    # Closed stdin prevents implicit restart confirmation. Upstream may still
+    # stage its own service configuration. It does NOT manage our custom unit.
+    [[ $dry_run == --dry-run ]] || t3 update </dev/null || return 1
+  else
+    printf '!! Unknown T3 installation owner; left unchanged: %s\n' "$resolved" >&2
+    return 1
+  fi
+  [[ $dry_run == --dry-run ]] || return "$result"
+}
+
+# A narrowly scoped read-only preflight. Never run the fleet updater to inspect T3.
+if [[ ${1:-} == --t3-dry-run && $# -eq 1 ]]; then
+  update_t3 --dry-run
+  exit $?
+elif [[ $# -ne 0 ]]; then
+  printf 'Usage: update-ai-clis [--t3-dry-run]\n' >&2
+  exit 2
+fi
+
 update_npm_cli codex @openai/codex
 update_npm_cli gemini @google/gemini-cli
+update_t3 || { printf '!! T3 update incomplete\n' >&2; failed=1; }
 
 if command -v claude >/dev/null 2>&1; then
   if [[ "$(readlink -f "$(command -v claude)")" == "$HOME/.local/share/claude/versions/"* ]]; then

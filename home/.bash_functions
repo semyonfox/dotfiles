@@ -158,117 +158,14 @@ _maint_reboot_reason() {
     fi
 }
 
-# prune rebuildable package caches without touching installed tools or Docker data
+# Both shells use one guarded engine; no cwd-only/raw deep deletion fallback.
+# Already-open shells must re-source this file to replace the old definition.
 cleanup() {
-    if [[ $# -gt 1 ]]; then
-        printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
-        return 2
+    if [[ ! -f $HOME/.local/bin/cleanup-caches ]]; then
+        printf 'Cleanup unavailable: missing guarded frontend ~/.local/bin/cleanup-caches\n' >&2
+        return 1
     fi
-    case "${1:-}" in
-        --help|-h)
-            printf 'Usage: cleanup [--dry-run|--deep|--help]\n'
-            printf 'Default: prune package caches. --deep also clears idle Gradle, Playwright and npx caches.\n'
-            return 0
-            ;;
-        --dry-run|--deep|"") ;;
-        *)
-            printf 'Usage: cleanup [--dry-run|--deep|--help]\n' >&2
-            return 2
-            ;;
-    esac
-
-    local mode=${1:-} failed=0 step=0 total=4 title='System cleanup'
-    local before_sizes after_sizes before_used after_used avail disk
-    local -a caches=("$HOME/.cache/uv" "$HOME/.npm/_cacache" "$HOME/.cache/pnpm"
-        "$HOME/.cache/pip" "$HOME/.gradle/caches" "$HOME/.cache/ms-playwright" "$HOME/.npm/_npx")
-    [[ $mode == --deep ]] && total=7 title='System cleanup (deep)'
-    [[ $mode == --dry-run ]] && title='System cleanup (dry run)'
-
-    _maint_box '1;97' "$title"
-    before_sizes=$(_maint_cache_sizes "${caches[@]}")
-    if [[ $mode == --dry-run ]]; then
-        printf '\nCache sizes:\n'
-        _maint_size_diff "$before_sizes" "" sizes-only
-        return 0
-    fi
-    disk=$(_maint_disk)
-    before_used=${disk%% *}
-
-    _maint_step $((++step)) "$total" 'uv cache'
-    if ! command -v uv >/dev/null 2>&1; then
-        printf '      uv not installed, skipping\n'
-    else
-        _maint_idle -x uv
-        case $? in
-            0) uv cache prune || failed=1 ;;
-            1) printf '      skipped: uv is running\n' ;;
-            *) printf '      skipped: could not check for running uv\n'; failed=1 ;;
-        esac
-    fi
-
-    _maint_step $((++step)) "$total" 'npm download cache'
-    if command -v npm >/dev/null 2>&1; then
-        npm cache clean --force || failed=1
-    else
-        printf '      npm not installed, skipping\n'
-    fi
-
-    _maint_step $((++step)) "$total" 'pnpm store'
-    if command -v pnpm >/dev/null 2>&1; then
-        pnpm store prune || failed=1
-    else
-        printf '      pnpm not installed, skipping\n'
-    fi
-
-    _maint_step $((++step)) "$total" 'pip download cache'
-    if command -v pip3 >/dev/null 2>&1; then
-        pip3 cache purge || failed=1
-    else
-        printf '      pip3 not installed, skipping\n'
-    fi
-
-    if [[ $mode == --deep ]]; then
-        _maint_step $((++step)) "$total" 'Gradle build cache'
-        _maint_idle -f 'GradleDaemon|gradle-launcher'
-        case $? in
-            0) rm -rf -- "$HOME/.gradle/caches" || failed=1 ;;
-            1) printf '      skipped: Gradle is running\n' ;;
-            *) printf '      skipped: could not check for running Gradle\n'; failed=1 ;;
-        esac
-
-        _maint_step $((++step)) "$total" 'Playwright browser downloads'
-        _maint_idle -f 'ms-playwright|playwright|chromium|firefox|webkit'
-        case $? in
-            0) rm -rf -- "$HOME/.cache/ms-playwright" || failed=1 ;;
-            1) printf '      skipped: a browser or test is running\n' ;;
-            *) printf '      skipped: could not check for running browsers\n'; failed=1 ;;
-        esac
-
-        _maint_step $((++step)) "$total" 'npx cache'
-        _maint_idle -f "$HOME/.npm/_npx"
-        case $? in
-            0) rm -rf -- "$HOME/.npm/_npx" || failed=1 ;;
-            1) printf '      skipped: a cached tool is running\n' ;;
-            *) printf '      skipped: could not check for running npx tools\n'; failed=1 ;;
-        esac
-    fi
-
-    after_sizes=$(_maint_cache_sizes "${caches[@]}")
-    disk=$(_maint_disk)
-    after_used=${disk%% *}
-    avail=${disk##* }
-    local -a lines=(
-        "Freed:      $(_maint_human $(( ${before_used:-0} - ${after_used:-0} )))"
-        "Free on /:  $(_maint_human "${avail:-0}")"
-    )
-    if [[ $failed -ne 0 ]]; then
-        _maint_box '1;93' 'Cleanup finished with skipped steps' "${lines[@]}"
-    else
-        _maint_box '1;92' 'Cleanup complete' "${lines[@]}"
-    fi
-    printf '\nCache sizes, before -> after:\n'
-    _maint_size_diff "$before_sizes" "$after_sizes"
-    return "$failed"
+    command python3 -B "$HOME/.local/bin/cleanup-caches" "$@"
 }
 
 # ====================================================================== 
@@ -392,7 +289,7 @@ gaming-check() {
 }
 
 update() {
-    local failed=0 step=0 total=7 disk before_used after_used reboot
+    local failed=0 step=0 total=8 disk before_used after_used reboot
     local -a failed_steps=() skipped=()
     # record a failed step so one bad updater never hides the others
     _update_failed() { printf '!! %s failed\n' "$1"; failed=1; failed_steps+=("$1"); }
@@ -407,6 +304,13 @@ update() {
         paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || _update_failed paru
     else
         _update_skip paru
+    fi
+
+    _maint_step $((++step)) "$total" 'AMP (Mainline instances; may restart)'
+    if [[ $(uname -s) == Linux ]] && command -v ampinstmgr &>/dev/null; then
+        "$HOME/.local/bin/update-amp" || _update_failed AMP
+    else
+        _update_skip AMP
     fi
 
     # both shells use the same installation-aware provider updater
