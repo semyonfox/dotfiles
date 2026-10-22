@@ -53,11 +53,12 @@ crontab -l > "$stage/system/user-crontab.txt" 2>/dev/null || true
 } > "$stage/system/RECOVERY-INVENTORY.txt"
 [[ -s "$stage/system/RECOVERY-INVENTORY.txt" ]] || { echo "Missing recovery inventory" >&2; exit 1; }
 
-# same set the rsync job carried, plus the credential stores it used to miss
+# same set the rsync job carried, plus the credential stores it used to miss.
+# backups/ holds the nightly dumps from server-db-backup.sh and chess-analyser-db-backup.sh
 sources=(
   .claude .claude.json .codex .hermes .t3 .cursor .gemini .copilot
   code projects obsidian dotfiles Scripts scripts server-stacks
-  compsoc life-admin jenkins observability swim-api odysseus robin artificial
+  compsoc life-admin jenkins observability swim-api odysseus robin artificial backups
   .config/systemd .config/restic .config/schoolbooks .config/gh .config/rclone
   .local/share/server-recovery-system .local/share/ai-sessions-archive .local/bin
   .ssh .gnupg .aws .cloudflared .docker .wrangler .terraform.d .gam .doppler
@@ -84,6 +85,7 @@ set +e
   --exclude="$HOME/.hermes/cron/output" --exclude="$HOME/.hermes/state-snapshots" \
   --exclude="$HOME/.hermes/skills/.curator_backups" \
   --exclude="$HOME/.t3/userdata/logs" --exclude="$HOME/.t3/deploy-backups" \
+  --exclude="$HOME/backups/**/*.partial.*" \
   --exclude="$HOME/server-stacks/data/**/cache" \
   --exclude="$HOME/server-stacks/data/dormant-services" \
   --exclude="$HOME/server-stacks/data/pi-hole-recovery-*" \
