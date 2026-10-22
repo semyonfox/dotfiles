@@ -1,0 +1,16 @@
+[Unit]
+Description=Verified nightly updater for the existing T3 headless service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/home/semyon
+Environment=PATH=/home/semyon/.local/bin:/home/semyon/.nvm/versions/node/v24.16.0/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=/home/semyon
+ExecStart=/home/semyon/bin/update-t3-nightly --apply
+UMask=0077
+TimeoutStartSec=infinity
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=t3-nightly-update

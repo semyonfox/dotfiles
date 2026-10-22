@@ -1,0 +1,369 @@
+#!/usr/bin/env python3
+"""Local-only updater safety checks. Never print conversations or credentials."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import sqlite3
+import sys
+
+
+def connect(path):
+    db = sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True, timeout=30)
+    db.execute('PRAGMA query_only=ON')
+    return db
+
+
+TERMINAL_RUNS = ('completed', 'failed', 'cancelled', 'interrupted')
+
+
+def native_work(db):
+    """Current V2 state only; historical unresolved prompts are not live work."""
+    reasons = []
+    marks = ','.join('?' for _ in TERMINAL_RUNS)
+    n = db.execute(f'SELECT count(*) FROM orchestration_v2_projection_runs '
+                   f'WHERE status IS NULL OR status NOT IN ({marks})', TERMINAL_RUNS).fetchone()[0]
+    if n:
+        reasons.append(f'unfinished-v2-runs:{n}')
+    # An orphan/unknown request fails closed. A request tied to a terminal run
+    # remains preserved in SQLite but cannot establish current execution.
+    n = db.execute(f'''SELECT count(*) FROM orchestration_v2_projection_runtime_requests r
+        LEFT JOIN orchestration_v2_projection_nodes n ON n.node_id=r.node_id
+        LEFT JOIN orchestration_v2_projection_runs run ON run.run_id=n.run_id
+        WHERE (r.status IS NULL OR r.status NOT IN ('resolved','cancelled','dismissed'))
+        AND (run.status IS NULL OR run.status NOT IN ({marks}))''', TERMINAL_RUNS).fetchone()[0]
+    if n:
+        reasons.append(f'live-or-unmapped-runtime-requests:{n}')
+    for table, safe in (
+        ('orchestration_v2_projection_provider_threads', ('idle', 'closed', 'stopped')),
+        ('orchestration_v2_projection_provider_sessions', ('ready', 'stopped')),
+    ):
+        marks = ','.join('?' for _ in safe)
+        n = db.execute(f'SELECT count(*) FROM {table} WHERE status IS NULL OR status NOT IN ({marks})', safe).fetchone()[0]
+        if n:
+            reasons.append(f'nonidle-{table}:{n}')
+    return reasons
+
+
+def processes():
+    result = {}
+    for p in Path('/proc').iterdir():
+        if not p.name.isdecimal():
+            continue
+        try:
+            fields = (p / 'stat').read_text().rsplit(')', 1)[1].split()
+        except (FileNotFoundError, ProcessLookupError):
+            continue
+        row = {'parent': int(fields[1]), 'exe': '', 'args': []}
+        result[int(p.name)] = row
+        try:
+            row['exe'] = str((p / 'exe').resolve(strict=True))
+            row['args'] = [os.fsdecode(a) for a in (p / 'cmdline').read_bytes().split(b'\0') if a]
+        except (FileNotFoundError, ProcessLookupError, PermissionError):
+            # Retain the parent edge. An unreadable service descendant must be
+            # unrecognized, not silently disappear from our safety proof.
+            continue
+    return result
+
+
+def process_work(ps, pid, home):
+    """Recognize only the installed persistent transports, never arbitrary tools.
+
+    Called alongside global native-idle proof, NOT a standalone idle detector.
+    No argv or private thread/session identifiers are emitted to logs.
+    """
+    userhome = str(Path(home).parent)
+    children = lambda parent: [p for p, row in ps.items() if row['parent'] == parent]
+    runtimes = children(pid)
+    if len(runtimes) != 1:
+        return ['unexpected-service-process-tree']
+    runtime = runtimes[0]
+    runtime_exe = ps[runtime]['exe']
+    if not (runtime_exe.startswith(str(Path(home) / 'runtime/versions') + '/')
+            and runtime_exe.endswith('/t3')):
+        return ['unexpected-serving-executable']
+    recognized = {pid, runtime}
+    providers = []
+    for child in children(runtime):
+        row = ps[child]
+        exe, args = row['exe'], row['args']
+        if exe == str(Path(runtime_exe).parent / 'resource-monitor/linux-x64/t3-resource-monitor') or exe == str(Path(runtime_exe).parent / 'resource-monitor/linux-arm64/t3-resource-monitor'):
+            recognized.add(child)
+        elif (exe.startswith(userhome + '/.local/share/claude/versions/')
+              and '--input-format' in args and '--output-format' in args
+              and args[args.index('--input-format') + 1:args.index('--input-format') + 2] == ['stream-json']
+              and args[args.index('--output-format') + 1:args.index('--output-format') + 2] == ['stream-json']):
+            recognized.add(child)
+            providers.append(child)
+        elif (Path(exe).name == 'node' and args == ['node', userhome + '/.local/bin/codex', 'app-server']):
+            binaries = children(child)
+            if len(binaries) == 1:
+                binary = binaries[0]
+                b = ps[binary]
+                if ('/node_modules/@openai/codex/' in b['exe'] and
+                        b['exe'].startswith(userhome + '/') and b['exe'].endswith('/bin/codex') and
+                        b['args'] == [b['exe'], 'app-server']):
+                    recognized.update((child, binary))
+                    providers.append(binary)
+    for provider in providers:
+        for child in children(provider):
+            row = ps[child]
+            # Code-mode host is a persistent Codex protocol host, not a shell.
+            host = str(Path(ps[provider]['exe']).with_name('codex-code-mode-host'))
+            if ps[provider]['exe'].endswith('/bin/codex') and row['exe'] == host and row['args'] == [host]:
+                recognized.add(child)
+            elif (row['exe'] == str(Path(userhome) / '.local/bin/uv') and
+                  row['args'] == [userhome + '/.local/bin/uv', 'tool', 'uvx', '--python', '3.11', 'blender-mcp']):
+                leaves = children(child)
+                if len(leaves) == 1:
+                    leaf = leaves[0]
+                    py = ps[leaf]
+                    args = py['args']
+                    if (len(args) == 2 and args[0].startswith(userhome + '/.cache/uv/archive-v0/')
+                            and args[0].endswith('/bin/python')
+                            and args[1] == str(Path(args[0]).with_name('blender-mcp'))
+                            and py['exe'].startswith(userhome + '/.local/share/uv/python/')
+                            and Path(py['exe']).name.startswith('python3.11')):
+                        recognized.update((child, leaf))
+    # Walk the ENTIRE tree, including grandchildren of allowlisted daemons.
+    # Thus rsync/ssh/shell tools outliving a terminal V2 run still defer.
+    descendants = {pid}
+    for _ in range(len(ps)):
+        added = {p for p, row in ps.items() if row['parent'] in descendants} - descendants
+        if not added:
+            break
+        descendants.update(added)
+    return ['unrecognized-service-descendants'] if descendants - recognized else []
+
+
+def busy(home, pid):
+    db = connect(Path(home) / 'userdata/statev2.sqlite')
+    db.execute('BEGIN')
+    reasons = native_work(db)
+    ps = processes()
+    reasons.extend(process_work(ps, pid, home))
+    # Empty native provider inventory cannot establish idle for live providers.
+    if len([r for r in ps.values() if r['parent'] == pid]) == 1:
+        runtime = next(p for p, r in ps.items() if r['parent'] == pid)
+        if len([r for r in ps.values() if r['parent'] == runtime]) > 1:
+            if not db.execute('SELECT count(*) FROM orchestration_v2_projection_provider_threads').fetchone()[0]:
+                reasons.append('missing-native-provider-inventory')
+    print(json.dumps({'busy': bool(reasons), 'reasons': sorted(set(reasons))}))
+    return bool(reasons)
+
+
+def snapshot(source, target):
+    # SQLite online backup includes WAL. Do not copy an open database file.
+    src = connect(source)
+    dst = sqlite3.connect(target)
+    src.backup(dst, pages=4096, sleep=0.05)
+    assert_integrity = dst.execute('PRAGMA quick_check').fetchone()[0]
+    if assert_integrity != 'ok':
+        raise RuntimeError('Backup failed SQLite quick_check')
+    dst.close()
+    os.chmod(target, 0o600)
+
+
+def inventory(path):
+    db = connect(path)
+    result = {}
+    # Canonical event/history IDs, not mutable projection bytes.
+    for table in ('orchestration_events', 'orchestration_v2_events',
+                  'orchestration_v2_projection_messages', 'projection_thread_messages'):
+        columns = db.execute(f'PRAGMA table_info({table})').fetchall()
+        keys = [row[1] for row in columns if row[5]]
+        if not keys:
+            raise RuntimeError('Missing history primary key: ' + table)
+        names = ','.join('"' + k + '"' for k in keys)
+        h = hashlib.sha256()
+        count = 0
+        for row in db.execute(f'SELECT {names} FROM {table} ORDER BY {names}'):
+            h.update(json.dumps(row, separators=(',', ':')).encode() + b'\n')
+            count += 1
+        result[table] = {'count': count, 'ids_sha256': h.hexdigest()}
+    print(json.dumps(result, sort_keys=True))
+
+
+def compare_history(path, previous):
+    """Stable, read-only preservation check; native compaction is not row loss.
+
+    Only the inspected upstream supersession predicates are allowed. Complete
+    projected history payloads remain protected; runtime lifecycle changes need
+    canonical post-backup events. No writes or database copies are performed.
+    """
+    db = connect(path)
+    db.execute('ATTACH DATABASE ? AS previous', (Path(previous).resolve().as_uri() + '?mode=ro',))
+    db.execute('BEGIN')
+    try:
+        tables = {r[0] for r in db.execute("SELECT name FROM previous.sqlite_master WHERE type='table'")}
+        current_tables = {r[0] for r in db.execute("SELECT name FROM main.sqlite_master WHERE type='table'")}
+        def columns(table, schema='main'):
+            return db.execute(f'PRAGMA {schema}.table_info("{table}")').fetchall()
+        def fail(message):
+            raise RuntimeError('History preservation failed: ' + message)
+        def identical_rows(table, mutable=None):
+            oldcols = columns(table, 'previous')
+            names = [r[1] for r in oldcols]
+            keys = [r[1] for r in sorted(oldcols, key=lambda r: r[5]) if r[5]]
+            if not keys:
+                fail('missing primary key: ' + table)
+            if table not in current_tables or not set(names) <= {r[1] for r in columns(table)}:
+                fail('history schema disappeared: ' + table)
+            select = ','.join('"' + n + '"' for n in names)
+            order = ','.join('"' + n + '"' for n in keys)
+            old = iter(db.execute(f'SELECT {select} FROM previous."{table}" ORDER BY {order}'))
+            now = iter(db.execute(f'SELECT {select} FROM main."{table}" ORDER BY {order}'))
+            indexes = [names.index(k) for k in keys]
+            key = lambda row: tuple(row[i] for i in indexes)
+            row = next(now, None)
+            for before in old:
+                while row is not None and key(row) < key(before):
+                    row = next(now, None)
+                if row is None or key(row) != key(before):
+                    fail('row disappeared: ' + table)
+                if before != row and not (mutable and mutable(dict(zip(names, before)), dict(zip(names, row)))):
+                    fail('payload changed without canonical justification: ' + table)
+        real_events = {'sequence', 'event_type', 'payload_json', 'application_event_version', 'stream_id'} <= {r[1] for r in columns('orchestration_events', 'previous')}
+        if not real_events:
+            # Small/old schemas retain the strict safe contract, never opt in
+            # to predicates whose native event shape cannot be established.
+            for table in ('orchestration_events', 'orchestration_v2_events', 'orchestration_v2_projection_messages', 'projection_thread_messages'):
+                identical_rows(table)
+            print('All pre-switch canonical event/message IDs preserved')
+            return
+        max_old = db.execute('SELECT coalesce(max(sequence),0) FROM previous.orchestration_events').fetchone()[0]
+        event_columns = [r[1] for r in columns('orchestration_events', 'previous')]
+        if event_columns != [r[1] for r in columns('orchestration_events')]:
+            fail('event schema changed')
+        added = []
+        for row in db.execute('SELECT * FROM main.orchestration_events WHERE sequence>? ORDER BY sequence', (max_old,)):
+            e = dict(zip(event_columns, row)); e['payload'] = json.loads(e['payload_json']); added.append(e)
+        by_stream = {}
+        by_entity = {}
+        for e in added:
+            by_stream.setdefault(e['stream_id'], []).append(e)
+            payload = e['payload']
+            if isinstance(payload, dict) and 'id' in payload:
+                by_entity[(e['event_type'], payload['id'])] = e
+        def lifecycle(table, event_type, id_column, allowed_fields, transitions):
+            def valid(old, now):
+                before = json.loads(old['payload_json']); after = json.loads(now['payload_json'])
+                canonical = by_entity.get((event_type, now[id_column]))
+                if not canonical or canonical['payload'] != after:
+                    return False
+                if (before.get('status'), after.get('status')) not in transitions:
+                    return False
+                for column, field in (('status', 'status'), ('completed_at', 'completedAt'), ('updated_at', 'updatedAt')):
+                    if column in now and now[column] != after.get(field):
+                        return False
+                if any(before.get(k) != after.get(k) for k in before.keys() | after.keys() if k not in allowed_fields):
+                    return False
+                return all(old[k] == now[k] for k in old if k not in {'payload_json', 'status', 'updated_at', 'completed_at'})
+            identical_rows(table, valid)
+        def thread_change(old, now):
+            events = by_stream.get(now['thread_id'], [])
+            if not events:
+                return False
+            before = json.loads(old['payload_json']); after = json.loads(now['payload_json'])
+            if any(old[k] != now[k] for k in old if k not in {'payload_json', 'updated_at'}):
+                return False
+            if any(before.get(k) != after.get(k) for k in before.keys() | after.keys() if k not in {'updatedAt', 'pullRequests'}):
+                return False
+            if after.get('updatedAt') != events[-1]['occurred_at'] or now.get('updated_at') != events[-1]['occurred_at']:
+                return False
+            links = list(before.get('pullRequests') or [])
+            identity = lambda link: (link.get('host'), link.get('repository'), link.get('number'))
+            for e in events:
+                if e['event_type'] == 'thread.pull-request-link-updated':
+                    link = e['payload']; match = next((i for i, v in enumerate(links) if identity(v) == identity(link)), None)
+                    if match is None:
+                        links.append(link)
+                    else:
+                        links[match] = link
+            return (before.get('pullRequests') == after.get('pullRequests') or links == after.get('pullRequests'))
+        excluded = {'orchestration_v2_projection_metadata', 'orchestration_v2_projection_nodes', 'orchestration_v2_projection_subagents', 'orchestration_v2_projection_provider_sessions', 'orchestration_v2_projection_threads'}
+        protected = {t for t in tables if t.startswith('orchestration_v2_projection_')} - excluded
+        protected |= tables & {'orchestration_v2_events', 'orchestration_v2_turn_item_positions', 'projection_thread_messages', 'projection_threads', 'projection_thread_sessions', 'projection_thread_pull_requests', 'projection_projects', 'provider_session_runtime'}
+        for table in sorted(protected):
+            identical_rows(table)
+        if 'orchestration_v2_projection_threads' in tables:
+            identical_rows('orchestration_v2_projection_threads', thread_change)
+        for table, event_type, idcol, allowed, transitions in (
+            ('orchestration_v2_projection_nodes', 'node.updated', 'node_id', {'status', 'completedAt'}, {('running', 'cancelled')}),
+            ('orchestration_v2_projection_subagents', 'subagent.updated', 'subagent_id', {'status', 'completedAt', 'updatedAt'}, {('running', 'cancelled')}),
+            ('orchestration_v2_projection_provider_sessions', 'provider-session.updated', 'provider_session_id', {'status', 'updatedAt'}, {('ready', 'stopped')}),
+        ):
+            if table in tables:
+                lifecycle(table, event_type, idcol, allowed, transitions)
+        imports = set()
+        if 'orchestration_v2_legacy_imports' in current_tables:
+            imports = {r[0] for r in db.execute('SELECT thread_id FROM orchestration_v2_legacy_imports WHERE transcript_imported_at IS NOT NULL')}
+        supersedable = {'thread.archived', 'thread.unarchived', 'thread.settled', 'thread.unsettled', 'thread.snoozed', 'thread.unsnoozed', 'thread.pinned', 'thread.auto-settle-set', 'thread.unpinned', 'thread.pin-reordered', 'thread.active-reordered', 'thread.metadata-updated', 'thread.pull-request-synced', 'thread.runtime-mode-updated', 'thread.interaction-mode-updated', 'thread.model-selection-updated', 'thread.provider-switched'}
+        reads = {'thread.visited', 'thread.marked-unread'}
+        activity = set(); readstate = set(); entities = {}; removed = 0
+        # A merged newest-first stream makes the native predicates explicit.
+        # Retained rows are compared in full, not merely by event sequence.
+        old = iter(db.execute('SELECT * FROM previous.orchestration_events ORDER BY sequence DESC'))
+        now = iter(db.execute('SELECT * FROM main.orchestration_events ORDER BY sequence DESC'))
+        x = next(old, None); y = next(now, None)
+        seq_index = event_columns.index('sequence')
+        while x is not None or y is not None:
+            if y is None or (x is not None and x[seq_index] > y[seq_index]):
+                row = x; present = False; x = next(old, None); removed += 1
+            elif x is None or y[seq_index] > x[seq_index]:
+                row = y; present = True; y = next(now, None)
+            else:
+                if x != y:
+                    fail('retained event payload mutated')
+                row = x; present = True; x = next(old, None); y = next(now, None)
+            e = dict(zip(event_columns, row)); typ = e['event_type']; stream = e['stream_id']; version = e['application_event_version']; seq = e['sequence']
+            justified = False
+            if version == 1 and e['aggregate_kind'] == 'thread' and stream in imports:
+                justified = True
+            elif version == 2:
+                if e['aggregate_kind'] == 'thread' and typ in supersedable:
+                    justified = stream in activity
+                    if not justified and not present:
+                        fail('latest activity-bearing thread snapshot disappeared')
+                    activity.add(stream)
+                elif e['aggregate_kind'] == 'thread' and typ in reads:
+                    justified = stream in activity or stream in readstate
+                    if not justified and not present:
+                        fail('latest read-state snapshot disappeared')
+                    readstate.add(stream)
+                elif typ == 'thread.pull-request-link-updated' and stream in activity:
+                    justified = True
+                elif typ in {'message.updated', 'node.updated', 'thread.pull-request-link-updated'}:
+                    p = json.loads(e['payload_json'])
+                    entity = (p.get('host'), p.get('repository'), p.get('number')) if typ == 'thread.pull-request-link-updated' else p.get('id')
+                    if entity is None:
+                        fail('unreadable keyed event')
+                    key = (typ, stream, entity)
+                    if key not in entities:
+                        if not present:
+                            fail('latest entity event disappeared')
+                        entities[key] = (seq, present)
+                    else:
+                        entities[key] = (seq, present)
+                    justified = True  # Oldest/append-order anchor checked below.
+            if not present and not justified:
+                fail('unexplained unique event removal: ' + typ)
+        if any(not present for _, present in entities.values()):
+            fail('first entity event / append-order anchor disappeared')
+        print(json.dumps({'preserved': True, 'native_compacted_events': removed, 'protected_payload_tables': len(protected), 'canonical_added_events': len(added)}))
+    finally:
+        db.close()
+
+
+if __name__ == '__main__':
+    action, *args = sys.argv[1:]
+    if action == 'busy':
+        sys.exit(10 if busy(args[0], int(args[1])) else 0)
+    elif action == 'backup':
+        snapshot(*args)
+    elif action == 'inventory':
+        inventory(*args)
+    elif action == 'compare':
+        compare_history(*args)
+    else:
+        raise SystemExit('Unknown action')
