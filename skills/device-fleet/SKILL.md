@@ -43,6 +43,14 @@ Keep noninteractive SSH read-only unless a change was requested:
 ssh -o BatchMode=yes -o ConnectTimeout=8 <target> 'hostname; uname -a; ip -brief addr'
 ```
 
+## Existing browser sessions
+
+- Try Marionette on the existing tab first. If unavailable or any step fails, stop protocol attempts, inspect a fresh screenshot, and fall back to physical clicks through Hyprland.
+- Never open consoles, extra tabs/windows, inject JavaScript, or use other direct DOM/API automation without explicit authorization. Fall back instead of restarting the browser to enable Marionette unless a restart is approved.
+- Use the input method already verified for the active session. Establish control before timed work; stop after a mismatched click instead of experimenting on the live form.
+- After a click, wait for loading to finish and inspect a fresh screenshot. Verify the selected option and saved state; a sidebar checkmark only proves that an answer exists.
+- Revisit every requested item before submission, including answers Semyon entered. Keep submission as a separate deliberate action after review.
+
 ## T3 Code and Tailscale
 
 Do **not** default to `npx t3@nightly serve`: the verified server setup uses global `t3` plus an enabled user systemd service. `references/t3-code.md` has the exact unit, wrappers, ports, and safe management commands. Read-only checks:
