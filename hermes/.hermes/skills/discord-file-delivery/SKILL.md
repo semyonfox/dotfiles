@@ -69,8 +69,8 @@ MEDIA:/absolute/path/to/file
 
 4. If upload fails with HTTP 413 or the file is clearly too large:
    - Do **not** keep retrying the attachment.
-   - For Semyon's own large artifacts, prefer the self-hosted Erugo fileshare (`https://fileshare.semyon.ie`) before public temporary hosts. The detailed Erugo workflow lives in `personal-infrastructure-operations` → `references/erugo-fileshare-artifact-delivery.md`.
-   - Upload to a public temporary/direct file host only if the user requested upload/delivery, Erugo/self-hosted delivery is unavailable, and the artifact is not sensitive.
+   - For Semyon's own large artifacts, prefer the self-hosted Pingvin Share X fileshare (`https://fileshare.semyon.ie`, publish with `python3 /home/semyon/server-stacks/fileshare/publish-file.py`) before public temporary hosts. The detailed workflow lives in `personal-infrastructure-operations` → `references/erugo-fileshare-artifact-delivery.md`.
+   - Upload to a public temporary/direct file host only if the user requested upload/delivery, self-hosted delivery is unavailable, and the artifact is not sensitive.
    - Verify the download URL with `curl -I` and include the SHA256.
    - Tell the user Discord rejected the native upload because of size.
 
@@ -105,8 +105,8 @@ When Semyon asks for many project assets “here in Discord”:
 - For large APKs/build artifacts, a direct download link plus checksum is usually the practical path.
 - For large APKs/build artifacts, a direct download link plus checksum is usually the practical path.
 - For large APKs/build artifacts, a direct download link plus checksum is usually the practical path.
-- On Semyon's infrastructure, prefer the self-hosted Erugo fileshare at `fileshare.semyon.ie` when available. It lives under `/home/semyon/server-stacks/fileshare/` and can handle large APK-style artifacts better than Discord's native cap.
+- On Semyon's infrastructure, prefer the self-hosted Pingvin Share X fileshare at `fileshare.semyon.ie` when available. It lives under `/home/semyon/server-stacks/fileshare/` and can handle large APK-style artifacts better than Discord's native cap.
 - When the user needs to tap a URL from Discord/mobile, put the URL as a bare clickable line, not inside a code block.
 - For APKs, remember APKs are ZIP containers; if Android/file managers treat the download as a ZIP/folder, serve it with `Content-Type: application/vnd.android.package-archive` and `Content-Disposition: attachment; filename="name.apk"`, or stage it via ADB.
-- Do not upload private or sensitive files to public temporary hosts without explicit user approval; use self-hosted Erugo first when possible.
+- Do not upload private or sensitive files to public temporary hosts without explicit user approval; use the self-hosted fileshare first when possible.
 - If using `send_message`, verify tool result includes `success: true`, platform `discord`, and a `message_id` before claiming delivery.

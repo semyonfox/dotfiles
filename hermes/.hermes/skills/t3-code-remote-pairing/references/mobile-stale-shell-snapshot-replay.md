@@ -132,7 +132,8 @@ Do not confuse this with APK publication. Verify served APK and build state sepa
 
 ```bash
 curl -kIsS --max-time 10 https://fileshare.semyon.ie/t3-apk.php | sed -n '1,20p'
-sha256sum /home/semyon/t3code-mobile-builds/*.apk /home/semyon/server-stacks/fileshare/public-apk/t3-code-preview.apk 2>/dev/null || true
+sha256sum /home/semyon/t3code-mobile-builds/*.apk 2>/dev/null || true
+curl -fsSL --max-time 300 https://fileshare.semyon.ie/t3-apk.php | sha256sum
 cat /home/semyon/.hermes/t3code-mobile-watch/last_success_sha 2>/dev/null || true
 npm view t3 dist-tags --json
 ```

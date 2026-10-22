@@ -76,18 +76,18 @@ PROJECT=/home/semyon/code/<game>
 
 For hand-authored minimal Unity `Packages/manifest.json`, built-in module dependencies must cover runtime API use. If code uses `GUI`/`GUIStyle`/`OnGUI`, include `com.unity.modules.imgui`. If it uses `AudioListener` or other audio APIs, include `com.unity.modules.audio`; alternatively remove unused audio components. Do not omit required modules simply to make the manifest small.
 
-## Share bundles through Erugo
+## Share bundles through the fileshare
 
 Unity desktop output is a bundle, not a standalone executable: preserve the executable beside its `<Game>_Data/` directory and `UnityPlayer` library/DLL.
 
 - Linux: archive the whole output as `.tar.gz`.
 - Windows: archive the whole output as `.zip`; include a short `README.txt` with extract/run instructions and controls.
-- Generate `SHA256SUMS.txt`, validate archives (`tar -tzf`, `unzip -t`), then publish to:
+- Generate `SHA256SUMS.txt`, validate archives (`tar -tzf`, `unzip -t`), then publish each archive with a version in its filename:
 
-  ```text
-  /home/semyon/server-stacks/fileshare/erugo-storage/app/public/bin/<app>/<version>/
-  https://fileshare.semyon.ie/storage/bin/<app>/<version>/
+  ```bash
+  python3 /home/semyon/server-stacks/fileshare/publish-file.py --expires-days 30 --title "<app> <version>" <app>-<version>-linux-x64.tar.gz
   ```
 
-- Always download the public URLs back and run `sha256sum -c SHA256SUMS.txt`.
-- Publish immutable versioned paths. If an existing public path is CDN-cached with an older file, do not claim the overwritten object was verified; publish a new version directory and verify that URL instead.
+  It prints `sha256`, `share_url` and `download_url`. Erugo's `/storage/bin/` folders are a read-only archive now; do not write there.
+- Always download the `download_url` back and compare its SHA-256 with the printed one.
+- Give each version its own share. If a cached public URL still serves an older file, do not claim the new file was verified; publish a new share and verify that URL instead.
