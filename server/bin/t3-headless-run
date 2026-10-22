@@ -9,8 +9,12 @@ export T3CODE_HOST=0.0.0.0
 LOCK=/home/semyon/.t3/t3-headless.lock
 mkdir -p /home/semyon/.t3
 
+# One explicit atomic deployment pointer, owned by update-t3-nightly.
+# Never select the newest directory or follow the independent npm shim.
+RUNTIME=/home/semyon/.t3/runtime/headless-current/t3
+[[ -x "$RUNTIME" ]] || { echo 'Missing headless runtime pointer' >&2; exit 1; }
 exec /usr/bin/flock -n "$LOCK" \
-  /home/semyon/.local/bin/t3 serve \
+  "$RUNTIME" serve \
     --host 0.0.0.0 \
     --port 3773 \
     --no-browser \

@@ -1,0 +1,12 @@
+[Unit]
+Description=Check official T3 nightly releases every three hours (UTC)
+
+[Timer]
+OnCalendar=*-*-* 00/3:00:00 UTC
+AccuracySec=1min
+RandomizedDelaySec=0
+Persistent=true
+Unit=t3-nightly-update.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+# Approved custom-headless deployment lane. No upstream service-manager changes.
+set -euo pipefail
+umask 077
+mode=${1:---apply}
+case $mode in --apply|--check|--maintenance-stop) ;; *) printf 'Usage: update-t3-nightly [--check|--apply|--maintenance-stop]\n' >&2; exit 2;; esac
+base="$HOME/.t3"
+state="$base/update-headless"
+unit=t3-code-headless.service
+helper="$(dirname "$(readlink -f "$0")")/t3-update-state"
+mkdir -p "$state" "$base/runtime/versions"
+exec 9>"$state/update.lock"
+if ! flock -n 9; then echo 'Another T3 updater holds the lock; skipped.'; exit 0; fi
+if [[ $mode != --check && -e $state/transaction ]]; then
+  echo "RECOVERY REQUIRED: interrupted/failed deployment marker $state/transaction; inspect prior status/journal before further changes" >&2
+  exit 1
+fi
+log() { printf '%s %s\n' "$(date --iso-8601=seconds)" "$*"; }
+status() {
+  printf '%s\n' "$*" > "$state/status.new"
+  mv -f "$state/status.new" "$state/status"
+  log "$*"
+}
+stage=''
+trap 'rc=$?; if ((rc)); then status "FAILED rc=$rc; serving pointer unchanged unless rollback is reported above; inspect journalctl --user -u t3-nightly-update"; fi; exit "$rc"' EXIT
+
+# Official release metadata, sorted by publication time (not API order, which
+# can put a preview ahead of the newest nightly). No GitHub credentials needed.
+metadata=$(curl --proto '=https' -fsSL --retry 2 --connect-timeout 20 --max-time 90 \
+  'https://api.github.com/repos/pingdotgg/t3code/releases?per_page=100')
+release=$(jq -ce '[.[] | select(.draft == false and (.tag_name | test("^v[0-9]+\\.[0-9]+\\.[0-9]+-nightly\\.[0-9]+\\.[0-9]+$")))] | sort_by(.published_at) | last // error("No nightly release")' <<<"$metadata")
+tag=$(jq -r .tag_name <<<"$release")
+version=${tag#v}
+case $(uname -m) in x86_64) arch=x64;; aarch64) arch=arm64;; *) echo 'Unsupported architecture' >&2; exit 1;; esac
+name="t3-$version-linux-$arch.tar.gz"
+asset=$(jq -ce --arg name "$name" '[.assets[] | select(.name == $name)] | if length == 1 then .[0] else error("Missing/duplicate runtime asset") end' <<<"$release")
+url=$(jq -r .browser_download_url <<<"$asset")
+digest=$(jq -r .digest <<<"$asset")
+[[ $url == "https://github.com/pingdotgg/t3code/releases/download/$tag/$name" ]]
+[[ $digest =~ ^sha256:[a-f0-9]{64}$ ]]
+current=$(readlink -f "$base/runtime/headless-current")
+[[ -x $current/t3 ]]
+current_version=$("$current/t3" --version)
+log "Latest official nightly: $version; selected: $current_version"
+if [[ $mode == --check ]]; then exit 0; fi
+if [[ $current_version == "t3 v$version" ]]; then
+  # Still test real serving executable: a pointer alone is not a deployed update.
+  main=$(systemctl --user show "$unit" -p MainPID --value)
+  runtime=$(pgrep -P "$main" -x node-MainThread || true)
+  [[ -n $runtime && $(readlink -f "/proc/$runtime/exe") == "$current/t3" ]]
+  curl -fsS --max-time 10 http://127.0.0.1:3773/ >/dev/null
+  status "CURRENT $version; actual serving executable and HTTP health verified"
+  exit 0
+fi
+# Always download and verify a candidate before making it eligible for switch.
+# A stale unverified versions directory is never trusted.
+candidate="$base/runtime/versions/$version"
+# Busy checks repeat every three hours. Reuse only a staged tree whose entire
+# content still matches the hashes recorded after the verified official download.
+reuse=0
+if [[ -f $candidate/.release-digest && -f $candidate/.files-sha256 && $(<"$candidate/.release-digest") == "$digest" ]]; then
+  if (cd "$candidate" && sha256sum --quiet -c .files-sha256); then reuse=1; fi
+fi
+if ((reuse == 0)); then
+stage=$(mktemp -d "$state/stage.XXXXXXXX")
+printf '%s\n' "$release" > "$stage/release.json"
+curl --proto '=https' -fsSL --retry 2 --connect-timeout 20 --max-time 300 "$url" -o "$stage/runtime.tar.gz"
+printf '%s  %s\n' "${digest#sha256:}" "$stage/runtime.tar.gz" | sha256sum -c -
+# Reject path traversal, links and device nodes before extraction.
+python3 - "$stage/runtime.tar.gz" "t3-$version-linux-$arch" <<'PY'
+import sys,tarfile
+from pathlib import PurePosixPath
+with tarfile.open(sys.argv[1]) as archive:
+    for m in archive:
+        p=PurePosixPath(m.name)
+        if p.is_absolute() or '..' in p.parts or not p.parts or p.parts[0] != sys.argv[2]:
+            raise ValueError('Unsafe archive path')
+        if not (m.isfile() or m.isdir()):
+            raise ValueError('Non-regular archive member')
+PY
+mkdir "$stage/runtime"
+tar -xzf "$stage/runtime.tar.gz" -C "$stage/runtime" --strip-components=1
+[[ $("$stage/runtime/t3" --version) == "t3 v$version" ]]
+# Keep the small provenance record beside the unpacked runtime.
+cp "$stage/release.json" "$stage/runtime/release.json"
+if [[ -e $base/runtime/versions/$version ]]; then
+  # Never overwrite an existing install. Verify the complete staged tree first.
+  diff -qr --exclude=release.json --exclude=.release-digest --exclude=.files-sha256 "$stage/runtime" "$candidate" >/dev/null
+else
+  mv "$stage/runtime" "$candidate"
+fi
+printf '%s\n' "$digest" > "$candidate/.release-digest"
+python3 - "$candidate" <<'PY'
+import hashlib,sys
+from pathlib import Path
+root=Path(sys.argv[1])
+with (root/'.files-sha256').open('w') as manifest:
+    for p in sorted(root.rglob('*')):
+        if p.is_file() and p.name != '.files-sha256':
+            manifest.write(hashlib.file_digest(p.open('rb'),'sha256').hexdigest()+'  '+str(p.relative_to(root))+'\n')
+PY
+# This directory was freshly allocated by this invocation and contains only
+# public release files, never user data. Keep failed stages for diagnostics.
+python3 - "$stage" <<'PY'
+import shutil,sys
+shutil.rmtree(sys.argv[1])
+PY
+fi
+printf '%s\n' "$version" > "$state/pending"
+status "PENDING $version; verified official download; evaluating active-work gates"
+
+systemctl --user is-active --quiet "$unit"
+main=$(systemctl --user show "$unit" -p MainPID --value)
+set +e
+python3 "$helper" busy "$base" "$main" > "$state/busy.json"
+rc=$?
+set -e
+if ((rc == 10)) && [[ $mode != --maintenance-stop ]]; then
+  status "DEFERRED $version; native work or unrecognized service descendants exist; current runtime untouched; see $state/busy.json"
+  exit 0
+fi
+((rc == 0)) || [[ $rc == 10 && $mode == --maintenance-stop ]]
+if [[ $mode == --maintenance-stop ]]; then
+  cp "$state/busy.json" "$state/maintenance-busy.json"
+  log 'EXPLICIT MAINTENANCE: native T3 SIGINT stop; storage/history checks remain enabled'
+else
+# Require a quiet interval, and fail closed if the schema/process tree changes.
+sleep 30
+python3 "$helper" busy "$base" "$main" > "$state/busy.json" || {
+  rc=$?
+  if ((rc == 10)); then status "DEFERRED $version; work appeared during quiet interval"; exit 0; fi
+  exit "$rc"
+}
+fi
+# Consistent snapshot, outside the data dir. Keep every recovery set.
+# The same optional Stow config is read by manual and scheduled runs. A missing
+# external destination fails closed instead of silently spilling onto root.
+backup_root="$state/backups"
+backup_config="$HOME/.config/t3-nightly-update/backup-root"
+if [[ -f $backup_config ]]; then
+  IFS= read -r backup_root < "$backup_config"
+  [[ $backup_root == /* && -d $backup_root && -w $backup_root ]] || { echo 'Configured rollback storage unavailable' >&2; exit 1; }
+  [[ $(stat -c %u "$backup_root") == "$(id -u)" ]] || { echo 'Rollback storage must belong to current user' >&2; exit 1; }
+  permissions=$(stat -c %a "$backup_root")
+  (( (8#$permissions & 077) == 0 )) || { echo 'Rollback storage must be private (0700)' >&2; exit 1; }
+else
+  mkdir -p "$backup_root"
+fi
+bytes=$(stat -c %s "$base/userdata/statev2.sqlite")
+free=$(df --output=avail -B1 "$backup_root" | tail -n 1)
+(( free > bytes * 2 + 2147483648 )) || { echo 'Insufficient rollback storage (two DB copies + 2 GiB required)' >&2; exit 1; }
+probe=$(mktemp "$backup_root/.write-probe.XXXXXXXX")
+rm -f "$probe"
+backup="$backup_root/$(date -u +%Y%m%dT%H%M%SZ)-$version"
+mkdir -p "$backup"
+printf '%s\n' "$current" > "$backup/previous-runtime"
+# The live database remains authoritative until the sole stopped snapshot is
+# complete and integrity-checked. Avoid two redundant full backup/WAL passes.
+set +e
+python3 "$helper" busy "$base" "$main" > "$state/busy.json"
+rc=$?
+set -e
+if ((rc == 10)) && [[ $mode != --maintenance-stop ]]; then status "DEFERRED $version; work appeared during pre-switch storage checks"; exit 0; fi
+((rc == 0)) || [[ $rc == 10 && $mode == --maintenance-stop ]]
+if [[ $mode == --maintenance-stop ]]; then cp "$state/busy.json" "$state/maintenance-busy.json"; fi
+# No second T3 service is ever started. Rollback preserves the failed database
+# in full; never discard it or manually rewrite migrations/events.
+rollback() {
+  # A failed health/history check must not kill work admitted after startup.
+  # Preserve the transaction marker and require recovery instead.
+  if [[ $(readlink -f "$base/runtime/headless-current") == "$candidate" ]] && systemctl --user is-active --quiet "$unit"; then
+    local recovery_pid
+    recovery_pid=$(systemctl --user show "$unit" -p MainPID --value) || return 1
+    python3 "$helper" busy "$base" "$recovery_pid" > "$state/busy.json" || return 1
+  fi
+  if [[ $(readlink -f "$base/runtime/headless-current") == "$current" ]]; then
+    # No pointer switch means no candidate migration has run. The original DB
+    # is still canonical; never replace it with a partial/failed snapshot.
+    systemctl --user start "$unit" || return 1
+    local preswitch_healthy=0
+    for ((j=0;j<30;j++)); do
+      if curl -fsS --max-time 2 http://127.0.0.1:3773/ >/dev/null 2>&1; then preswitch_healthy=1; break; fi
+      sleep 2
+    done
+    ((preswitch_healthy == 1)) || return 1
+    local preswitch_pid preswitch_runtime
+    preswitch_pid=$(systemctl --user show "$unit" -p MainPID --value) || return 1
+    preswitch_runtime=$(pgrep -P "$preswitch_pid" -x node-MainThread) || return 1
+    [[ $(readlink -f "/proc/$preswitch_runtime/exe") == "$current/t3" ]] || return 1
+    status "PRE-SWITCH ABORT; original runtime/database recovered untouched; incomplete snapshot retained at $backup"
+    rm -f "$state/transaction"
+    return 0
+  fi
+  systemctl --user stop "$unit" || return 1
+  local failed="$backup/failed-state"
+  mkdir -p "$failed" || return 1
+  for f in "$base/userdata/statev2.sqlite"{,-wal,-shm}; do
+    if [[ -e $f ]]; then mv "$f" "$failed/" || return 1; fi
+  done
+  cp --reflink=auto "$backup/statev2.sqlite" "$base/userdata/statev2.sqlite" || return 1
+  ln -s "$current" "$base/runtime/headless-current.rollback" || return 1
+  mv -Tf "$base/runtime/headless-current.rollback" "$base/runtime/headless-current" || return 1
+  if [[ -d $backup/config ]]; then
+    mkdir -p "$backup/failed-config" || return 1
+    for saved in "$backup/config/"*; do
+      [[ -f $saved ]] || continue
+      local filename=${saved##*/}
+      if [[ -f $base/userdata/$filename ]]; then cp -p "$base/userdata/$filename" "$backup/failed-config/$filename" || return 1; fi
+      cp -p "$saved" "$base/userdata/$filename" || return 1
+    done
+  fi
+  systemctl --user start "$unit" || return 1
+  local recovered=0
+  for ((j=0;j<30;j++)); do
+    if curl -fsS --max-time 2 http://127.0.0.1:3773/ >/dev/null 2>&1; then recovered=1; break; fi
+    sleep 2
+  done
+  ((recovered == 1)) || return 1
+  local recovery_runtime
+  recovery_pid=$(systemctl --user show "$unit" -p MainPID --value) || return 1
+  recovery_runtime=$(pgrep -P "$recovery_pid" -x node-MainThread) || return 1
+  [[ $(readlink -f "/proc/$recovery_runtime/exe") == "$current/t3" ]] || return 1
+  [[ $("$current/t3" --version) == "$current_version" ]] || return 1
+  status "ROLLED BACK to $current; failed candidate DB retained at $failed; recovery must reconcile any startup writes"
+  rm -f "$state/transaction"
+}
+# The marker survives interruption and failed recovery; future runs fail closed.
+trap 'rc=$?; if ((rc)); then rollback || status "RECOVERY REQUIRED; candidate failed and safe old-service recovery could not be established (possibly new work); backup $backup; no data discarded"; fi; exit "$rc"' EXIT
+printf '%s\n' "$backup" > "$state/transaction"
+systemctl --user stop "$unit"
+if [[ $mode == --maintenance-stop ]]; then
+  # This is physical quiescence, never permission to copy a running database.
+  [[ $(systemctl --user show "$unit" -p MainPID --value) == 0 ]]
+  [[ $(systemctl --user show "$unit" -p SubState --value) == dead ]]
+fi
+# Private local rollback copies only; never include these in task attachments.
+mkdir -p "$backup/config"
+for filename in settings.json client-settings.json desktop-settings.json keybindings.json saved-environments.json saved-environments.windows-import.json model-manifest.json environment-id anonymous-id; do
+  if [[ -f $base/userdata/$filename ]]; then
+    cp -pL "$base/userdata/$filename" "$backup/config/$filename"
+    chmod 600 "$backup/config/$filename"
+  fi
+done
+python3 "$helper" backup "$base/userdata/statev2.sqlite" "$backup/statev2.sqlite"
+python3 "$helper" inventory "$base/userdata/statev2.sqlite" > "$backup/history-before.json"
+ln -s "$candidate" "$base/runtime/headless-current.new"
+mv -Tf "$base/runtime/headless-current.new" "$base/runtime/headless-current"
+systemctl --user start "$unit"
+healthy=0
+for ((i=0;i<60;i++)); do
+  if curl -fsS --max-time 2 http://127.0.0.1:3773/ >/dev/null 2>&1; then healthy=1; break; fi
+  sleep 2
+done
+((healthy == 1))
+main=$(systemctl --user show "$unit" -p MainPID --value)
+runtime=$(pgrep -P "$main" -x node-MainThread || true)
+[[ -n $runtime && $(readlink -f "/proc/$runtime/exe") == "$candidate/t3" ]]
+[[ $("$candidate/t3" --version) == "t3 v$version" ]]
+python3 "$helper" inventory "$base/userdata/statev2.sqlite" > "$backup/history-after.json"
+python3 "$helper" compare "$base/userdata/statev2.sqlite" "$backup/statev2.sqlite"
+# The CLI and custom service share one authoritative pointer. Preserve npm's
+# install as-is; do not pretend updating its shim deploys the custom service.
+if [[ ! -e $state/previous-cli && ! -L $state/previous-cli ]]; then cp -a "$HOME/.local/bin/t3" "$state/previous-cli"; fi
+ln -s "$base/runtime/headless-current/t3" "$HOME/.local/bin/t3.headless-new"
+mv -Tf "$HOME/.local/bin/t3.headless-new" "$HOME/.local/bin/t3"
+printf '%s\n' "$version" > "$state/installed"
+# Keep pending as a durable record, but mark successful application explicitly.
+printf '%s\n' "applied $version" > "$state/pending"
+status "UPDATED $version; serving executable, version, HTTP and compaction-aware history preservation verified; backup $backup"
+rm -f "$state/transaction"
+trap - EXIT
+# Free-space safety is not a retention policy. Compress the successful rollback
+# snapshot losslessly; never delete old snapshots/history to force another update.
+if ! gzip -1 "$backup/statev2.sqlite" || ! gzip -t "$backup/statev2.sqlite.gz"; then
+  status "WARNING $version is serving, but rollback snapshot compression/validation failed; inspect retained snapshot set at $backup"
+  exit 1
+fi
