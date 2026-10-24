@@ -1,0 +1,18 @@
+# System unit, not stowed into systemd. Install once with:
+#   sudo install -m 644 ~/.config/dotfiles/mullvad-tailscale.nft /etc/mullvad-tailscale.nft
+#   sudo install -m 644 ~/.config/dotfiles/mullvad-tailscale.service /etc/systemd/system/
+#   sudo systemctl enable --now mullvad-tailscale.service
+#
+# Loads a separate nftables table, so it stays out of /etc/nftables.conf and
+# survives Mullvad rebuilding its own tables on connect.
+[Unit]
+Description=Let Tailscale traffic past the Mullvad firewall
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/nft -f /etc/mullvad-tailscale.nft
+ExecStop=/usr/bin/nft delete table inet mullvad-tailscale
+
+[Install]
+WantedBy=multi-user.target

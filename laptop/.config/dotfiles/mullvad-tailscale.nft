@@ -1,0 +1,23 @@
+#!/usr/bin/nft -f
+# Mullvad routes and firewalls everything into its tunnel unless a packet
+# carries its split-tunnel marks, and its routing rule (5209) runs before
+# Tailscale's table 52 (5270). Marking tailnet destinations in a route chain
+# makes the kernel reroute them past Mullvad's rule onto tailscale0.
+#
+# 100.64.0.0/24 is skipped because Mullvad's own DNS servers live there, and
+# 10.0.0.0/24 is the home LAN reached through the server's subnet route.
+
+destroy table inet mullvad-tailscale
+table inet mullvad-tailscale {
+  chain out {
+    type route hook output priority -10; policy accept;
+    ip daddr 100.64.0.0/24 return
+    ip daddr { 100.64.0.0/10, 10.0.0.0/24 } ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+    ip6 daddr fd7a:115c:a1e0::/48 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+  }
+
+  chain in {
+    type filter hook input priority -100; policy accept;
+    iifname "tailscale0" ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+  }
+}
