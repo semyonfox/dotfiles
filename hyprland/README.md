@@ -20,7 +20,6 @@ The shared package owns:
 Host overlays own:
 
 - `~/.config/hypr/hyprland.lua`
-- `~/.config/hypr/hypridle.conf`
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
@@ -28,7 +27,7 @@ Host overlays own:
 
 That split keeps monitor layout, idle/suspend behavior, HDR/RustDesk capture, and launcher preferences out of the shared package.
 
-Hyprland 0.56+ uses the host `hyprland.lua` entrypoint and shared `common.lua` module. The `.conf` compositor tree is deprecated and kept for reference only; Hypridle, Hyprlock, Hyprpaper, and XDPH continue using their own upstream-supported config formats. Noctalia generates `~/.config/hypr/noctalia.lua` as runtime theme state, so it is deliberately not tracked.
+Hyprland 0.56+ uses the host `hyprland.lua` entrypoint and shared `common.lua` module. The `.conf` compositor tree is deprecated and kept for reference only; Hyprpaper and XDPH continue using their own upstream-supported config formats. Noctalia generates `~/.config/hypr/noctalia.lua` as runtime theme state, so it is deliberately not tracked.
 
 Useful commands:
 

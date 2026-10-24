@@ -1,6 +1,6 @@
-# Login box for the screen that shows the lock UI. Shared widgets live in the
-# noctalia package's lockscreen-widgets.toml.
-# The laptop panel. Docked screens are blanked by lockscreen.toml.
+# Login box for the laptop panel. Shared widgets live in the noctalia
+# package's lockscreen-widgets.toml. Noctalia gives every other screen its
+# own default login box, saved per connector in its settings.toml state.
 [lockscreen_widgets.widget.lock-login]
 type = "login_box"
 output = "eDP-1"
