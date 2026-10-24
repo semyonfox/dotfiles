@@ -392,8 +392,16 @@ gaming-check() {
 }
 
 update() {
-    local failed=0 step=0 total=7 disk before_used after_used reboot
-    local -a failed_steps=() skipped=()
+    local failed=0 step=0 total=9 disk before_used after_used reboot arg crate
+    local firmware=0 firmware_staged=0 firmware_rc reboot_after=0
+    local -a failed_steps=() skipped=() notes=()
+    for arg in "$@"; do
+        case "$arg" in
+            --firmware) firmware=1 ;;
+            --reboot) reboot_after=1 ;;
+            *) printf 'usage: update [--firmware] [--reboot]\n' >&2; return 2 ;;
+        esac
+    done
     # record a failed step so one bad updater never hides the others
     _update_failed() { printf '!! %s failed\n' "$1"; failed=1; failed_steps+=("$1"); }
     _update_skip() { printf '      %s not installed, skipping\n' "$1"; skipped+=("$1"); }
@@ -428,6 +436,17 @@ update() {
         _update_skip rustup
     fi
 
+    # rustup only moves the toolchain, crates from cargo install need their own pass.
+    # git and path installs show a source in brackets and are left alone
+    _maint_step $((++step)) "$total" 'cargo binaries'
+    if command -v cargo &>/dev/null; then
+        for crate in $(cargo install --list | awk '/^[^ ].*:$/ && !/\(/ {print $1}'); do
+            cargo install --locked "$crate" || _update_failed "cargo $crate"
+        done
+    else
+        _update_skip cargo
+    fi
+
     _maint_step $((++step)) "$total" 'pnpm'
     if command -v pnpm &>/dev/null; then
         pnpm self-update || _update_failed 'pnpm self-update'
@@ -455,19 +474,60 @@ update() {
         _update_skip uv
     fi
 
+    # always look for firmware, only flash it with --firmware because it lands on
+    # the next reboot. fwupdmgr exits 2 when there is nothing to do
+    _maint_step $((++step)) "$total" 'firmware (fwupd)'
+    if command -v fwupdmgr &>/dev/null; then
+        fwupdmgr refresh
+        firmware_rc=$?
+        (( firmware_rc == 0 || firmware_rc == 2 )) || _update_failed 'firmware metadata'
+        if (( firmware )); then
+            fwupdmgr update --assume-yes --no-reboot-check
+            firmware_rc=$?
+            if (( firmware_rc == 0 )); then
+                firmware_staged=1
+            elif (( firmware_rc != 2 )); then
+                _update_failed firmware
+            fi
+        else
+            fwupdmgr get-updates
+            firmware_rc=$?
+            if (( firmware_rc == 0 )); then
+                notes+=("Firmware: ready, run update --firmware")
+            elif (( firmware_rc != 2 )); then
+                _update_failed 'firmware check'
+            fi
+        fi
+    else
+        _update_skip fwupdmgr
+    fi
+
     unset -f _update_failed _update_skip
     disk=$(_maint_disk)
     after_used=${disk%% *}
     reboot=$(_maint_reboot_reason)
+    (( firmware_staged )) && reboot='yes, firmware staged'
     local -a lines=()
     (( ${#failed_steps[@]} )) && lines+=("Failed:   ${failed_steps[*]}")
     (( ${#skipped[@]} )) && lines+=("Skipped:  ${skipped[*]}")
+    (( ${#notes[@]} )) && lines+=("${notes[@]}")
     lines+=("Disk:     $(_maint_human $(( ${after_used:-0} - ${before_used:-0} ))) change on /")
     lines+=("Reboot:   ${reboot:-not needed}")
     if [[ $failed -ne 0 ]]; then
         _maint_box '1;91' 'Update finished with failures' "${lines[@]}"
     else
         _maint_box '1;92' 'Everything is up to date' "${lines[@]}"
+    fi
+
+    if (( reboot_after )); then
+        if (( failed )); then
+            printf 'not rebooting until the failures above are fixed\n'
+        elif [[ -n $reboot ]]; then
+            printf 'rebooting in 10s, ctrl-c to cancel\n'
+            sleep 10 && systemctl reboot
+        else
+            printf 'no reboot needed\n'
+        fi
     fi
     return "$failed"
 }
