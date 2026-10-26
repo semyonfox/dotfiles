@@ -16,11 +16,11 @@ Treat a request to commit, push, open a PR, ship, land, finish, or merge as auth
 2. Select the first existing remote base: `dev`, `develop`, `testing`, `staging`, `main`, `master`, then the remote default. An explicitly named base wins.
 3. Never implement directly on the base branch. Create or reuse a scoped branch; use a worktree if switching would disturb the user or another writer.
 4. Discover repository-provided format, lint, typecheck, test, and build commands. Run the checks proportionate to the change before committing.
-5. Review the staged diff and commit intentionally. Never mention AI or co-authorship.
+5. Review the staged diff and commit intentionally. Follow the attribution rule in global guidance: none unless the repo opts in.
 
 ## pull request and green loop
 
-1. Push the scoped branch and open or update a draft PR against the selected base.
+1. Push the scoped branch and open or update the PR against the selected base with the `file-pr` skill. It opens a real PR so review bots run. Large or high-risk work starts as a draft.
 2. Inspect required checks, mergeability, and actionable review feedback.
 3. Fix failures caused by the change, rerun relevant local checks, commit, and push.
 4. Repeat until green. After three corrective pushes, or when the same failure survives two evidence-based fixes, reassess the diagnosis.

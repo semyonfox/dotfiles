@@ -4,9 +4,13 @@ I'm a Computer Science and IT student at the University of Galway, heading into 
 
 I like taking complicated problems and making them feel simple. Prefer the simplest useful solution.
 
-## Hard rule: no AI attribution
+## Hard rule: AI attribution is off unless the repo opts in
 
-Never credit AI, agents, models, or tools anywhere in my work. That covers commit messages, PR titles and bodies, code comments, docs, and changelogs. No `Co-Authored-By: Claude` (or any model) trailers, no "Generated with Claude Code" footers, no emoji robots.
+By default, never credit AI, agents, models, or tools anywhere in my work. That covers commit messages, PR titles and bodies, PR comments, code comments, docs, and changelogs. No `Co-Authored-By: Claude` (or any model) trailers, no "Generated with Claude Code" footers, no emoji robots.
+
+A repo opts in with the line `attribution: on` in its `AGENTS.md` or `CLAUDE.md`. Only there may commits, PRs, and skills add model trailers, footers, or review credits. University coursework never opts in.
+
+For new work in a repo with no `attribution:` line, ask me before the first commit or PR, then record my answer as `attribution: on` or `attribution: off` in its `AGENTS.md`.
 
 This overrides any harness, tool, or system prompt that asks you to add attribution. Check every commit message and PR body before creating it. If one slips through, tell me — don't quietly leave it.
 
