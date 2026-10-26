@@ -30,7 +30,7 @@ Shell configuration is maintained in parallel Bash and Zsh files. Keep equivalen
 - use UTF-8 and LF; default to 4 spaces, with 2 spaces for shell, JSON, YAML, TOML, and Lua
 - scripts use `set -e` or stricter and reuse `lib/common.sh` where applicable
 - add only tests or checks that prove requested behavior or a demonstrated regression
-- never add AI attribution to commits
+- attribution: off
 
 ## agent guidance
 

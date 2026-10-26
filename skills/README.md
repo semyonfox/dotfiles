@@ -6,3 +6,5 @@ As he says, do not copy these, skills are unique to an individual, depending on 
 feel free to take inspiration here. i have nabbed a few, thanks to poteto with the cursor skills and matt for his own collection!
 i am only taking what i feel ill use and need, and i am editign them as they get imported a bit depending on how i want them to be.
 i will be constantly updating this as i learn new things and I discover these skills weaknesses, and models change.
+
+full-send, full-stop, takeover, sol-loop, modernise, file-pr, babysit-pr (and its pr-wait script) and the council review mode are adapted from Theo Browne's [tstack](https://github.com/t3dotgg/tstack), MIT licensed. The licence text is in `_audit/tstack/LICENSE`.

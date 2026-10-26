@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tstack vs fleet skills</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #000; color: #eee; font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 32px 0 8px; }
+  p, li { color: #ccc; }
+  .sub { color: #999; margin: 0 0 20px; }
+  .wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 760px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px; border-bottom: 1px solid #333; }
+  th { background: #1a1a1a; color: #fff; font-weight: 600; }
+  tr:nth-child(even) td { background: #0d0d0d; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  code { background: #222; padding: 1px 5px; border-radius: 3px; font-size: 0.9em; }
+  .none { color: #888; font-style: italic; }
+  .tag { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 0.8rem; background: #2a2a2a; white-space: nowrap; }
+  .new { background: #1f3a24; color: #b6f0c0; }
+  .both { background: #1f2d45; color: #bcd3ff; }
+  .hold { background: #43361a; color: #f5dca0; }
+  .box { background: #111; border: 1px solid #333; border-radius: 6px; padding: 12px 16px; }
+</style>
+</head>
+<body>
+<main>
+<h1>tstack vs your fleet skills</h1>
+<p class="sub">tstack snapshot at <code>7de017b</code> (MIT, Theo Browne). Compared against the shared skills in your dotfiles repo, 26 October 2026.</p>
+
+<div class="wrap">
+<table>
+<thead>
+<tr><th>tstack skill</th><th>Your closest skill</th><th>Difference</th><th>Plan</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>full-send</td>
+  <td><code>ship-changes</code> (partly)</td>
+  <td>Takes a change all the way to a merged PR while you're away: it proves the change, gets it reviewed, files it, babysits it and merges it. It's allowed to merge, force-push its own branch and skip ask-first testing rules. <code>ship-changes</code> only runs the stages you name, sorts each change into a risk tier and leaves risky work as a draft. It has no proof step, no review loop and no babysitting.</td>
+  <td><span class="tag new">promote</span></td>
+</tr>
+<tr>
+  <td>full-stop</td>
+  <td><code>ship-changes</code> + <code>babysit-pr</code></td>
+  <td>Same as full-send but it never merges. It also turns off auto-merge and merge queues, then hands back a PR that's ready, waiting on approval or blocked. Neither of your skills has a "ready for me to merge" handoff.</td>
+  <td><span class="tag new">promote</span></td>
+</tr>
+<tr>
+  <td>takeover</td>
+  <td class="none">none</td>
+  <td>Finishes someone else's PR, branch or agent thread. It brings their commits onto a new branch, keeps their authorship and co-author trailers, and credits them in the PR. Nothing in the fleet covers this.</td>
+  <td><span class="tag new">promote</span></td>
+</tr>
+<tr>
+  <td>modernize</td>
+  <td class="none">none</td>
+  <td>Rebases an old PR and decides whether it should still exist: MODERNIZE, REWORK or CLOSE. It compares the PR before and after the rebase with <code>range-diff</code> and pushes with <code>--force-with-lease</code> against the head it saw before rebasing. Nothing in the fleet covers this.</td>
+  <td><span class="tag new">promote</span></td>
+</tr>
+<tr>
+  <td>leaving-pr-comments</td>
+  <td><code>babysit-pr</code> step 5 (one line)</td>
+  <td>A full comment format: a <code>&gt; [!NOTE] 🤖 &lt;model&gt; responding on behalf of &lt;user&gt;</code> banner, a secrets check, lead with the conclusion, and confirm GitHub returned the URL before resolving a thread. Yours only says "identify the harness/model if the platform permits".</td>
+  <td><span class="tag hold">stays in audit</span></td>
+</tr>
+<tr>
+  <td>council</td>
+  <td><code>council</code></td>
+  <td>Theirs is a review loop. Three flagship models score the work out of 10 each round, it loops until all are satisfied, and it puts a score table in the PR body. It also tells the lead to fight scope creep. Yours deliberates on decisions with Opus 5.5, Sol 6.1 and DeepSeek Flash: blind answers first, then cross-review labelled A/B/C, up to 4 rounds, then you check the claims. There are no scores and nothing goes into the PR. Different jobs, so both are worth keeping.</td>
+  <td><span class="tag both">keep both</span></td>
+</tr>
+<tr>
+  <td>sol-loop</td>
+  <td><code>claude-second-opinion</code> (nearest)</td>
+  <td>A multi-round code review by Sol. It has a budget of 3 rounds (5 for security or data-loss work), blocker/should/nit levels, a log of findings, and a reviewer that can't edit. Yours is a single bounded <code>claude -p</code> call for a second opinion and isn't a review loop. Sol is billed on metered Codex credits.</td>
+  <td><span class="tag new">promote</span></td>
+</tr>
+<tr>
+  <td>file-pr</td>
+  <td><code>file-pr</code></td>
+  <td>The same base text. Theirs adds a secrets and private-details check, a REST fallback when GraphQL is rate-limited, "don't post follow-up comments" and a model/harness footer. It diffs against the real base, while yours hardcodes <code>origin/main</code> (this repo uses <code>master</code>).</td>
+  <td><span class="tag new">replace</span></td>
+</tr>
+<tr>
+  <td>babysit-pr</td>
+  <td><code>babysit-pr</code></td>
+  <td>Yours is 6 short steps and tells the agent to "poll". Theirs bans DIY polling and uses one watcher per PR: <code>watch_pull_request</code> in T3, <code>pr-wait</code> elsewhere. Delegated child tasks never watch, and the agent unwatches before handing back. It also covers rate limits, acts only on events newer than the latest push, says how to decline scope creep, and checks for BEHIND before calling a PR ready.</td>
+  <td><span class="tag new">replace</span></td>
+</tr>
+<tr>
+  <td>pr-wait (script)</td>
+  <td class="none">none</td>
+  <td>A 556-line Python watcher. It only reads from GitHub (one GraphQL query, no mutations), keeps a lock and state in <code>~/.local/state/pr-wait/</code>, and prints one line per real event. <code>--until ready</code> waits for Greptile or Macroscope, <code>green</code> waits for checks only.</td>
+  <td><span class="tag new">bring with babysit-pr</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2>AI attribution: my take</h2>
+<div class="box">
+<p><strong>Don't drop it. Make it off by default and turn it on per repo.</strong></p>
+<p>Right now there's a global ban, and five of these skills add attribution: the file-pr footer, the council score table, the sol-loop line, the leaving-pr-comments banner and the takeover note. Trying to remember to strip it from university repos is the wrong way round. One missed repo and it shows up in coursework.</p>
+<ul>
+  <li>Keep the global rule as "no attribution unless the project says so". If someone forgets, nothing leaks.</li>
+  <li>Opt in with one line in a project's <code>AGENTS.md</code>, for example <code>attribution: on</code>, in your own open-source and work repos.</li>
+  <li>The skills check that line, so they can keep their footers and banners without a second "uni" procedure.</li>
+</ul>
+<p>One caveat: a git trailer and your university's AI-use policy are different things. Some modules require you to disclose AI use. Hiding it from commits doesn't cover that, so check the policy for each module.</p>
+</div>
+</main>
+</body>
+</html>
