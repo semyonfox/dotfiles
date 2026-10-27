@@ -498,6 +498,8 @@ update() {
                 _update_failed 'firmware check'
             fi
         fi
+        # also catches firmware staged by an earlier run
+        fwupdmgr check-reboot-needed &>/dev/null && firmware_staged=1
     else
         _update_skip fwupdmgr
     fi
