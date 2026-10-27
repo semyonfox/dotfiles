@@ -81,6 +81,7 @@ hl.on("hyprland.start", function()
         "noctalia --daemon",
         "udiskie --no-automount --smart-tray",
         home .. "/.local/bin/power-mode.sh auto",
+        home .. "/.local/bin/ddc-defaults.sh",
         "playerctl daemon",
     }
     for _, command in ipairs(commands) do
@@ -89,7 +90,10 @@ hl.on("hyprland.start", function()
     hl.timer(number_workspaces_by_monitor, {timeout = 500, type = "oneshot"})
 end)
 
+-- the portable APT panel forgets its brightness and contrast whenever it loses
+-- power, so reapply 100/100 every time a display shows up
 hl.on("monitor.added", function()
+    hl.exec_cmd(home .. "/.local/bin/ddc-defaults.sh")
     -- a new output reports 0x0 until it is arranged, so number it a beat later
     hl.timer(number_workspaces_by_monitor, {timeout = 500, type = "oneshot"})
 end)
