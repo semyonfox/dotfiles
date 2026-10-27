@@ -6,8 +6,14 @@ umask 077
 PATH=/usr/local/bin:/usr/bin:/bin
 export PATH
 
-readonly mountpoint=/mnt/nas
-readonly repo="$mountpoint/users/semyon/restic/semyon-laptop"
+# the nas serves this repo through rest-server in append-only mode, so this
+# laptop can add and read snapshots but never delete them. retention and prune
+# run on the server against the repo directly
+readonly rest_host=10.0.0.6
+readonly rest_port=8000
+readonly repo="rest:http://$rest_host:$rest_port/semyon-laptop/"
+readonly rest_user=semyon-laptop
+readonly rest_password_file="$HOME/.config/restic/rest-server.password"
 readonly password_file="$HOME/.config/restic/password"
 readonly tag=semyon-laptop
 readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/backup-to-nas"
@@ -31,19 +37,17 @@ acquire_lock() {
 
 ensure_existing_repository() {
   [[ -r "$password_file" ]] || die 'missing or unreadable Restic password file'
+  [[ -r "$rest_password_file" ]] || die 'missing or unreadable rest-server login file'
 
-  # /mnt/nas is a systemd automount. Accessing a child path is what triggers
-  # the NFS mount; testing the automount root itself only reports "autofs".
-  timeout --foreground 90s stat -- "$repo" >/dev/null || \
-    die 'NAS repository path did not become reachable within 90 seconds'
+  # restic retries an unreachable rest server for minutes, so fail fast instead
+  timeout 15s bash -c ': </dev/tcp/$0/$1' "$rest_host" "$rest_port" 2>/dev/null || \
+    die "rest-server at $rest_host:$rest_port is unreachable"
 
-  findmnt --target "$repo" --noheadings --output FSTYPE | \
-    grep -Eq '^[[:space:]]*nfs(4)?[[:space:]]*$' || \
-    die 'NAS repository path is not backed by an NFS mount'
-
-  [[ -d "$repo" ]] || die 'expected existing Restic repository directory is missing'
   export RESTIC_REPOSITORY="$repo"
   export RESTIC_PASSWORD_FILE="$password_file"
+  export RESTIC_REST_USERNAME="$rest_user"
+  RESTIC_REST_PASSWORD="$(<"$rest_password_file")"
+  export RESTIC_REST_PASSWORD
 
   # Never create a repository from a scheduled job. A mount, password, or NAS
   # failure must fail closed rather than silently producing a new empty repo.
@@ -116,11 +120,6 @@ collect_sources() {
   ((${#sources[@]})) || die 'no configured backup source paths exist'
 }
 
-apply_retention() {
-  restic --retry-lock 5m forget --tag "$tag" --group-by host,tags \
-    --keep-daily 30 --keep-weekly 12 --keep-monthly 12 "$@"
-}
-
 run_backup() {
   collect_sources
 
@@ -129,14 +128,10 @@ run_backup() {
     --exclude "$HOME/.local/bin/uv" \
     --exclude "$HOME/.local/bin/uvx" \
     "${sources[@]}"
-
-  # Retention stays cheap in the daily path; pruning is deliberately separate.
-  apply_retention
 }
 
 run_maintenance() {
-  # Monthly maintenance reclaims expired packs and reads a rotating 5% sample.
-  apply_retention --prune
+  # read-only integrity sample. forget and prune live on the server
   restic --retry-lock 5m check --read-data-subset=5% --with-cache
 }
 
