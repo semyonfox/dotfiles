@@ -5,7 +5,7 @@
 	required = true
 [user]
 	name = Semyon Fox
-	email = semyon.fox@gmail.com
+	email = 169000301+semyonfox@users.noreply.github.com
 [core]
 	autocrlf = input
 	diffAlgorithm = histogram

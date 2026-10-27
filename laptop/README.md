@@ -17,6 +17,7 @@ This package owns host-specific files:
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
+- `~/.local/bin/ddc-defaults.sh`, reapplies brightness and contrast 100/100 to the portable APT panel, which loses them on power loss
 
 Shared Noctalia config and helpers come from the `hyprland`, `noctalia`, and `home` packages.
 

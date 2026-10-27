@@ -235,7 +235,7 @@ function M.setup()
     local main = "SUPER"
     local term = "kitty"
     local file_manager = "nemo"
-    local browser = "helium-browser"
+    local browser = "zen-browser"
 
     -- Window & Session management
     hl.bind(main .. " + SHIFT + P", M.exec("hyprpicker -a"))

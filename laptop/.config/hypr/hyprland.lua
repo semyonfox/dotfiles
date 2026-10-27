@@ -36,16 +36,32 @@ hl.monitor({
     scale = 1,
 })
 
-hl.workspace_rule({
-    workspace = "1",
-    monitor = "desc:Dell Inc. DELL G2422HS G6H6XJ3",
-    default = true,
-})
-hl.workspace_rule({
-    workspace = "5",
-    monitor = "desc:Dell Inc. DELL G2422HS 6TG6XJ3",
-    default = true,
-})
+-- number the screens left to right, so whatever is plugged in shows 1..n.
+-- focusing a workspace on the current monitor pulls it over if another screen
+-- had it, which keeps the numbering stable across hotplug
+local function number_workspaces_by_monitor()
+    local monitors = {}
+    for _, monitor in ipairs(hl.get_monitors()) do
+        if not monitor.is_mirror then
+            table.insert(monitors, monitor)
+        end
+    end
+    table.sort(monitors, function(a, b)
+        if a.position.x ~= b.position.x then
+            return a.position.x < b.position.x
+        end
+        return a.position.y < b.position.y
+    end)
+
+    local focused = hl.get_active_monitor()
+    for index, monitor in ipairs(monitors) do
+        hl.dispatch(hl.dsp.focus({monitor = monitor.name}))
+        hl.dispatch(hl.dsp.focus({workspace = index, on_current_monitor = true}))
+    end
+    if focused then
+        hl.dispatch(hl.dsp.focus({monitor = focused.name}))
+    end
+end
 
 -- Touchpad configuration for laptop
 hl.config({
@@ -65,12 +81,23 @@ hl.on("hyprland.start", function()
         "noctalia --daemon",
         "udiskie --no-automount --smart-tray",
         home .. "/.local/bin/power-mode.sh auto",
+        home .. "/.local/bin/ddc-defaults.sh",
         "playerctl daemon",
     }
     for _, command in ipairs(commands) do
         hl.exec_cmd(command)
     end
+    hl.timer(number_workspaces_by_monitor, {timeout = 500, type = "oneshot"})
 end)
+
+-- the portable APT panel forgets its brightness and contrast whenever it loses
+-- power, so reapply 100/100 every time a display shows up
+hl.on("monitor.added", function()
+    hl.exec_cmd(home .. "/.local/bin/ddc-defaults.sh")
+    -- a new output reports 0x0 until it is arranged, so number it a beat later
+    hl.timer(number_workspaces_by_monitor, {timeout = 500, type = "oneshot"})
+end)
+hl.on("monitor.removed", number_workspaces_by_monitor)
 
 -- Load shared Hyprland configuration (layouts, theme, rules, common binds)
 local common = require("common")
