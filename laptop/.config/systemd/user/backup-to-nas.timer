@@ -1,8 +1,8 @@
 [Unit]
-Description=Daily laptop essentials backup to NAS
+Description=Hourly attempt at the daily laptop essentials backup to NAS
 
 [Timer]
-OnCalendar=*-*-* 02:00:00
+OnCalendar=hourly
 Persistent=true
 RandomizedDelaySec=5min
 AccuracySec=1min

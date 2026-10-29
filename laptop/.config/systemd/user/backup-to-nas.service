@@ -10,6 +10,8 @@ ExecStart=%h/.local/bin/backup-to-nas backup
 StandardOutput=journal
 StandardError=journal
 TimeoutStartSec=12h
+# 75 means the nas was out of reach, which is normal away from home
+SuccessExitStatus=75
 UMask=0077
 NoNewPrivileges=yes
 PrivateTmp=yes

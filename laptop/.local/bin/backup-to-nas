@@ -18,6 +18,12 @@ readonly password_file="$HOME/.config/restic/password"
 readonly tag=semyon-laptop
 readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/backup-to-nas"
 readonly lock_file="$state_dir/restic.lock"
+readonly last_success_file="$state_dir/last-success"
+# the timer fires hourly so a laptop that was asleep or away at night still
+# backs up once it's back. this gap keeps that to roughly one snapshot a day
+readonly min_gap_seconds=$((20 * 60 * 60))
+# exit code the unit treats as success: nothing went wrong, just try later
+readonly ex_tempfail=75
 
 die() {
   printf 'backup-to-nas: %s\n' "$*" >&2
@@ -40,8 +46,10 @@ ensure_existing_repository() {
   [[ -r "$rest_password_file" ]] || die 'missing or unreadable rest-server login file'
 
   # restic retries an unreachable rest server for minutes, so fail fast instead
-  timeout 15s bash -c ': </dev/tcp/$0/$1' "$rest_host" "$rest_port" 2>/dev/null || \
-    die "rest-server at $rest_host:$rest_port is unreachable"
+  if ! timeout 15s bash -c ': </dev/tcp/$0/$1' "$rest_host" "$rest_port" 2>/dev/null; then
+    printf 'backup-to-nas: rest-server at %s:%s unreachable, retrying next hour\n' "$rest_host" "$rest_port" >&2
+    exit "$ex_tempfail"
+  fi
 
   export RESTIC_REPOSITORY="$repo"
   export RESTIC_PASSWORD_FILE="$password_file"
@@ -53,6 +61,21 @@ ensure_existing_repository() {
   # failure must fail closed rather than silently producing a new empty repo.
   restic snapshots --no-lock --compact >/dev/null || \
     die 'existing Restic repository is unavailable; refusing to run restic init'
+
+  # a laptop run killed by power loss or a hard shutdown leaves its lock behind,
+  # and an exclusive one blocks this job and the server's b2 copy until removed.
+  # plain unlock only drops stale locks (dead pid on this host, or not refreshed
+  # for 30 min), so live jobs elsewhere keep theirs. append-only still allows it
+  restic unlock || printf 'backup-to-nas: stale lock cleanup failed, continuing\n' >&2
+}
+
+backed_up_recently() {
+  local last now
+  [[ -r "$last_success_file" ]] || return 1
+  last=$(<"$last_success_file")
+  [[ "$last" =~ ^[0-9]+$ ]] || return 1
+  now=$(date +%s)
+  ((now - last < min_gap_seconds))
 }
 
 sources=()
@@ -123,11 +146,17 @@ collect_sources() {
 run_backup() {
   collect_sources
 
+  # exit 3 still writes a snapshot, just missing files that vanished or were
+  # unreadable mid-run, so count it as done rather than retrying every hour
+  local rc=0
   restic --retry-lock 5m backup --tag "$tag" --skip-if-unchanged --exclude-caches \
     --exclude "$HOME/dotfiles/home/.ssh/**" \
     --exclude "$HOME/.local/bin/uv" \
     --exclude "$HOME/.local/bin/uvx" \
-    "${sources[@]}"
+    "${sources[@]}" || rc=$?
+  ((rc == 0 || rc == 3)) || exit "$rc"
+
+  date +%s >"$last_success_file"
 }
 
 run_maintenance() {
@@ -148,6 +177,10 @@ case "$mode" in
 esac
 
 acquire_lock
+if [[ "$mode" == backup ]] && backed_up_recently; then
+  printf 'backup-to-nas: last backup under 20h ago, skipping\n'
+  exit 0
+fi
 ensure_existing_repository
 
 case "$mode" in
