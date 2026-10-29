@@ -89,20 +89,12 @@ add() {
 add_prismlauncher_essentials() {
   local prism_root="$HOME/.local/share/PrismLauncher"
 
+  # whole instances: worlds, replays, packs, configs, mod jars and their
+  # .index metadata. launcher payloads (libraries, assets, java, meta) live
+  # outside instances/ and are re-downloaded, logs and .fabric caches are
+  # excluded in run_backup
   add "$prism_root/prismlauncher.cfg"
-  [[ -d "$prism_root" ]] || return 0
-
-  # Keep worlds, screenshots and instance settings, not downloaded Minecraft
-  # libraries, assets, mods, or launcher/runtime payloads.
-  while IFS= read -r -d '' item; do
-    add "$item"
-  done < <(
-    find "$prism_root" -maxdepth 5 \
-      \( \
-        \( -type d \( -name saves -o -name screenshots \) \) -o \
-        \( -type f \( -name instance.cfg -o -name options.txt -o -name servers.dat \) \) \
-      \) -print0 2>/dev/null
-  )
+  add "$prism_root/instances"
 }
 
 collect_sources() {
@@ -153,6 +145,8 @@ run_backup() {
     --exclude "$HOME/dotfiles/home/.ssh/**" \
     --exclude "$HOME/.local/bin/uv" \
     --exclude "$HOME/.local/bin/uvx" \
+    --exclude "$HOME/.local/share/PrismLauncher/instances/*/minecraft/logs" \
+    --exclude "$HOME/.local/share/PrismLauncher/instances/*/minecraft/.fabric" \
     "${sources[@]}" || rc=$?
   ((rc == 0 || rc == 3)) || exit "$rc"
 
