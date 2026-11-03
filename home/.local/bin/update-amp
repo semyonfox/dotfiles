@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# AMP tools are APT-owned; instance binaries are owned by the AMP account.
+# Upstream: https://discourse.cubecoders.com/t/how-to-update-amp-to-the-latest-version/2297
+set -euo pipefail
+
+if [[ $(uname -s) != Linux ]] || ! command -v ampinstmgr >/dev/null 2>&1; then
+  printf 'AMP not installed on Linux, skipping\n'
+  exit 0
+fi
+if ! command -v dpkg-query >/dev/null 2>&1 || ! command -v apt-get >/dev/null 2>&1 ||
+   ! dpkg-query -S "$(command -v ampinstmgr)" 2>/dev/null | grep -q '^ampinstmgr:'; then
+  printf 'AMP: unsupported package owner; update through the existing installer, not a second package manager.\n' >&2
+  exit 1
+fi
+if ! command -v sudo >/dev/null 2>&1 || ! sudo -n true ||
+   ! sudo -n -u amp -i ampinstmgr --ShowInstancesList; then
+  printf 'AMP: administrator/amp-account authentication unavailable. Run sudo -v interactively, then retry.\n' >&2
+  exit 1
+fi
+# Never imply that a live tar copy is a consistent world backup. Operator must
+# confirm a completed, recoverable backup made with instances quiesced.
+if [[ ${AMP_UPDATE_BACKUP_CONFIRMED:-0} != 1 ]]; then
+  if [[ -t 0 ]]; then
+    read -r -p 'AMP update restarts running instances. Consistent configuration/world backup completed? [y/N] ' answer
+    [[ $answer == y || $answer == Y ]] || exit 1
+  else
+    printf 'AMP: blocked until a consistent configuration/world backup is completed; set AMP_UPDATE_BACKUP_CONFIRMED=1 only after verifying it.\n' >&2
+    exit 1
+  fi
+fi
+# Refresh metadata only; install/upgrade this one already-installed package.
+# Do not call getamp update: its moving installer can install extra system units.
+sudo -n apt-get update || {
+  printf 'AMP: APT metadata refresh failed; package and instance updates not attempted.\n' >&2
+  exit 1
+}
+sudo -n apt-get install --only-upgrade ampinstmgr || {
+  printf 'AMP: package update failed; instance updates not attempted.\n' >&2
+  exit 1
+}
+# Restart only instances already running; leave non-Mainline channels untouched.
+sudo -n -u amp -i ampinstmgr --nocache --UpgradeAll true true || {
+  printf 'AMP: instance upgrade failed; updates may be partial. Inspect panel/instance health before retrying.\n' >&2
+  exit 1
+}
+sudo -n -u amp -i ampinstmgr --ShowInstancesList || {
+  printf 'AMP: post-update inventory failed; running instance state is unverified.\n' >&2
+  exit 1
+}
+printf 'AMP package and Mainline instance update command completed. Verify panel and game health before declaring success.\n'

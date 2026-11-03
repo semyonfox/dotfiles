@@ -32,6 +32,12 @@ printf 'pipx-helper\n' >> "$TRACE"
 [ "$TEST_FAIL_STEP" != pipx-helper ]
 EOF
 chmod +x "$HOME/.local/bin/update-ai-clis" "$HOME/.local/bin/update-pipx-venvs"
+cat > "$HOME/.local/bin/update-amp" <<'EOF'
+#!/bin/sh
+printf 'amp\n' >> "$TRACE"
+[ "$TEST_FAIL_STEP" != amp ]
+EOF
+chmod +x "$HOME/.local/bin/update-amp"
 
 awk '/^(update|_maint_[a-z_]+)\(\) \{/{copy=1} copy {print} copy && /^\}/{copy=0}' "$source_file" > "$test_root/update.function"
 source "$test_root/update.function"
@@ -44,12 +50,14 @@ pnpm() {
     [[ "$TEST_FAIL_STEP" != "pnpm-$1" ]]
 }
 pipx() { :; }
+ampinstmgr() { :; }
+uname() { printf 'Linux\n'; }
 uv() {
     printf 'uv-%s-%s\n' "$1" "${2:-}" >> "$TRACE"
     [[ "$TEST_FAIL_STEP" != "uv-$1-${2:-}" ]]
 }
 
-for step in success paru ai flatpak rustup pnpm-self-update pnpm-update pipx-helper uv-tool-upgrade; do
+for step in success paru amp ai flatpak rustup pnpm-self-update pnpm-update pipx-helper uv-tool-upgrade; do
     : > "$TRACE"
     if [[ $step == success ]]; then
         TEST_FAIL_STEP=
@@ -71,15 +79,28 @@ for step in success paru ai flatpak rustup pnpm-self-update pnpm-update pipx-hel
     printf 'PASS: %s returned %s; last step ran\n' "$step" "$update_exit"
 done
 
+# Platform guard must skip AMP even when the command exists on another OS.
+: > "$TRACE"
+TEST_FAIL_STEP=
+uname() { printf 'Darwin\n'; }
+if update > "$test_root/output" 2>&1; then update_exit=0; else update_exit=$?; fi
+if [[ $update_exit -ne 0 ]] || grep -qx amp "$TRACE"; then
+    printf 'FAIL: non-Linux AMP dispatch\n' >&2
+    exit 1
+fi
+printf 'PASS: non-Linux AMP skipped\n'
+uname() { printf 'Linux\n'; }
+
 # a tool that isn't installed is skipped, not reported as a failure
 : > "$TRACE"
 TEST_FAIL_STEP=
 unset -f flatpak
+unset -f ampinstmgr
 saved_path=$PATH
 PATH="$test_root/empty-path"
 if update > "$test_root/output" 2>&1; then update_exit=0; else update_exit=$?; fi
 PATH=$saved_path
-if [[ $update_exit -ne 0 ]] || ! grep -q 'flatpak not installed' "$test_root/output" || ! grep -q 'Everything is up to date' "$test_root/output"; then
+if [[ $update_exit -ne 0 ]] || grep -qx amp "$TRACE" || ! grep -q 'AMP not installed' "$test_root/output" || ! grep -q 'flatpak not installed' "$test_root/output" || ! grep -q 'Everything is up to date' "$test_root/output"; then
     printf 'FAIL: missing flatpak returned %s or was not reported as skipped\n' "$update_exit" >&2
     exit 1
 fi

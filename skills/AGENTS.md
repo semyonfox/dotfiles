@@ -64,7 +64,7 @@ Don't flatter me into a bad decision. If my premise is wrong, my plan is overcom
 
 ## Agents
 
-Don't turn a small task into a panel of agents or an elaborate plan. Parallelise only genuinely independent work, and give each parallel agent one file at a time.
+Do not use subagents or delegate work unless I explicitly ask. When requested, parallelise only genuinely independent work and give each parallel agent one file at a time.
 
 When a problem repeats, propose the smallest durable instruction change that would prevent it, then trim it down.
 
@@ -77,6 +77,20 @@ Use the `model-routing` skill before delegating, picking a model, or escalating 
 - Effort is medium or high. Never low, max, or ultrathink; xhigh only after a failed pass with a stated gap.
 - Give delegated agents compact task cards with model and effort set explicitly.
 - Delegated output is a patch candidate. Inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
+
+## Context for coding work
+
+- Write en-GB. Anything I publish (docs, READMEs, commits, CV, blog) must not read as AI-written: no em dashes, no semicolons, no emojis, no filler. Never call me a "tinkerer".
+- My messages are fast, lowercase and sweary, read them for intent. "resume", "continue" and "push" mean carry on with the validated work, no recap. Resume work, never restart it.
+- Check foreign-key cascades before deleting rows. A cascade once wiped 188 swim results.
+- Inspect visual changes in a real render before calling them fixed, and keep light and dark themes working. Benchmark performance claims.
+- Remove or move obsolete config instead of hiding it behind exclusion rules. Refactors drop legacy code and edit files in place, no renamed copies.
+- Reports go out as self-contained HTML pages shared through Seol.
+- pnpm by default, npm in OghmaNotes, paru for Arch. `~/server-stacks` is the source of truth for homelab deploys. Device facts live in the device-fleet skill.
+- Credit people properly: Sam wrote OghmaNotes' original RAG code, and Canvas MCP is an aggregation of community servers. Only submit upstream PRs I've reviewed.
+- Never edit Eidhne Kennedy's notes in my Obsidian vault.
+- SWIM (being renamed BlackFox) is the active flagship. OghmaNotes is not public yet (IP review), but Semyon and a few friends use it daily for real study, so fixes and behaviour changes driven by that use are in scope. Most AI features run on GPT-6 Luna.
+- Hermes' personal-tasks board is the canonical task list and Fox Focus (focus.semyon.ie) is my daily page. Never start a parallel todo list.
 
 ## Safety
 

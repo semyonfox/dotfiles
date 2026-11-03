@@ -207,3 +207,9 @@ Verified on 2026-07-03:
 - `pc`: no `t3` binary, no T3 user units, no listener on `3773`, `14773`, or `6733`.
 - `pc`: user linger was `Linger=yes`.
 - `laptop`: unreachable over `ssh semyon@100.127.128.15` during the second audit. An earlier same-day probe saw T3 Code listening on `0.0.0.0:3773`, but the startup mechanism was not verified. Re-audit before documenting or changing laptop T3 startup.
+
+## Server updater stuck, verified 2026-10-25
+
+- `t3-nightly-update.timer` fires every three hours UTC and runs `~/bin/update-t3-nightly --apply`. Every run since 2026-10-20 04:00 exits with "RECOVERY REQUIRED" because `~/.t3/update-headless/transaction` still points at the 20 October backup after a candidate failed verification (`busy.json` showed unfinished runs at the time).
+- The service runs `~/.t3/runtime/headless-current` -> `versions/0.1.1-nightly.20261020.3386` (restarted 2026-10-24 17:38). The npm shim `t3@0.1.3-nightly.20261024.3630` in `~/.local/lib/node_modules/t3` downloads each version's GitHub Release CLI into `~/.t3/runtime/versions` after a SHA256SUMS check, and was updated separately, so `t3 --version` and the running service disagree.
+- Latest nightly on 2026-10-25 was `0.1.3-nightly.20261025.3669`. Clearing the marker and updating restarts T3, so do it only on request and outside the T3 service cgroup.

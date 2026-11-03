@@ -241,12 +241,12 @@ sssh <host>         # SSH with completion (see config for details)
 
 ```bash
 update              # Update system packages and developer tools
-cleanup             # Prune available uv, npm, pnpm, and pip caches
-cleanup --dry-run   # Show cache sizes without changing anything
-cleanup --deep      # Also clear Gradle, Playwright, and npx directories
+cleanup             # Prune build, uv, pnpm, npm and pip caches
+cleanup --dry-run   # Show cache sizes and what would happen without changing anything
+cleanup --deep      # Also idle project build outputs, CI runner caches, Jenkins exports, old app images and more
 ```
 
-`update` runs `paru`, the AI CLI updater, Flatpak, rustup, pnpm, pipx, and uv. It is Arch-oriented because it calls `paru` unconditionally. `cleanup --deep` checks for matching processes before removing its extra directories. Cleanup does not remove installed packages or Docker data.
+`update` runs `paru`, the AI CLI updater, Flatpak, rustup, pnpm, pipx, and uv. It is Arch-oriented because it calls `paru` unconditionally. `cleanup` uses each tool's own prune command and skips anything that is in use. On the server it also runs the hourly Docker and Jenkins build cache cleaner. `--deep` only removes project build output that git ignores, in projects nothing is running in and that haven't changed today. It never removes installed packages, AI history, backups or Docker volumes. See `docs/CLEANUP.md`.
 
 #### Gaming Helpers
 

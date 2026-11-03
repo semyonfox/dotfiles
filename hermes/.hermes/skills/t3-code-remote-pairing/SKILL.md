@@ -245,8 +245,8 @@ Current durable paths:
 - State: `/home/semyon/.hermes/t3code-mobile-watch/last_success_sha`
 - JDK: `/home/semyon/android-build-tools/jdk-21`
 - Android SDK: `/home/semyon/android-sdk`
-- Canonical public APK: `/home/semyon/server-stacks/fileshare/erugo-storage/app/public/apk/t3-code-preview.apk`
-- Download URL: `https://fileshare.semyon.ie/t3-apk.php`, which serves that one canonical current APK.
+- Canonical public APK: Pingvin share `build-FxzcEFBa1cwxk-Oq1YGwDw`, replaced in place by the watcher through `server-stacks/fileshare/publish-file.py --replace-share`
+- Download URL: `https://fileshare.semyon.ie/t3-apk.php`, an nginx route that serves the newest file in that share.
 
 The script now self-heals common post-reboot/missing-toolchain cases when there is a new commit to build: it bootstraps Temurin JDK 21 and Android command-line tools/SDK components into the durable paths above. It intentionally checks the remote SHA and exits silently before bootstrap when there is no new commit, so no-agent cron stays quiet while healthy. The default whole-build bound is 39 minutes (with a 2150-second Gradle step cap). Expo/RN 0.85/SDK 56 arm64 builds can need the extra time for Metro, Android resource merging, dexing, signing, and packaging; this retains a one-minute margin below the 40-minute cron limit for publication, state writes, cleanup, and reporting. The watcher also hard-resets and `git clean -fd`s its dedicated worktree before each build (preserving ignored caches) so stale untracked source cannot enter a published APK. It runs Expo prebuild incrementally (without `--clean`) so the ignored generated Android tree and Gradle task outputs survive a timeout; prebuild still reconciles the freshly checked-out app configuration before every build. It writes `reactNativeArchitectures=arm64-v8a` into the generated Gradle properties alongside the CLI architecture selector.
 
@@ -268,15 +268,14 @@ Known failure signatures:
 
 - `ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`: script must export `CI=true` and `COREPACK_ENABLE_DOWNLOAD_PROMPT=0` before `pnpm install`.
 - `JAVA_HOME is set to an invalid directory: /tmp/android-build-tools/jdk-21`: old tmp-based toolchain was wiped; use the durable `/home/semyon/android-build-tools` and `/home/semyon/android-sdk` paths.
-- URL `Content-Length` or SHA mismatch after a successful build: publish to both `public-apk/t3-code-preview.apk` and `erugo-storage/app/public/apk/t3-code-preview.apk`; the PHP download endpoint may read the latter.
+- URL `Content-Length` or SHA mismatch after a successful build: rerun `python3 /home/semyon/server-stacks/fileshare/publish-file.py --refresh-map` so nginx points `/t3-apk.php` at the share's newest file. Never copy APKs into the old Erugo storage.
 
 Verification after a fix:
 
 ```bash
 ~/.hermes/scripts/t3code-mobile-watch.sh
-sha256sum /home/semyon/t3code-mobile-builds/t3-code-preview-arm64-android-<short>.apk \
-  /home/semyon/server-stacks/fileshare/public-apk/t3-code-preview.apk \
-  /home/semyon/server-stacks/fileshare/erugo-storage/app/public/apk/t3-code-preview.apk
+sha256sum /home/semyon/t3code-mobile-builds/t3-code-preview-arm64-android-<short>.apk
+curl -fsSL https://fileshare.semyon.ie/t3-apk.php | sha256sum
 curl -kIsS --max-time 10 https://fileshare.semyon.ie/t3-apk.php | head
 ```
 

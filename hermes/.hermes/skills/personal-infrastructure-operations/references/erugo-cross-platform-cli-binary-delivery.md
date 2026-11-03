@@ -1,53 +1,36 @@
-# Erugo cross-platform CLI binary delivery
+# Fileshare cross-platform CLI binary delivery
 
-Use when Semyon asks to publish a standalone CLI/tool binary through his self-hosted Erugo fileshare and verify that downloads work.
+Use when Semyon asks to publish a standalone CLI/tool binary through his self-hosted fileshare and verify that downloads work.
+
+Erugo was replaced by Pingvin Share X on 2026-10-22; the file keeps its old name so existing links to it still resolve. Pingvin only serves files from shares, so there are no new `/storage/bin/<app>/<version>/` folders. The old ones under `/storage/` still serve from a read-only archive; do not write there.
 
 ## Pattern
 
-Prefer Erugo static public storage for direct artifact URLs:
+Bundle the platform binaries with a checksum file, then publish the bundle as one share. Use `tar.gz` unless `zip` is definitely installed:
 
 ```bash
 APP=canvas-export
 VERSION=0.1.0
 SRC=/path/to/dist/release
-DEST=/home/semyon/server-stacks/fileshare/erugo-storage/app/public/bin/$APP/$VERSION
-mkdir -p "$DEST"
-cp "$SRC"/* "$DEST"/
-chmod 0644 "$DEST"/*
-chmod 0755 "$DEST"/*linux* "$DEST"/*macos* 2>/dev/null || true
-(
-  cd "$DEST"
-  sha256sum * > SHA256SUMS.txt
-)
+cd "$SRC"
+sha256sum <artifact files> > SHA256SUMS.txt
+tar -czf "/tmp/$APP-$VERSION-all-platforms.tar.gz" <artifact files> SHA256SUMS.txt
+python3 /home/semyon/server-stacks/fileshare/publish-file.py --expires-days 30 \
+  --title "$APP $VERSION" "/tmp/$APP-$VERSION-all-platforms.tar.gz"
 ```
 
-Public URLs become:
-
-```text
-https://fileshare.semyon.ie/storage/bin/<app>/<version>/<filename>
-https://fileshare.semyon.ie/storage/bin/<app>/<version>/SHA256SUMS.txt
-```
-
-For a bundle, use `tar.gz` unless `zip` is definitely installed:
-
-```bash
-cd "$DEST"
-tar -czf "$APP-$VERSION-all-platforms.tar.gz" <artifact files> SHA256SUMS.txt
-sha256sum "$APP-$VERSION-all-platforms.tar.gz" >> SHA256SUMS.txt
-```
+When a single platform needs its own direct link, publish that binary as its own share the same way. Each run prints JSON with `sha256`, `share_url` and `download_url` (`https://fileshare.semyon.ie/shares/<share-id>/<filename>`).
 
 ## Verification
 
-Always verify from the public URL, not just from the local Erugo storage path:
+Always verify from the public URL, not just from the local file:
 
 ```bash
-BASE="https://fileshare.semyon.ie/storage/bin/$APP/$VERSION"
 rm -rf /tmp/${APP}-download-test && mkdir /tmp/${APP}-download-test
 cd /tmp/${APP}-download-test
-
-for f in <artifact files> SHA256SUMS.txt; do
-  curl --fail --silent --show-error -L -o "$f" "$BASE/$f"
-done
+curl --fail --silent --show-error -L -o bundle.tar.gz '<download_url>'
+sha256sum bundle.tar.gz   # must equal the printed sha256
+tar -xzf bundle.tar.gz
 sha256sum -c SHA256SUMS.txt
 file <artifact files>
 ```

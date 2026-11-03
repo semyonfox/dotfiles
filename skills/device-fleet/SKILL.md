@@ -43,6 +43,10 @@ Keep noninteractive SSH read-only unless a change was requested:
 ssh -o BatchMode=yes -o ConnectTimeout=8 <target> 'hostname; uname -a; ip -brief addr'
 ```
 
+## Laptop browser quizzes
+
+Use the `mcq-remote` skill to take over a quiz or browser tab on the laptop.
+
 ## T3 Code and Tailscale
 
 Do **not** default to `npx t3@nightly serve`: the verified server setup uses global `t3` plus an enabled user systemd service. `references/t3-code.md` has the exact unit, wrappers, ports, and safe management commands. Read-only checks:
