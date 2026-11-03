@@ -5,6 +5,8 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"
 fixture=$(mktemp -d)
 trap 'rm -rf "$fixture"' EXIT
 export HOME="$fixture/home"
+# a real T3CODE_HOME would point the runtime check outside the fixture
+unset T3CODE_HOME
 mkdir -p "$HOME/.local/bin" "$HOME/.local/lib/node_modules/t3/bin"
 export PATH="$HOME/.local/bin:$PATH"
 cat > "$HOME/.local/lib/node_modules/t3/bin/t3.js" <<'EOF'

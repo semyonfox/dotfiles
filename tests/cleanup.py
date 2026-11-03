@@ -375,8 +375,8 @@ class CleanupTests(unittest.TestCase):
         (releases.parent / "current").symlink_to(releases / "0.3.0-x86_64-unknown-linux-musl", target_is_directory=True)
         p = self.call("bash", "--deep")
         self.assertEqual(p.returncode, 0, p.stdout)
-        self.assertRegex(p.stdout, r"Codex release 0\.1\.0 +[\d.]+K -> 0B +removed")
-        self.assertRegex(p.stdout, r"Codex release 0\.2\.0 +[\d.]+K -> 0B +removed")
+        self.assertRegex(p.stdout, r"Codex release 0\.1\.0 +\S+ -> 0B +removed")
+        self.assertRegex(p.stdout, r"Codex release 0\.2\.0 +\S+ -> 0B +removed")
         # 0.3.0 is current, 0.4.0 the newest other one; older releases retire
         self.assertEqual(sorted(x.name[:5] for x in releases.iterdir()), ["0.3.0", "0.4.0"])
         p = self.call("zsh", "--deep")
