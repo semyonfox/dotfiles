@@ -1,0 +1,34 @@
+Started: 2026-10-22T19:19:19+01:00 policy=aggressive-exact-v2 dry_run=0
+
+--- category=jenkins-buildkit target=- ---
+Total:	0B
+
+NATIVE_RECLAIM Total:	0B
+CATEGORY=jenkins-buildkit EXIT_STATUS=0 TIMEOUT=no BEFORE_BYTES=unknown AFTER_BYTES=unknown
+
+--- category=default-buildkit target=- ---
+ID						RECLAIMABLE	SIZE		LAST ACCESSED
+tlxoa4jtyuoghf70kh5nthjh0*              	true 		77B       	42 minutes ago
+kwpdxc5am0039ueb4rumfq4j7               	true 	651.9MB   	42 minutes ago
+Total:	659.4MB
+
+NATIVE_RECLAIM Total:	659.4MB
+CATEGORY=default-buildkit EXIT_STATUS=0 TIMEOUT=no BEFORE_BYTES=unknown AFTER_BYTES=unknown
+
+--- category=dangling-images target=- ---
+Error response from daemon: prune already running
+
+CATEGORY=dangling-images EXIT_STATUS=1 TIMEOUT=no BEFORE_BYTES=unknown AFTER_BYTES=unknown
+
+--- category=go-build target=/home/semyon/.cache/go-build ---
+
+CATEGORY=go-build EXIT_STATUS=0 TIMEOUT=no BEFORE_BYTES=12288 AFTER_BYTES=0
+ALLOCATED_CATEGORY_DELTA_BYTES=12288 (not unique physical reclaim)
+
+NATIVE_ONLY: skipped shared npm, guarded/advisory additions and tagged-image policy.
+
+Finished: 2026-10-22T19:19:40+01:00
+Before available bytes: 18127069184
+After available bytes: 18786410496
+Filesystem delta bytes (concurrent activity included): 659341312
+Failed commands: 1
