@@ -89,7 +89,7 @@ Use the `model-routing` skill before delegating, picking a model, or escalating 
 - pnpm by default, npm in OghmaNotes, paru for Arch. `~/server-stacks` is the source of truth for homelab deploys. Device facts live in the device-fleet skill.
 - Credit people properly: Sam wrote OghmaNotes' original RAG code, and Canvas MCP is an aggregation of community servers. Only submit upstream PRs I've reviewed.
 - Never edit Eidhne Kennedy's notes in my Obsidian vault.
-- SWIM (being renamed BlackFox) is the active flagship. OghmaNotes is on hold for IP review, bugfixes only. Most AI features run on GPT-6 Luna.
+- SWIM (being renamed BlackFox) is the active flagship. OghmaNotes is not public yet (IP review), but Semyon and a few friends use it daily for real study, so fixes and behaviour changes driven by that use are in scope. Most AI features run on GPT-6 Luna.
 - Hermes' personal-tasks board is the canonical task list and Fox Focus (focus.semyon.ie) is my daily page. Never start a parallel todo list.
 
 ## Safety
