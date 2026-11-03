@@ -350,7 +350,12 @@ update() {
 
     _maint_step $((++step)) "$total" 'pnpm'
     if command -v pnpm &>/dev/null; then
-        pnpm self-update || _update_failed 'pnpm self-update'
+        # corepack shims refuse self-update, so ask corepack for the new release
+        if [[ $(readlink -f "$(command -v pnpm)") == */corepack/* ]]; then
+            corepack install -g pnpm@latest || _update_failed 'pnpm (corepack)'
+        else
+            pnpm self-update || _update_failed 'pnpm self-update'
+        fi
         pnpm update -g || _update_failed pnpm
     else
         _update_skip pnpm
