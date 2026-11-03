@@ -4,8 +4,14 @@ umask 077
 
 readonly PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
 readonly RESTIC='/usr/bin/restic'
-readonly NAS_SOURCE='10.0.0.6:/nas'
-readonly REPOSITORY='/mnt/nas/users/semyon/restic/semyon-pc'
+# the nas serves this repo through rest-server in append-only mode, so the pc
+# can add and read snapshots but never delete them. retention and prune run on
+# the server against the repo directly
+readonly REST_HOST='10.0.0.6'
+readonly REST_PORT='8000'
+readonly REPOSITORY="rest:http://$REST_HOST:$REST_PORT/semyon-pc/"
+readonly REST_USER='semyon-pc'
+readonly REST_PASSWORD_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/restic/rest-server.password"
 readonly PASSWORD_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/restic/pc.password"
 readonly STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/restic"
 readonly LOCK_FILE="$STATE_DIR/semyon-pc-restic-backup.lock"
@@ -25,20 +31,22 @@ prepare_lock() {
 }
 
 verify_password_file() {
-  [[ -f "$PASSWORD_FILE" && ! -L "$PASSWORD_FILE" ]] || die 'missing regular password file'
-
-  local mode
-  mode="$(stat -c '%a' -- "$PASSWORD_FILE")"
-  (( (8#$mode & 8#077) == 0 )) || die 'password file permissions are too open'
+  local file mode
+  for file in "$PASSWORD_FILE" "$REST_PASSWORD_FILE"; do
+    [[ -f "$file" && ! -L "$file" ]] || die "missing regular password file $file"
+    mode="$(stat -c '%a' -- "$file")"
+    (( (8#$mode & 8#077) == 0 )) || die "permissions on $file are too open"
+  done
 }
 
 ensure_nas_repository() {
-  timeout 45s stat -- "$REPOSITORY" >/dev/null || die 'NAS repository is unavailable'
+  # restic retries an unreachable rest server for minutes, so fail fast instead
+  timeout 15s bash -c ': </dev/tcp/$0/$1' "$REST_HOST" "$REST_PORT" 2>/dev/null || \
+    die "rest-server at $REST_HOST:$REST_PORT is unreachable"
 
-  local mount_info
-  mount_info="$(findmnt -T "$REPOSITORY" -n -o SOURCE,FSTYPE)" || die 'could not inspect NAS mount'
-  awk -v expected="$NAS_SOURCE" '$1 == expected && $2 ~ /^nfs/ { found = 1 } END { exit !found }' <<<"$mount_info" || \
-    die 'repository is not on the expected NFS mount'
+  export RESTIC_REST_USERNAME="$REST_USER"
+  RESTIC_REST_PASSWORD="$(<"$REST_PASSWORD_FILE")"
+  export RESTIC_REST_PASSWORD
 
   "$RESTIC" snapshots >/dev/null || die 'repository validation failed; refusing to initialize or change it'
 }
@@ -141,13 +149,7 @@ backup() {
 }
 
 maintenance() {
-  "$RESTIC" --retry-lock 30m forget \
-    --tag semyon-pc \
-    --group-by host,tags \
-    --keep-daily 30 \
-    --keep-weekly 12 \
-    --keep-monthly 12 \
-    --prune
+  # read-only integrity sample. forget and prune live on the server
   "$RESTIC" --retry-lock 30m check --read-data-subset=5% --with-cache
 }
 
