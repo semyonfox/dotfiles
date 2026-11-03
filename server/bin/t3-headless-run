@@ -9,7 +9,7 @@ export T3CODE_HOST=0.0.0.0
 LOCK=/home/semyon/.t3/t3-headless.lock
 mkdir -p /home/semyon/.t3
 
-# One explicit atomic deployment pointer, owned by update-t3-nightly.
+# Explicit runtime selection; automatic custom updates have been retired.
 # Never select the newest directory or follow the independent npm shim.
 RUNTIME=/home/semyon/.t3/runtime/headless-current/t3
 [[ -x "$RUNTIME" ]] || { echo 'Missing headless runtime pointer' >&2; exit 1; }
