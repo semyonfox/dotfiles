@@ -289,7 +289,7 @@ gaming-check() {
 }
 
 update() {
-    local failed=0 step=0 total=10 disk before_used after_used reboot arg crate
+    local failed=0 step=0 total=11 disk before_used after_used reboot arg crate
     local firmware=0 firmware_staged=0 firmware_rc reboot_after=0
     local -a failed_steps=() skipped=() notes=()
     for arg in "$@"; do
@@ -309,7 +309,7 @@ update() {
 
     _maint_step $((++step)) "$total" 'system packages (paru)'
     if command -v paru &>/dev/null; then
-        paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall || _update_failed paru
+        paru -Syu --noconfirm --sudoloop --combinedupgrade --batchinstall --ignore davinci-resolve-studio || _update_failed paru
     else
         _update_skip paru
     fi
@@ -381,6 +381,15 @@ update() {
         uv tool upgrade --all || _update_failed uv
     else
         _update_skip uv
+    fi
+
+    # the AUR recipe can't fetch its own zip, so paru ignores it and this takes over.
+    # the download and build carry on after update exits
+    _maint_step $((++step)) "$total" 'DaVinci Resolve'
+    if [[ -x "$HOME/.local/bin/update-davinci" ]]; then
+        "$HOME/.local/bin/update-davinci" --background || _update_failed 'DaVinci Resolve'
+    else
+        _update_skip update-davinci
     fi
 
     # always look for firmware, only flash it with --firmware because it lands on

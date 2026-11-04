@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+# Keep the DaVinci Resolve Studio package current from Blackmagic's own release feed.
+#
+#   update-davinci               fetch and build if needed, then install or ask to
+#   update-davinci --background  same, detached, so `update` doesn't sit through 11 GB
+#   update-davinci --install     install the ready package, waiting for Resolve to close
+set -euo pipefail
+
+pkg=davinci-resolve-studio
+product=davinci-resolve-studio
+api=https://www.blackmagicdesign.com/api
+agent='Mozilla/5.0'
+downloads="${XDG_DOWNLOAD_DIR:-$HOME/Downloads}"
+aur_dir="$HOME/davinci-resolve-studio"
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/davinci-update"
+unit=davinci-update
+# measured on 21.1.2: 11 GB zip, 22 GB unpacked, 8 GB package. the staged copy is a btrfs reflink
+min_free_gb=45
+
+log() { printf '%s\n' "$*"; }
+die() {
+    printf 'update-davinci: %s\n' "$*" >&2
+    # nobody is watching when this runs detached from `update`
+    if [[ ! -t 2 ]] && command -v notify-send >/dev/null; then
+        notify-send --app-name='DaVinci Resolve' --icon=davinci-resolve 'Resolve update failed' "$*" || true
+    fi
+    exit 1
+}
+
+resolve_running() { pgrep -f '^/opt/resolve/bin/resolve' >/dev/null; }
+
+installed_version() {
+    local full
+    full=$(pacman -Q "$pkg" 2>/dev/null) || return 1
+    full=${full#* }
+    printf '%s\n' "${full%-*}"
+}
+
+ready_package() {
+    compgen -G "$cache/$pkg-*-x86_64.pkg.tar.zst" | sort -V | tail -n 1 || true
+}
+
+ready_version() {
+    local name
+    name=$(basename "$1")
+    name=${name#"$pkg-"}
+    printf '%s\n' "${name%%-*}"
+}
+
+# zip name in the signed url is the only place the real version string appears:
+# 21.0 ships as 21.0, not 21 or 21.0.0
+latest_download() {
+    local id
+    id=$(curl -fsS -A "$agent" "$api/support/latest-stable-version/$product/linux" |
+        jq -er '.linux.downloadId') || die 'could not read the release feed'
+    # updates don't need registration, so this sends no name or email
+    curl -fsS -A "$agent" \
+        -H 'Content-Type: application/json;charset=UTF-8' \
+        -H 'Origin: https://www.blackmagicdesign.com' \
+        -H 'Referer: https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' \
+        -d '{"country":"ie","platform":"Linux","product":"DaVinci Resolve Studio","policy":true}' \
+        "$api/register/us/download/$id"
+}
+
+fetch_zip() {
+    local url=$1 zip=$2
+    if [[ -f $zip ]]; then
+        bsdtar -tf "$zip" >/dev/null 2>&1 && return 0
+        # a cut-off file has no central directory, so resume it rather than trust it
+        mv "$zip" "$zip.part"
+    fi
+    log "downloading $(basename "$zip") to $downloads"
+    curl -fL --retry 5 -C - -sS -o "$zip.part" "$url"
+    bsdtar -tf "$zip.part" >/dev/null || die "$zip.part is not a valid zip"
+    mv "$zip.part" "$zip"
+}
+
+build_package() {
+    local version=$1 build="$cache/build" aur_version zip_args=()
+    if [[ -d $aur_dir/.git ]]; then
+        git -C "$aur_dir" pull --ff-only --quiet
+    else
+        git clone --quiet "https://aur.archlinux.org/$pkg" "$aur_dir"
+    fi
+
+    rm -rf "$build"
+    mkdir -p "$build"
+    cp "$aur_dir/PKGBUILD" "$aur_dir/$pkg.install" "$aur_dir/davinci-control-panels-setup.sh" "$build/"
+
+    aur_version=$(sed -n 's/^pkgver=//p' "$build/PKGBUILD")
+    if [[ $aur_version != "$version" ]]; then
+        # Blackmagic usually ships before the AUR catches up, so there's no published
+        # checksum yet. the zip came straight from them over https
+        log "AUR is on $aur_version, building $version from the same recipe"
+        sed -i "s/^pkgver=.*/pkgver=$version/; s/^pkgrel=.*/pkgrel=1/" "$build/PKGBUILD"
+        zip_args=(--skipchecksums)
+    fi
+
+    # patchelf 0.19.3 refuses this helper and fails the whole build. it only needs
+    # libc, so it can go without the rpath, and any other refusal still stops the build
+    sed -i 's|^\( *\)patchelf --set-rpath|\1[[ ${_file##*/} == chrome-sandbox ]] \&\& continue\n&|' "$build/PKGBUILD"
+
+    log "building $pkg $version"
+    if ! (cd "$build" && SRCDEST="$downloads" makepkg -f --nodeps "${zip_args[@]}"); then
+        # a dead build is tens of GB, don't leave it on a full disk
+        rm -rf "$build"
+        die "build failed, see journalctl --user -u $unit"
+    fi
+
+    # only ever keep the newest ready package
+    find "$cache" -maxdepth 1 -name "$pkg-*-x86_64.pkg.tar.zst" -delete
+    mv "$build/$pkg-$version"-*-x86_64.pkg.tar.zst "$cache/"
+    rm -rf "$build"
+}
+
+install_ready() {
+    local package=$1 version previous
+    version=$(ready_version "$package")
+    previous=$(installed_version) || previous=
+    sudo pacman -U --noconfirm "$package"
+    rm -f "$package"
+    # keep the new installer and the one before it, for rolling back
+    find "$downloads" -maxdepth 1 -name 'DaVinci_Resolve_Studio_*_Linux.zip' \
+        ! -name "DaVinci_Resolve_Studio_${version}_Linux.zip" \
+        ! -name "DaVinci_Resolve_Studio_${previous}_Linux.zip" -delete
+    log "installed $pkg $version"
+}
+
+ask_to_install() {
+    local version=$1 choice
+    command -v notify-send >/dev/null || { log "run update-davinci --install"; return 0; }
+    choice=$(notify-send --wait --app-name='DaVinci Resolve' --icon=davinci-resolve \
+        --action=install='Install now' \
+        "Resolve $version is ready" 'Needs your password. Or run: update-davinci --install') || true
+    if [[ $choice == install ]]; then
+        "${TERMINAL:-xdg-terminal-exec}" -e "$0" --install
+    fi
+}
+
+mode=run
+case "${1:-}" in
+    '') ;;
+    --background) mode=background ;;
+    --install) mode=install ;;
+    *) printf 'usage: update-davinci [--background|--install]\n' >&2; exit 2 ;;
+esac
+
+# on a machine without the package this is a no-op, so `update` can call it anywhere
+installed=$(installed_version) || exit 0
+mkdir -p "$cache" "$downloads"
+
+ready=$(ready_package)
+
+if [[ $mode == install ]]; then
+    [[ -n $ready ]] || die 'no package is ready yet'
+    if [[ $(vercmp "$(ready_version "$ready")" "$installed") -le 0 ]]; then
+        rm -f "$ready"
+        log "already on $installed"
+        exit 0
+    fi
+    if resolve_running; then
+        log 'waiting for Resolve to close, so nothing unsaved gets lost'
+        while resolve_running; do sleep 5; done
+    fi
+    install_ready "$ready"
+    exit 0
+fi
+
+if [[ $mode == background ]]; then
+    # paru has only just asked for sudo, so a ready package can go in without a prompt
+    if [[ -n $ready ]] && [[ $(vercmp "$(ready_version "$ready")" "$installed") -gt 0 ]] &&
+        ! resolve_running && sudo -n true 2>/dev/null; then
+        install_ready "$ready"
+        exit 0
+    fi
+    if systemctl --user is-active --quiet "$unit.service"; then
+        log "already running, follow it with: journalctl --user -fu $unit"
+        exit 0
+    fi
+    systemctl --user reset-failed "$unit.service" 2>/dev/null || true
+    systemd-run --user --quiet --collect --unit="$unit" \
+        --setenv=PATH="$PATH" --setenv=TERMINAL="${TERMINAL:-}" \
+        --setenv=WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" --setenv=DISPLAY="${DISPLAY:-}" \
+        "$0"
+    log "checking in the background, follow it with: journalctl --user -fu $unit"
+    exit 0
+fi
+
+# `update` can start a second run mid-build, and each one wipes the build dir
+exec 9>"$cache/lock"
+if ! flock -n 9; then
+    log "another update-davinci is already working, follow it with: journalctl --user -fu $unit"
+    exit 0
+fi
+
+url=$(latest_download)
+case "$url" in
+    https://sw.blackmagicdesign.com/*) ;;
+    *) die 'unexpected download link from Blackmagic' ;;
+esac
+zip_name=${url%%\?*}
+zip_name=${zip_name##*/}
+[[ $zip_name =~ ^DaVinci_Resolve_Studio_([0-9.]+)_Linux\.zip$ ]] || die "unexpected file name: $zip_name"
+latest=${BASH_REMATCH[1]}
+
+if [[ $(vercmp "$latest" "$installed") -le 0 ]]; then
+    log "$pkg $installed is current"
+    exit 0
+fi
+log "$pkg $installed -> $latest"
+
+if [[ -z $ready ]] || [[ $(vercmp "$(ready_version "$ready")" "$latest") -lt 0 ]]; then
+    free_gb=$(df --output=avail -BG "$cache" | tail -n 1 | tr -dc 0-9)
+    needed=$min_free_gb
+    [[ -f $downloads/$zip_name ]] && needed=$((needed - 11))
+    (( free_gb >= needed )) || die "need ${needed} GB free to build, only ${free_gb} GB available"
+    fetch_zip "$url" "$downloads/$zip_name"
+    build_package "$latest"
+    ready=$(ready_package)
+fi
+
+# the prompt can sit there for hours, so don't hold the lock through it
+exec 9>&-
+if [[ -t 0 ]] && ! resolve_running; then
+    install_ready "$ready"
+else
+    ask_to_install "$latest"
+fi
