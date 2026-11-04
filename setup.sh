@@ -291,6 +291,34 @@ deploy_dotfiles() {
     success "Dotfiles deployed"
 }
 
+# claude code rewrites ~/.claude/settings.json itself and each machine keeps its own
+# model and permissions there, so the shared keys get merged in instead of stowing it
+merge_claude_settings() {
+    local shared="$SCRIPT_DIR/lib/claude-settings.json"
+    local target="$HOME/.claude/settings.json"
+    local merged
+
+    [[ " ${PACKAGES[*]} " == *" claude "* ]] || return 0
+    if ! command -v jq >/dev/null 2>&1; then
+        warn "jq not found, skipped merging $shared"
+        return 0
+    fi
+    if [[ "$DRY_RUN" == true ]]; then
+        info "[DRY RUN] Would merge $shared into $target"
+        return 0
+    fi
+
+    mkdir -p "$HOME/.claude"
+    [[ -s "$target" ]] || printf '{}\n' > "$target"
+    if ! merged="$(jq -s '.[0] * .[1]' "$target" "$shared")"; then
+        warn "$target is not valid JSON, left it alone"
+        return 0
+    fi
+    # writing in place keeps the file's existing mode
+    printf '%s\n' "$merged" > "$target"
+    success "Merged shared Claude settings"
+}
+
 verify_installation() {
     local verified=0 failed=0 package source rel target
 
@@ -375,6 +403,7 @@ main() {
     ensure_stow
     echo ""
     deploy_dotfiles
+    merge_claude_settings
     echo ""
 
     if [[ "$DRY_RUN" == false ]]; then

@@ -119,3 +119,21 @@ test "$(cat "$case_dir/home/.config/foo")" = 'old nested'
 test "$(ls -ld "$case_dir/home" | cut -c1-10)" = 'drwxr-xr-x'
 test "$(ls -ld "$case_dir/home/.config" | cut -c1-10)" = 'drwx------'
 printf 'directory modes preserved\n'
+setup_case claude
+case_dir="$work/claude"
+mv "$case_dir/repo/pkg" "$case_dir/repo/claude"
+cp "$repo/lib/claude-settings.json" "$case_dir/repo/lib/claude-settings.json"
+mkdir "$case_dir/home/.claude"
+printf '{"model":"keep-me","attribution":{"commit":"old"}}\n' > "$case_dir/home/.claude/settings.json"
+chmod 600 "$case_dir/home/.claude/settings.json"
+cat > "$case_dir/bin/stow" <<'STOW'
+#!/usr/bin/env bash
+exec "$REAL_STOW" "$@"
+STOW
+chmod +x "$case_dir/bin/stow"
+env REAL_STOW="$real_stow" HOME="$case_dir/home" PATH="$case_dir/bin:$PATH" "$bash_bin" "$case_dir/repo/setup.sh" --packages claude > "$case_dir/log" 2>&1
+settings="$case_dir/home/.claude/settings.json"
+test "$(jq -r .model "$settings")" = keep-me
+test "$(jq -c .attribution "$settings")" = '{"commit":"","pr":"","sessionUrl":false}'
+test "$(ls -l "$settings" | cut -c1-10)" = '-rw-------'
+printf 'claude settings merged\n'
