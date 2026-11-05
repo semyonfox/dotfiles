@@ -1,0 +1,11 @@
+[Unit]
+Description=DaVinci Resolve decode-helper watcher
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/davinci-decode-watch
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

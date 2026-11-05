@@ -1,0 +1,13 @@
+# DaVinci Resolve fast media, read by davinci-decode-fix and davinci-decode-watch.
+# originals are never touched. proxies and fixed-audio copies go in CACHE_DIR, and
+# Workspace > Scripts > Link Fast Media in Resolve attaches them
+
+# made as soon as new footage lands here. anything else gets made the first time Link
+# Fast Media sees it in a project
+WATCH_DIRS="$HOME/Videos"
+
+CACHE_DIR="$HOME/.cache/resolve-media"
+PROXY_MAX_HEIGHT=1080
+# proxies are dropped oldest first past this. fixed copies a project uses are never dropped
+CACHE_MAX_GB=50
+NOTIFY="true"
