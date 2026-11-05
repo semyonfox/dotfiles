@@ -1,0 +1,308 @@
+#!/usr/bin/env bash
+# Edit-friendly copies of media for DaVinci Resolve on Linux, kept in one cache folder
+# instead of next to the originals.
+#
+#   proxies      DNxHR LB, at most PROXY_MAX_HEIGHT tall. Resolve has no hardware decode
+#                off NVIDIA, so long-GOP H.264/HEVC/AV1 scrubs badly. decoding runs on
+#                the iGPU through VA-API when it can
+#   fixed copies video copied as is, audio as PCM, for audio Resolve can't read (AAC or
+#                Opus in MKV, Vorbis, Ogg, raw AC3...). a proxy can't fix that, Resolve
+#                always takes audio from the clip itself
+#
+# "Link Fast Media" in Resolve's Workspace > Scripts menu swaps clips onto their fixed
+# copies and links the proxies. it talks to this script through --lookup
+#
+#   davinci-decode-fix <file|dir>...  make whatever each file needs now
+#   davinci-decode-fix --lookup LIST  one TSV row per path in LIST, queue what's missing
+#   davinci-decode-fix --prune        drop cache entries nothing needs any more
+set -uo pipefail
+
+CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/davinci-decode-fix/config"
+# shellcheck source=/dev/null
+[[ -f $CONFIG_FILE ]] && source "$CONFIG_FILE"
+
+CACHE_DIR="${CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/resolve-media}"
+PROXY_MAX_HEIGHT="${PROXY_MAX_HEIGHT:-1080}"
+CACHE_MAX_GB="${CACHE_MAX_GB:-50}"
+# fixed copies no project has picked up yet are cheap to make again
+UNCLAIMED_MAX_DAYS="${UNCLAIMED_MAX_DAYS:-30}"
+NOTIFY="${NOTIFY:-true}"
+VAAPI_DEVICE="${VAAPI_DEVICE:-/dev/dri/renderD128}"
+LOG_FILE="${LOG_FILE:-${XDG_DATA_HOME:-$HOME/.local/share}/davinci-decode-fix/convert.log}"
+
+mkdir -p "$CACHE_DIR" "$(dirname "$LOG_FILE")"
+
+log() { printf '[%(%F %T)T] %s\n' -1 "$*" >>"$LOG_FILE"; }
+
+notify() {
+    [[ $NOTIFY == true ]] && command -v notify-send >/dev/null || return 0
+    notify-send --app-name='DaVinci Resolve' --icon="${3:-davinci-resolve}" "$1" "$2" || true
+}
+
+is_media() {
+    local ext="${1##*.}"
+    case "${ext,,}" in
+        3gp|aac|ac3|aif|aiff|avi|flac|flv|m2ts|m4a|m4v|mka|mkv|mov|mp3|mp4|mts|mxf|ogg|opus|wav|webm|wmv) return 0 ;;
+    esac
+    return 1
+}
+
+# csv output tacks a comma onto AC3 streams (side data), so ask for bare values
+probe() { ffprobe -v error -select_streams "$1" -show_entries stream=codec_name -of default=nw=1:nk=1 "$2" 2>/dev/null; }
+
+# first real video stream, cover art doesn't count
+video_codec() {
+    probe V:0 "$1" | head -n 1
+}
+
+# checked against Resolve Studio 21.1.2 on Linux. the container matters as much as the
+# codec: Opus plays from MP4 but not from MKV, AAC from MP4 but not from MKV
+resolve_reads_audio() {
+    local ext="${1##*.}" codec
+    ext="${ext,,}"
+    while IFS= read -r codec; do
+        [[ -n $codec ]] || continue
+        [[ $codec == pcm_* && $ext != webm ]] && continue
+        case "$ext:$codec" in
+            mp4:aac|mp4:ac3|mp4:eac3|mp4:alac|mp4:mp3|mp4:opus) ;;
+            mov:aac|mov:ac3|mov:eac3|mov:alac|mov:mp3|mov:opus) ;;
+            m4v:aac|m4v:ac3|m4v:eac3|m4v:alac|m4v:mp3) ;;
+            m4a:aac|m4a:alac|mkv:flac|flac:flac|mp3:mp3) ;;
+            *) return 1 ;;
+        esac
+    done <<<"$(probe a "$1")"
+    return 0
+}
+
+needs_fix() { [[ -n $(probe a "$1") ]] && ! resolve_reads_audio "$1"; }
+
+# intra-frame codecs already scrub well
+needs_proxy() {
+    local codec
+    codec="$(video_codec "$1")"
+    case "$codec" in
+        ''|prores|dnxhd|cfhd|mjpeg|rawvideo|v210|r210|dvvideo|png|tiff|dpx|exr) return 1 ;;
+    esac
+    return 0
+}
+
+key_of() { printf '%s' "$1" | sha1sum | cut -c1-16; }
+stamp_of() { stat -c '%s %Y' "$1" 2>/dev/null; }
+entry() { printf '%s/%s' "$CACHE_DIR" "$1"; }
+fixed_of() {
+    local f
+    for f in "$(entry "$1").fixed.mkv" "$(entry "$1").fixed.wav"; do
+        [[ -f $f ]] && { printf '%s' "$f"; return 0; }
+    done
+    return 1
+}
+
+# a clip already on a fixed copy points into the cache, directly or through one of the
+# audio/ links, so map it back to the original it came from
+source_of() {
+    local real
+    real="$(realpath -e -- "$1" 2>/dev/null)" || return 1
+    if [[ $real == "$(realpath "$CACHE_DIR")"/* && $(basename "$real") =~ ^([0-9a-f]{16})\.fixed\. ]]; then
+        head -n 1 "$(entry "${BASH_REMATCH[1]}").src" 2>/dev/null
+    else
+        printf '%s' "$real"
+    fi
+}
+
+# Resolve won't even import an Opus, Ogg or AC3 file, so Link Fast Media never sees it.
+# a readable name in audio/ is what gets imported instead
+link_audio() {
+    local src="$1" fixed="$2" dir="$CACHE_DIR/audio" name link
+    mkdir -p "$dir"
+    name="$(basename "${src%.*}")"
+    link="$dir/$name.wav"
+    if [[ -L $link && $(readlink "$link") != "../$(basename "$fixed")" ]]; then
+        link="$dir/$name-$(basename "$fixed" | cut -c1-8).wav"
+    fi
+    ln -sfn "../$(basename "$fixed")" "$link"
+    notify 'Audio ready to import' "$(basename "$src") is at $link"
+}
+
+# the source changed since the entry was made: the proxy is wrong now, and so is the
+# fixed copy, which gets remade in place so a project using it picks up the new one
+refresh_entry() {
+    local src="$1" key="$2" e
+    e="$(entry "$key")"
+    [[ -f $e.src ]] || return 0
+    [[ $(sed -n 2p "$e.src") == "$(stamp_of "$src")" ]] && return 0
+    log "STALE $src"
+    rm -f "$e.proxy.mov" "$e.failed"
+    rm -f "$e.fixed.mkv" "$e.fixed.wav"
+}
+
+write_src() { printf '%s\n%s\n' "$1" "$(stamp_of "$1")" >"$(entry "$2").src"; }
+
+run_ffmpeg() { ffmpeg -hide_banner -nostdin -loglevel error -y "$@" 2>>"$LOG_FILE"; }
+
+make_fixed() {
+    local src="$1" e="$2" out tmp
+    if [[ -n $(video_codec "$src") ]]; then
+        out="$e.fixed.mkv"
+        tmp="$e.tmp.mkv"
+        run_ffmpeg -i "$src" -map 0:V -map 0:a -c:v copy -c:a pcm_s16le -map_metadata 0 "$tmp"
+    else
+        out="$e.fixed.wav"
+        tmp="$e.tmp.wav"
+        run_ffmpeg -i "$src" -vn -map 0:a:0 -c:a pcm_s16le "$tmp"
+    fi || { rm -f "$tmp"; return 1; }
+    mv -f "$tmp" "$out"
+    [[ $out == *.wav ]] && link_audio "$src" "$out"
+    return 0
+}
+
+make_proxy() {
+    local input="$1" e="$2" tmp="$2.tmp.mov" h="$PROXY_MAX_HEIGHT"
+    local enc=(-map 0:V:0 -map '0:a?' -c:v dnxhd -profile:v dnxhr_lb -c:a pcm_s16le -map_metadata 0)
+    if [[ -e $VAAPI_DEVICE ]] &&
+        run_ffmpeg -hwaccel vaapi -hwaccel_device "$VAAPI_DEVICE" -hwaccel_output_format vaapi -i "$input" \
+            -vf "scale_vaapi=w=-2:h='min(ih,$h)':format=nv12,hwdownload,format=nv12,format=yuv422p" \
+            "${enc[@]}" "$tmp"; then
+        :
+    else
+        # no VA-API decoder for this codec, or no iGPU at all
+        log "CPU decode $input"
+        run_ffmpeg -i "$input" -vf "scale=-2:'min(ih,$h)',format=yuv422p" "${enc[@]}" "$tmp" ||
+            { rm -f "$tmp"; return 1; }
+    fi
+    mv -f "$tmp" "$e.proxy.mov"
+}
+
+# makes what $1 needs. only one conversion runs at a time, the rest wait their turn
+convert() {
+    local src key e want_fix=0 want_proxy=0 status=0
+    src="$(source_of "$1")" || return 0
+    [[ -f $src ]] && is_media "$src" || return 0
+    key="$(key_of "$src")"
+    e="$(entry "$key")"
+    refresh_entry "$src" "$key"
+    needs_fix "$src" && ! fixed_of "$key" >/dev/null && want_fix=1
+    needs_proxy "$src" && [[ ! -f $e.proxy.mov ]] && want_proxy=1
+    (( want_fix || want_proxy )) || return 0
+
+    exec 9>"$CACHE_DIR/.lock"
+    flock 9
+    write_src "$src" "$key"
+    if (( want_fix )); then
+        log "FIX $src"
+        make_fixed "$src" "$e" || { log "FAILED fix $src"; status=1; }
+    fi
+    if (( want_proxy && status == 0 )); then
+        log "PROXY $src"
+        make_proxy "$(fixed_of "$key" || printf '%s' "$src")" "$e" || { log "FAILED proxy $src"; status=1; }
+    fi
+    if (( status == 0 )); then rm -f "$e.failed"; else : >"$e.failed"; fi
+    exec 9>&-
+    return "$status"
+}
+
+# rows are: state, clip path, fixed copy, proxy. state is ready, queued, failed or skip
+lookup() {
+    local list="$1" path src key e fixed proxy state queue=()
+    while IFS= read -r path; do
+        [[ -n $path ]] || continue
+        fixed='' proxy='' state=skip
+        if src="$(source_of "$path")" && [[ -f $src ]] && is_media "$src"; then
+            key="$(key_of "$src")"
+            e="$(entry "$key")"
+            refresh_entry "$src" "$key"
+            fixed="$(fixed_of "$key")"
+            # already on it, maybe through an audio/ link, so nothing to swap
+            [[ -n $fixed && $(realpath -- "$path") == "$(realpath -- "$fixed")" ]] && fixed="$path"
+            [[ -f $e.proxy.mov ]] && proxy="$e.proxy.mov"
+            # a project is about to point at it, so prune must leave it alone from now on
+            [[ -n $fixed ]] && : >"$e.claimed"
+            if { needs_fix "$src" && [[ -z $fixed ]]; } || { needs_proxy "$src" && [[ -z $proxy ]]; }; then
+                if [[ -f $e.failed ]]; then
+                    state=failed
+                else
+                    state=queued
+                    queue+=("$src")
+                fi
+            elif [[ -n $fixed || -n $proxy ]]; then
+                state=ready
+            fi
+        fi
+        printf '%s\t%s\t%s\t%s\n' "$state" "$path" "$fixed" "$proxy"
+    done <"$list"
+    (( ${#queue[@]} )) || return 0
+    local qfile
+    qfile="$(mktemp "$CACHE_DIR/.queue.XXXXXX")"
+    printf '%s\n' "${queue[@]}" >"$qfile"
+    setsid -f "$0" --queue "$qfile" >/dev/null 2>&1 </dev/null
+}
+
+run_queue() {
+    local qfile="$1" path done=0 failed=0
+    while IFS= read -r path; do
+        if convert "$path"; then done=$((done + 1)); else failed=$((failed + 1)); fi
+    done <"$qfile"
+    rm -f "$qfile"
+    prune
+    if (( failed )); then
+        notify 'Fast media' "$done ready, $failed failed. See $LOG_FILE" dialog-error
+    else
+        notify 'Fast media ready' "$done clip(s) done. Run Workspace > Scripts > Link Fast Media again"
+    fi
+}
+
+cache_kb() { du -sk --apparent-size "$CACHE_DIR" | cut -f1; }
+
+prune() {
+    local s e src fixed
+    exec 8>"$CACHE_DIR/.lock"
+    flock -n 8 || return 0
+    for s in "$CACHE_DIR"/*.src; do
+        [[ -f $s ]] || continue
+        e="${s%.src}"
+        src="$(head -n 1 "$s")"
+        [[ -f $src ]] && continue
+        log "PRUNE source gone $src"
+        rm -f "$e.proxy.mov" "$e.failed"
+        # a project may still point at a claimed fixed copy, and now it's the only copy
+        [[ -f $e.claimed ]] || rm -f "$e.fixed.mkv" "$e.fixed.wav" "$s"
+    done
+    while IFS= read -r fixed; do
+        e="${fixed%.fixed.*}"
+        [[ -f $e.claimed ]] && continue
+        log "PRUNE unclaimed $fixed"
+        rm -f "$fixed"
+    done < <(find "$CACHE_DIR" -maxdepth 1 -name '*.fixed.*' -mtime +"$UNCLAIMED_MAX_DAYS")
+    [[ -d $CACHE_DIR/audio ]] && find "$CACHE_DIR/audio" -xtype l -delete
+    # proxies can always be made again, so they go first when the cache is too big
+    while (( $(cache_kb) > CACHE_MAX_GB * 1024 * 1024 )); do
+        e="$(find "$CACHE_DIR" -maxdepth 1 -name '*.proxy.mov' -printf '%T@ %p\n' | sort -n | head -n 1 | cut -d' ' -f2-)"
+        [[ -n $e ]] || break
+        log "PRUNE over ${CACHE_MAX_GB}G $e"
+        rm -f "$e"
+    done
+    exec 8>&-
+}
+
+process_path() {
+    if [[ -d $1 ]]; then
+        local f status=0
+        while IFS= read -r -d '' f; do convert "$f" || status=1; done < <(find "$1" -type f -print0)
+        return "$status"
+    fi
+    convert "$1"
+}
+
+case "${1:-}" in
+    --lookup) lookup "$2" ;;
+    --queue) run_queue "$2" ;;
+    --prune) prune ;;
+    ''|-h|--help)
+        sed -n '2,/^set -uo/{/^set -uo/d;s/^# \{0,1\}//;p}' "$0"
+        exit 2
+        ;;
+    *)
+        status=0
+        for arg in "$@"; do process_path "$arg" || status=1; done
+        exit "$status"
+        ;;
+esac
