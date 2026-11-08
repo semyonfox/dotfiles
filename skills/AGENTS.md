@@ -8,7 +8,11 @@ I like taking complicated problems and making them feel simple. Prefer the simpl
 
 By default, never credit AI, agents, models, or tools anywhere in my work. That covers commit messages, PR titles and bodies, PR comments, code comments, docs, and changelogs. No `Co-Authored-By: Claude` (or any model) trailers, no "Generated with Claude Code" footers, no emoji robots.
 
-A repo opts in with the line `attribution: on` in its `AGENTS.md` or `CLAUDE.md`. Only there may commits, PRs, and skills add model trailers, footers, or review credits. University coursework never opts in.
+A repo opts in with the line `attribution: on` in its `AGENTS.md` or `CLAUDE.md`. University coursework never opts in. Opting in still never means harness footers or `Co-Authored-By` model trailers. It means the agent names itself, with the model name the harness reports (name only the harness if the model isn't exposed, never guess):
+
+- PR description: end with `Created with <model> in <harness>.`, naming subagent models that wrote part of the change
+- commit messages: no model lines, the PR carries it
+- review credits that skills define, like the sol-loop line
 
 For new work in a repo with no `attribution:` line, ask me before the first commit or PR, then record my answer as `attribution: on` or `attribution: off` in its `AGENTS.md`.
 
