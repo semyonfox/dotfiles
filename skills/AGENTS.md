@@ -63,6 +63,9 @@ Don't flatter me into a bad decision. If my premise is wrong, my plan is overcom
 - Idiomatic for the language and the repo. Don't write TypeScript like Python or Rust like C.
 - Check existing patterns before adding a library, folder structure, state manager, validation layer, or architecture.
 - Tests that prove behaviour likely to break. No stale bloat, generic smoke tests, or mocks that only test themselves.
+- Prove a fix by reproducing the failure and watching it pass in the session. That proof goes in the report, not in a new test file. Add a test only when the bug could plausibly come back and nothing existing would catch it, and put it in the module's existing test file.
+- Before adding a test, look for a way to make it unnecessary: a type, a database constraint, a lint rule, a naming convention, or deleting the code. When you delete or replace behaviour, delete its tests in the same change.
+- When you brief other agents, never write "every fix gets a test" and never ask for a test per finding.
 - Comments explain unusual decisions, assumptions, and contracts — not obvious code. Keep them minimal and conversational: lowercase at the start unless it's an identifier (e.g. `className`), no unnecessary punctuation, no emoji unless asked. Same style for commit messages and docs.
 - Propose a bolder approach when it would make a real difference, but make the case first. Don't quietly turn a focused task into a rewrite.
 
