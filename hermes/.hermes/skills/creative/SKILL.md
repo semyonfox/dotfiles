@@ -114,7 +114,7 @@ When a game/prototype needs original Blender assets but the host has no GUI, use
 - Use infographic or slide workflows for executive-friendly presentation.
 - Use ASCII or code-art workflows for playful or terminal-friendly output.
 - Use generative image/video tools for polished visual composition.
-- For SVG cleanup and imagery generation/editing, pick the lead with the `model-routing` skill. Use Gemini/Antigravity as the visual QA/description worker that reports what the image actually looks like back to the lead agent.
+- For SVG cleanup and imagery generation/editing, pick the lead from the Models section of `~/dotfiles/skills/AGENTS.md`. Use Gemini/Antigravity as the visual QA/description worker that reports what the image actually looks like back to the lead agent.
 - For GPT image creation through Hermes, prefer the bundled `image_gen/openai-codex` backend rather than assuming the default FAL route. Enable it with `hermes plugins enable openai-codex`; it becomes available in a **fresh** Hermes session and uses the existing ChatGPT/Codex OAuth path with the Responses image-generation tool. For a multi-asset portfolio job, ask a fresh `hermes chat --provider openai-codex -m gpt-6.1-sol` worker to generate directly into the stable public asset directory, then independently verify file type/dimensions, render the real page, visually QA for generated text/watermarks/incorrect subject matter, and run the production build.
 - Use music/audio workflows when the target medium is sound rather than text.
 - Use humanizer-style rewrites when the artifact is textual but the voice needs to sound more natural.

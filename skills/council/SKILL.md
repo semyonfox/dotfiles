@@ -14,9 +14,9 @@ Start each member with `delegate_task`. Check `orchestrator_capabilities` first 
 
 - `claude-opus-5-5`, effort high
 - `gpt-6.1-sol`, reasoning effort high (it defaults to low)
-- `opencode/deepseek-v4.1-flash-free`, variant high, agent plan
+- `claude-fable-5-2`, effort high
 
-Members can't see this chat. Leave out secrets and private data because DeepSeek's free tier may keep prompts. Tell them not to edit anything. Stop after four rounds and take any split to the user.
+Members can't see this chat. Leave out secrets. Tell them not to edit anything. If a member fails twice, carry on with the others and say so. Stop after four rounds and take any split to the user.
 
 ## Decisions
 
@@ -41,7 +41,7 @@ Report the rounds and scores in your reply. If a member gives no score, write `n
 | --- | --- | --- |
 | Claude Opus | 7/10 | 9/10 |
 | GPT Sol | 8/10 | 10/10 |
-| DeepSeek Flash | 7/10 | 9/10 |
+| Claude Fable | 7/10 | 9/10 |
 ```
 
 Put that table in a PR description only when the repo has `attribution: on`. Edit the description rather than posting a comment.
