@@ -53,7 +53,7 @@ Portable compatibility information can live in `SKILL.md` frontmatter. That meta
 
 - `file-pr` — source material is the video passage at 15:04–17:45.
 - `babysit-pr` — source material is the video passage at 10:18–12:24.
-- `model-routing`, `ship-changes`, `skill-authoring`, and `visual-evidence` — existing Semyon-owned shared skills; each must retain its own provenance.
+- `ship-changes`, `skill-authoring`, and `visual-evidence` — existing Semyon-owned shared skills; each must retain its own provenance.
 
 ## Manual editing on the PC
 

@@ -72,15 +72,24 @@ Do not use subagents or delegate work unless I explicitly ask. When requested, p
 
 When a problem repeats, propose the smallest durable instruction change that would prevent it, then trim it down.
 
-### Model routing
+### Models
 
-Use the `model-routing` skill before delegating, picking a model, or escalating effort. It holds the current lanes and billing.
+Pick by job. Use full model IDs, because short aliases can resolve to older models.
 
-- Claude is flat-rate and limit-bound; Codex is metered credits at API prices. Don't assume Codex is free.
-- Fable and GPT-6 Astra are request-only.
-- Effort is medium or high. Never low, max, or ultrathink; xhigh only after a failed pass with a stated gap.
-- Give delegated agents compact task cards with model and effort set explicitly.
+| Job | Model |
+| --- | --- |
+| Lead: plans, product and UI calls, security review, final checks | Opus 5.5 (`claude-opus-5-5`) |
+| Implementation, review of a single diff | GPT-6.1 Sol (`gpt-6.1-sol`) |
+| Whole-repo audits, cross-review of another model's work, hard problems Opus has stalled on | Fable 5.2 (`claude-fable-5-2`) |
+| Bulk mechanical work: extraction, classification, summaries, boilerplate | GPT-6 Luna (`gpt-6-luna`) |
+
+- Sol bills Codex credits at API prices. Claude models share the plan's limits and Fable drains them fastest, so keep Fable on review and hard problems.
+- A model never cross-reviews its own implementation.
+- GPT-6 Astra is request-only. Don't use GPT-5.6, GPT-6 Sol, Kimi K3 or the free OpenCode models.
+- Effort is medium or high. Never low, max or ultrathink. xhigh only after a failed pass with a stated gap. Sol defaults to low, so always set it.
+- Task cards name the repo and branch, model and effort, one outcome, constraints, required checks and the stop condition.
 - Delegated output is a patch candidate. Inspect the diff, rerun relevant checks, and fix or revert anything suspect before claiming success.
+- Evidence for these picks lives in `repo-audit`. When a new model ships, try it in one slot of a real audit before changing this table.
 
 ## Context for coding work
 
