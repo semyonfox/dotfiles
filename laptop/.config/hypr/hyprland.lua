@@ -103,6 +103,13 @@ hl.on("monitor.removed", number_workspaces_by_monitor)
 local common = require("common")
 common.setup()
 
+-- allow apps to raise their windows after a notification click
+hl.config({
+    misc = {
+        focus_on_activate = true,
+    },
+})
+
 -- laptop panel is less legible than the desktop monitors, so keep windows near opaque
 hl.config({
     decoration = {
