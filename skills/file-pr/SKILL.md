@@ -36,6 +36,10 @@ Good:
 
 > My "new worktree" default was ignored when starting new threads on existing worktrees. Super unintuitive. Now your preferences always apply.
 
+Keep the description under 1000 characters, image links excluded. Leave out
+anything a reviewer can read from the diff: file lists, test inventories,
+step-by-step narration.
+
 Attribution follows the rule in global guidance. Only when the repo has
 `attribution: on`, end the description with the public model name and harness
 that made the changes, for example `Created with <model> in <harness>.` Include
