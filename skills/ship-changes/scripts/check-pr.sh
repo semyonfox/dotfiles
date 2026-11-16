@@ -42,6 +42,11 @@ if [[ "$mergeable" != "MERGEABLE" ]]; then
   exit 1
 fi
 
+if [[ $(jq '.statusCheckRollup | length' <<<"$pr_json") == 0 ]]; then
+  echo "blocked: no checks reported, confirm the repo requires none before merging" >&2
+  exit 1
+fi
+
 failed_checks=$(jq -r '
   [
     .statusCheckRollup[]?

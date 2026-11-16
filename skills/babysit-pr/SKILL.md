@@ -69,6 +69,27 @@ Kill the old one only if its events do not reach you.
 With either watcher: when an event needs no action, end your turn without a
 message. Never post or say "still waiting".
 
+## Reading check state
+
+- `gh pr checks` exit 8 means pending, not failed.
+- A cancelled run that a newer run of the same workflow replaced is noise.
+  Judge the newest run on the latest head.
+- `action_required` means a maintainer must approve the workflow run. It is
+  not a code failure. Tell the user.
+- No checks reported is not green. Check whether the repo requires checks
+  (rulesets and branch protection) before calling it ready.
+- Disk full, Docker address pools, OOM kills and runner timeouts are
+  infrastructure. Rerun once, then report it rather than changing code.
+- Read only what failed: `gh run view <run> --log-failed | tail -n 80`.
+
+Never guess a `gh` flag or JSON field. Run `gh <command> --help` first, and
+read the valid fields from the "Unknown JSON field" error rather than guessing
+again. `gh pr diff --stat` does not exist. For a change summary use
+`gh pr view <n> --json files --jq '.files[] | "\(.additions)+ \(.deletions)- \(.path)"'`
+or `gh pr diff <n> --name-only`. Ask for the fields you need with
+`--json a,b --jq`, never a full dump, and do not reread a PR that has not
+changed since you last read it.
+
 ## GitHub rate limits
 
 `gh pr create`, `gh pr view`, and `gh pr checks` use GraphQL. When GraphQL is
