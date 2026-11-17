@@ -231,3 +231,9 @@ Verified on 2026-07-03:
 - Cleanup 2026-11-07, on request: all migration backups, snapshots, rehearsals and tooling deleted (`~/.local/state/t3-laptop-migration-20261106`, `t3-laptop-delta-20261106`, `~/.local/share/t3-device-archive-20261106`, `t3-laptop-archive-20261106`, the three `~/.t3/userdata/laptop-merge-*` copies). Verified first: all 84 laptop threads and 2,096 of 2,098 messages on server. The 2 not merged were the 20:00 benchmark trigger and a one-line "all done?" in the laptop copy of the Marker thread. Paths above under those folders no longer exist.
 
 - open laptop cleanup / bw-audit work (2026-11-08): see `~/.local/state/laptop-cleanup-20261106/HANDOFF.md` on the server
+
+## Laptop threads imported live, verified 2026-11-14
+
+- 9 laptop-local threads (7 to 14 November) were imported with no outage into a new server project `Laptop` (`~/laptop-threads`, id `mcp:8732d96f-b30d-4ebb-b8e4-81adbec7708d`) as 10 `import:<provider>:<session>` threads. The notification-focus thread switched Claude to Codex, so it arrived as two threads.
+- Method: copy the laptop's native Claude/Codex transcripts to the server (no overwrite, mtimes kept), rewrite only their `cwd` fields to the project root, then call the WS RPCs `agentSessions.scan` and `agentSessions.import {projectId, expectedWorkspaceRoot}` on `ws://127.0.0.1:3773/ws?orchestrationProtocol=2` with a short-lived `t3 auth session issue --scope orchestration:read --scope orchestration:operate` bearer, revoked afterwards.
+- Limits: the importer skips anything under `~/.t3` (so never "No project"), only takes transcripts whose cwd is exactly the project root, uses a 30-day mtime window and caps at 100 transcripts. Threads cannot be moved between projects afterwards. It imports messages only: mid-turn steer messages and some interim assistant notes are not in native transcripts (dock thread lost 1 steer and 2 notes, DaVinci 3 notes). Laptop originals untouched.
