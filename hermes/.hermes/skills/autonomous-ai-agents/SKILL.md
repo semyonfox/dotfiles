@@ -39,7 +39,7 @@ Do not use this skill for simple shell commands, one-file edits, or tasks Hermes
 | Strong interactive coding flow with print mode and TUI | Claude Code | Mature print mode, worktree support, good review workflows |
 | OpenAI-native coding agent / Codex ecosystem | Codex | Best fit when the user is already on OpenAI/Codex auth |
 | Visual-description worker for screenshots/UI/images | Antigravity CLI (`agy`) + Gemini | Gemini is efficient and unusually strong at visual detail extraction; use it to produce dense handoff context, not as the lead reasoning/coding brain |
-| SVG cleanup / imagery generation-editing | lead per `model-routing` | Pair with Gemini/Antigravity visual QA when visual fidelity matters |
+| SVG cleanup / imagery generation-editing | lead per the global Models table | Pair with Gemini/Antigravity visual QA when visual fidelity matters |
 | Provider-agnostic open-source worker | OpenCode | Good when the user explicitly wants OpenCode or a flexible model setup |
 
 If the user did not specify, choose the agent that is already installed and authenticated, and prefer the shortest safe workflow that can complete the task.
@@ -55,12 +55,12 @@ If the user did not specify, choose the agent that is already installed and auth
    A tiny exact-output probe with the same option shape is the fastest validation before launching expensive/background reviews.
 2. **Use the right execution mode.** One-shot mode for bounded tasks; interactive/background mode only when iteration is needed.
 3. **Scope the workspace.** Use a repo-specific `workdir`, and prefer isolated worktrees for parallel edits.
-4. **Encode routing rules in the shared `model-routing` skill.** Model lanes, effort, and billing live only in `~/dotfiles/skills/model-routing`, symlinked into every harness; `~/dotfiles/skills/AGENTS.md` only points to it. Don't copy model names or scores into Hermes skills. Verify live links with `readlink -f` after changes.
+4. **Keep routing rules in one place.** Model lanes and effort live only in the Models section of `~/dotfiles/skills/AGENTS.md`, which every harness loads. Review evidence lives in the `repo-audit` skill. Don't copy model names or scores into Hermes skills.
 
 ### Instruction-library maintenance
 
 When reducing prompt/skill context, classify instruction surfaces before deduplicating. Claude global guidance, Codex guidance, local `AGENTS.md`, and a task playbook can be loaded independently; each needs a compact standalone fallback for model choice, stop conditions, and safety. Reduce tokens **within** a surface first: collapse duplicated sections, turn long reference catalogues into a short discovery pointer, and move specialised diagnostics into `references/`. Measure before/after size, preserve critical guardrails, and verify Stow source/live parity. Before using `stow` to deploy one changed guidance file, dry-run it; if an existing broad package conflicts, do not force/adopt it—compare the intended source and live target, then perform a narrow verified sync when authorized.
-5. **Pick models with the `model-routing` skill.** Use its lanes and effort rules for every delegation, and set model and effort explicitly in each task card.
+5. **Pick models from the Models section of `~/dotfiles/skills/AGENTS.md`.** Use its lanes and effort rules for every delegation, and set model and effort explicitly in each task card.
 6. **Encode phase boundaries in every long worker prompt.** Codex workers can complete lengthy work but may continue polishing or expanding scope after the useful terminal point. Task cards must state the phase (`plan`, `implement`, `review`, `PR`), an explicit `stop after:` condition, the required verification, and prohibited next phases. For example: plan then stop for approval; implement and run named checks then stop; or address only the first review round then stop. Propose a next phase in one line instead of executing it.
    - For Sol work, also state the minimum expected delta, nearest local reference, explicit non-goals, and the evidence that proves success. It can turn a small request into an unnecessary rewrite or speculative test matrix without these constraints.
    - After one failed hypothesis, require a premise check against observed evidence before a new workaround. Sol's persistence is valuable, but it can pursue a non-existent problem or keep an incorrect assumption alive.

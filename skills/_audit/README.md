@@ -4,23 +4,34 @@ These are source snapshots for personal review. They are not canonical shared sk
 
 Do not promote these folders into `skills/` until each one has been reviewed, renamed where appropriate, and given portable metadata.
 
-Exception: the cloudflare bundle below is temporarily linked into opencode, Cursor, and Gemini runtimes (2026-08-25) so loose per-provider copies could be deduplicated. Repoint or drop those links once the skills are reviewed and promoted.
-
 ## Snapshot sources
 
-- `mattpocock/` comes from `mattpocock/skills` at `5b15a47f2d7150f545fbcacbfe381787fc0230dc`.
-- `pstack/` comes from `cursor/plugins` at `46125561306434d8a1d7745d540d8932ab0cd2a2`, under its `pstack/` plugin.
-- `tstack/` comes from `t3dotgg/tstack` at `7de017b3fc9d50c03cf3ecb98fb71e0ca65a78bd` (2026-10-24), with its `skills/` folders flattened into `tstack/`.
-- All three source snapshots are MIT-licensed. Their license texts are retained beside the imported folders.
-- The top-level `agents-sdk`, `cloudflare*`, `durable-objects`, `sandbox-sdk`, `turnstile-spin`, `workers-best-practices`, and `wrangler` folders come from identical loose copies found in `~/.config/opencode/skills`, `~/.cursor/skills`, `~/.gemini/skills`, and `~/.hermes/skills` (opencode's copy kept as the snapshot). Vendor Cloudflare skill bundle, unreviewed.
-- `web-perf--gemini-snapshot/` is an outdated copy of the fleet `web-perf` skill from `~/.gemini/skills`, differing only by a missing metadata block. Safe to delete after review.
+- `mattpocock/` comes from `mattpocock/skills`, refreshed to `5863806dd4e15c63174bee4e7515a4256792ecfa` (2026-11-12).
+- `pstack/` comes from `cursor/plugins` at `e1cc03121a0e71129a4fb730d7c5528a0a3e43c8` (2026-11-16), under its `pstack/` plugin. Only `LICENSE` remains here, for the promoted skills.
+- `tstack/` comes from `t3dotgg/tstack` at `7de017b3fc9d50c03cf3ecb98fb71e0ca65a78bd` (2026-10-24), with its `skills/` folders flattened into `tstack/`. Checked against `11e37a74d0a6868c121cd0910ab2b3bd9873b92a` (2026-11-11) on 2026-11-17: the `council` changes are merged, and `full-stop`'s looser trigger was declined so a closing "full stop" used as emphasis doesn't start PR work.
+- All three sources are MIT-licensed. Their licence texts stay here for the promoted skills.
 
 ## Review status
 
-- The copied `SKILL.md` files and supporting files are upstream source, unchanged.
-- `pstack/teach-codebase/` contains Pstack's upstream `teach` skill. The directory name records the intended final name only. Its internal name remains untouched until review.
-- `setup-matt-pocock-skills`, `triage`, `to-tickets`, and `wayfinder` belong to one tracker-oriented set. Keep their setup dependency explicit while reviewing them.
-- tstack was reviewed on 2026-10-26. `full-send`, `full-stop`, `takeover`, `sol-loop`, and `modernize` (renamed `modernise`) were promoted. `file-pr` and `babysit-pr` (with `scripts/pr-wait`) replaced the fleet versions, and `council` was merged into the fleet council as its code review mode. `sol-loop` replaced `claude-second-opinion`. Attribution in all of them follows the opt-in rule in global guidance.
-- `tstack/leaving-pr-comments` stays here. Its banner is model attribution, so decide how it fits the opt-in rule before promoting it. Its writing rules already live in `babysit-pr`.
-- `tstack-comparison.html` is the comparison report from that review.
-- No provider metadata has been added yet.
+Triaged on 2026-11-12. Snapshots refreshed and fully decided on 2026-11-17. Dropped snapshots stay in git history and upstream.
+
+### Left to decide
+
+Nothing. Every snapshot was decided on 2026-11-17.
+
+### Promoted
+
+- 2026-11-17: `pstack/blast-radius`, `typescript-best-practices` and `correct` moved to `skills/` with local edits. `grilling` and `unslop` took upstream additions. `why` became a line in `skills/AGENTS.md`. `tstack/leaving-pr-comments` was promoted with upstream wording, its banner limited to `attribution: on` repos. It now holds the comment rules that used to sit in `babysit-pr`.
+
+### Dropped
+
+- Cloudflare bundle (`agents-sdk`, `cloudflare*`, `durable-objects`, `sandbox-stable`, `turnstile-spin`, `workers-best-practices`, `wrangler`): dropped on 2026-11-17 with its opencode, Cursor and Gemini links. Hermes' loose copies were moved to `~/.local/share/dropped-skills/hermes-cloudflare-20261117`. Upstream is `cloudflare/skills`.
+- `mattpocock/wizard`: dropped on 2026-11-17, not needed.
+- `pstack/benchmark-checklist`, `principle-explain-the-number`: dropped on 2026-11-17, not needed.
+- 2026-11-17, all not needed: `pstack/principle-test-behavior-not-implementation` and `principle-attack-the-premise` (their ideas live on as `skills/AGENTS.md` lines), `ketchup`, `ketchup-video`, `create-formal-verification-skill`, `maintain-formal-verification-skill`, `statechart`, `sharpen`, `in-your-own-words`, `make-bot-ui`, `poteto-help`. Never imported and declined: `mattpocock/retro`, `pr`, `chief-of-staff`, `software-factory`, and pstack's `reflect`, `interrogate`, `arena`, `swarm`, `tdd`, `technical-writing`, `recall`, `automate-me`, `teach`, `bro`, `poteto-mode`, `setup-pstack`, `show-me-your-work`, `create-verification-skill` and the other principle skills.
+- `pstack/how`: spawns a subagent unasked and adds little over reading the code.
+- `mattpocock/setup-matt-pocock-skills`, `to-tickets`, `triage`, `wayfinder`: issue-tracker workflows. Hermes' board is the task list.
+- `mattpocock/teach`, `pstack/teach-codebase`: `study` covers teaching.
+- `mattpocock/handoff`, `resolving-merge-conflicts`, `wait-what`, `tdd`, `to-questionnaire`: too thin or covered by the harness and global guidance.
+- `pstack/no-comments`, `figure-it-out`, `architect`: spawn agents unasked or depend on skills that aren't here. Global guidance already sets the comment style.
+- `web-perf--gemini-snapshot`: outdated copy of `web-perf`.
