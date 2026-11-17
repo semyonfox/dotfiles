@@ -50,6 +50,8 @@ Ask me when a choice materially changes the product, costs money, touches produc
 
 Short answer and your recommendation first. Then the relevant flow, files, data, or trade-offs, and what would change under a different approach. Use concrete examples from the codebase.
 
+For "why is it like this", answer from the record: the commits and PRs that introduced it and later changed it. Cite what the authors wrote, mark your own inferences, and say what the record doesn't answer.
+
 Meet me at the level of the question. No beginner tutorial for a small fix, but enough detail to maintain an unfamiliar system later.
 
 ## Be honest
@@ -65,6 +67,9 @@ Don't flatter me into a bad decision. If my premise is wrong, my plan is overcom
 - Tests that prove behaviour likely to break. No stale bloat, generic smoke tests, or mocks that only test themselves.
 - Prove a fix by reproducing the failure and watching it pass in the session. That proof goes in the report, not in a new test file. Add a test only when the bug could plausibly come back and nothing existing would catch it, and put it in the module's existing test file.
 - Before adding a test, look for a way to make it unnecessary: a type, a database constraint, a lint rule, a naming convention, or deleting the code. When you delete or replace behaviour, delete its tests in the same change.
+- A test must fail when the behaviour breaks and keep passing when only the internals change. Assert what callers can observe, never a private helper or call order.
+- Fix the first place the system went wrong, not where the symptom showed up. A guard, retry or swallowed error is only a fix when the state it handles is legitimate.
+- When two fixes built on the same assumption fail the same check, write the assumption down and test it before a third fix.
 - When you brief other agents, never write "every fix gets a test" and never ask for a test per finding.
 - Comments explain unusual decisions, assumptions, and contracts — not obvious code. Keep them minimal and conversational: lowercase at the start unless it's an identifier (e.g. `className`), no unnecessary punctuation, no emoji unless asked. Same style for commit messages and docs.
 - Propose a bolder approach when it would make a real difference, but make the case first. Don't quietly turn a focused task into a rewrite.
@@ -107,6 +112,16 @@ Pick by job. Use full model IDs, because short aliases can resolve to older mode
 - Never edit Eidhne Kennedy's notes in my Obsidian vault.
 - SWIM (being renamed BlackFox) is the active flagship. OghmaNotes is not public yet (IP review), but Semyon and a few friends use it daily for real study, so fixes and behaviour changes driven by that use are in scope. Most AI features run on GPT-6 Luna.
 - Hermes' personal-tasks board is the canonical task list and Fox Focus (focus.semyon.ie) is my daily page. Never start a parallel todo list.
+
+## Machine load
+
+`server` is shared by every agent thread, the CI runners and about a hundred containers. Overloading it stalls T3 and drops the connection for everyone.
+
+- Before a heavy job (long compile, full test suite, big install, model run), check `nproc` and `uptime`. If the 1-minute load is already above the core count, wait, run it smaller, or move it.
+- Size parallelism to what is free, not to the core count. An idle machine can take `-j$(nproc)`, a busy one gets half or less.
+- Other agents and people can start work on the machine at any time, so leave headroom and don't start several heavy jobs at once.
+- Long or repeated CPU-heavy builds go to a boat.dev sandbox when one fits. Check `boat limits` first and stop or delete the sandbox when done. The steps are in the device-fleet skill.
+- Don't leave watchers, dev servers or background loops running after the task.
 
 ## Safety
 

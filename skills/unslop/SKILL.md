@@ -81,3 +81,5 @@ Removing patterns is half the job. Sterile, voiceless writing is just as obvious
 29. **Active voice.** Prefer it. Catch "is/are/was/were + past participle" and name the actor: "queries are validated" becomes "the compiler validates queries", "the file is parsed by the loader" becomes "the loader parses the file". Passive is fine only when the actor is unknown or genuinely doesn't matter.
 30. **Cut adverbs, or use a stronger verb.** "runs quickly" becomes "is fast" or the number. "significantly improves" becomes the measured delta. An adverb propping up a weak verb means the verb is wrong.
 31. **Prefer the plain word.** "utilize" becomes "use", "leverage" becomes "use", "facilitate" becomes "help", "numerous" becomes "many", "in the event that" becomes "if". The fancier synonym is rarely clearer.
+32. **Figurative language.** No metaphor, aphorism, personified code ("the function wants", "the cache knows") or figurative verb where a literal phrase exists. Write what happens.
+33. **Whole sentences.** Keep articles and verbs. Spell out arrows ("→") and shorthand like "w/" and "b/c" in prose. Fragments are fine in tables and lists only.

@@ -87,8 +87,8 @@ Check each finding and severity yourself. Another path, rare case, or
 small cost is a nit, whatever label it came with.
 
 - Agree: smallest fix. Prefer delete or narrow over new lock, cache,
-  helper, or option. Fix the case that happened. Add one focused test
-  that fails without the fix, if intent needs it.
+  helper, or option. Fix the case that happened. Add a test only under
+  the test rules in global guidance.
 - Disagree: say why, with evidence (file:line, test, output).
 - Out of scope or nit: decline in one line. List as follow-up.
 

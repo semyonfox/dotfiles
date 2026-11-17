@@ -21,8 +21,8 @@ PR still belongs in the product.
   authorise merging, closing, changing the base branch, or expanding scope.
 - Never use an unqualified force push. Update a rebased branch with
   `--force-with-lease` against the head SHA observed before the rebase.
-- Do not post a PR comment unless the user asked for one. Follow `babysit-pr`
-  for any comment posted on the user's behalf.
+- Do not post a PR comment unless the user asked for one. Follow
+  `leaving-pr-comments` for any comment posted on the user's behalf.
 
 ## Establish the PR's intent
 

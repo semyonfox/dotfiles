@@ -74,8 +74,8 @@ reproduction, a screenshot. Use the most direct proof the change allows:
 - Reproduce the original failure, apply the fix, then watch the same
   reproduction pass.
 - Run the checks that the repo's CI runs (typecheck, lint, tests).
-- Add one focused test that fails without the fix, when the behaviour has none
-  and the repo has a test setup.
+- Add a test only under the test rules in global guidance: when the bug could
+  plausibly come back and nothing existing would catch it.
 - For UI and runtime behaviour, run the app and look at the change in light
   and dark themes. Green mocked tests do not prove that the user experience
   works. Attach screenshots to the PR when they help and you have a way to
