@@ -43,6 +43,13 @@ Keep noninteractive SSH read-only unless a change was requested:
 ssh -o BatchMode=yes -o ConnectTimeout=8 <target> 'hostname; uname -a; ip -brief addr'
 ```
 
+## Dotfiles on laptop and pc
+
+There `~/dotfiles` is the live config. Hyprland, noctalia, scripts and user units point into it, and Hyprland reloads the moment a file changes. A stash, checkout, merge or rebase removes files for a moment, and Hyprland keeps that error until the next reload (2026-11-17: a stash left the laptop on "cannot open hyprland.lua").
+
+- Don't stash there to deploy. `git merge` works on a dirty tree when the dirty files don't overlap. When they do, ask first.
+- After any git command that rewrites files there, run `hyprctl reload` and check `hyprctl configerrors` is empty. Over SSH, set `XDG_RUNTIME_DIR=/run/user/$(id -u)` and `HYPRLAND_INSTANCE_SIGNATURE=$(ls $XDG_RUNTIME_DIR/hypr | head -1)` first.
+
 ## Laptop browser quizzes
 
 Use the `mcq-remote` skill to take over a quiz or browser tab on the laptop.
