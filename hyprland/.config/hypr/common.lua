@@ -275,7 +275,9 @@ function M.setup()
     hl.bind(main .. " + C", M.exec(home .. "/.local/bin/t3code-nightly"))
 
     -- Launcher menus
-    hl.bind("CTRL + SHIFT + Escape", M.exec("pkill -x btop || " .. term .. " -e btop"))
+    local btop = M.exec("pkill -x btop || " .. term .. " -e btop")
+    hl.bind("CTRL + SHIFT + Escape", btop)
+    hl.bind(main .. " + Escape", btop)
 
     -- Audio controls
     local audio = scripts .. "/audio-control.sh"
