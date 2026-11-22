@@ -2,7 +2,7 @@
 name: study
 description: Use when Semyon wants to study, revise, learn a lecture, prep an exam, or says "teach me" about coursework. Runs a tutoring session that makes him do the thinking, grounded in his lecture notes.
 metadata:
-  harnesses: [claude, codex, opencode]
+  harnesses: [claude, codex, opencode, hermes]
 ---
 
 # Study
