@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+# flash every Dell dock (WD19/WD22/HD22 family) plugged into this laptop, one after another
+#
+# usage: flash-docks [--once]
+#   plug a dock in, wait for "DONE", unplug, plug the next. ctrl+c when the room is finished
+#   --once stops after the first dock
+#
+# runs as your user. fwupd asks polkit, so expect a fingerprint prompt every few minutes
+# unplug keyboards, mice and drives from the dock first, they sit behind the RTS5413 hub being flashed
+set -Eeuo pipefail
+
+readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/flash-docks"
+readonly log_file="$state_dir/log.tsv"
+once=0
+case "${1:-}" in
+    --once) once=1 ;;
+    '') ;;
+    *) printf 'usage: flash-docks [--once]\n' >&2; exit 2 ;;
+esac
+
+die() { printf 'flash-docks: %s\n' "$*" >&2; exit 1; }
+say() { printf '\n\033[1;96m==>\033[0m %s\n' "$*"; }
+
+command -v fwupdmgr >/dev/null || die 'fwupdmgr not installed'
+command -v jq >/dev/null || die 'jq not installed'
+mkdir -p "$state_dir"
+[[ -f $log_file ]] || printf 'time\tserial\tresult\tversions\n' > "$log_file"
+
+# dock parts are either the dell_dock plugin or children named "... in Dell dock" (the usb4 one is intel_usb4)
+dock_devices() {
+    fwupdmgr get-devices --json 2>/dev/null |
+        jq -c '.Devices[] | select(.Plugin == "dell_dock" or ((.Name // "") | test("in Dell dock")))'
+}
+
+dock_root() {
+    dock_devices | jq -r 'select(.Plugin == "dell_dock" and (.ParentDeviceId // "") == "") | .DeviceId' | head -n 1
+}
+
+# fwupd reports the same serial for every WD22TB4, so the thunderbolt uuid is what tells docks apart
+dock_id() {
+    local d
+    [[ -n $(dock_root) ]] || return 0
+    for d in /sys/bus/thunderbolt/devices/*; do
+        [[ -f $d/device_name && $(<"$d/device_name") == *Dock* ]] && { cat "$d/unique_id"; return 0; }
+    done
+    # usb-c only docks like the wd19 have no thunderbolt uuid
+    dock_devices | jq -r 'select(.Plugin == "dell_dock" and (.ParentDeviceId // "") == "") | .Serial // empty' | head -n 1
+}
+
+dock_versions() {
+    dock_devices | jq -r '"\(.Name)=\(.Version)"' | sort | paste -sd ',' -
+}
+
+pending_activation() {
+    dock_devices | jq -r 'select(.Flags | index("needs-activation")) | .DeviceId'
+}
+
+dock_updates() {
+    local ids
+    ids=$(dock_devices | jq -r '.DeviceId')
+    [[ -n $ids ]] || return 0
+    fwupdmgr get-updates --json 2>/dev/null |
+        jq -r --arg ids "$ids" --arg root "$(dock_root)" '($ids | split("\n")) as $dock
+            | [.Devices[]? | select((.Releases // []) | length > 0) | select(.DeviceId as $d | $dock | index($d)) | .DeviceId]
+            # the root update carries the whole dock package, the way that worked first time
+            | sort_by(. != $root) | .[]'
+}
+
+# flashing and activation reset the dock, so wait for the same one to come back before touching it again
+wait_for_dock() {
+    local want=$1 i
+    for ((i = 0; i < 60; i++)); do
+        [[ $(dock_id) == "$want" ]] && return 0
+        sleep 3
+    done
+    return 1
+}
+
+flash_one() {
+    local serial=$1 pass ids pending id result=ok last_error=''
+    say "dock $serial: $(dock_versions)"
+    # each flash can stage another image, and the realtek hubs sometimes stall mid erase.
+    # they are dual image so a failed write leaves the old firmware running, which makes retrying safe
+    for ((pass = 1; pass <= 5; pass++)); do
+        pending=$(pending_activation)
+        if [[ -n $pending ]]; then
+            say 'activating staged firmware (dock resets for a few seconds)'
+            # shellcheck disable=SC2086 # one argument per device id
+            fwupdmgr activate $pending || last_error='activate failed'
+            sleep 5
+            wait_for_dock "$serial" || { result='dock did not come back after activation'; break; }
+            continue
+        fi
+        ids=$(dock_updates)
+        [[ -n $ids ]] || break
+        say "flashing pass $pass, DO NOT UNPLUG"
+        for id in $ids; do
+            if ! fwupdmgr update "$id" --assume-yes --no-reboot-check; then
+                last_error="update failed on $id"
+                say "$last_error, retrying on the next pass"
+                sleep 10
+                break
+            fi
+        done
+        sleep 5
+        wait_for_dock "$serial" || { result='dock did not come back after flashing'; break; }
+    done
+    if [[ $result == ok && -n $(pending_activation)$(dock_updates) ]]; then
+        result="still pending after 5 passes${last_error:+ ($last_error)}"
+    fi
+    printf '%s\t%s\t%s\t%s\n' "$(date --iso-8601=seconds)" "$serial" "$result" "$(dock_versions)" >> "$log_file"
+    if [[ $result == ok ]]; then
+        printf '\n\033[1;92mDONE %s\033[0m %s\n' "$serial" "$(dock_versions)"
+    else
+        printf '\n\033[1;91mFAILED %s: %s\033[0m\n' "$serial" "$result"
+    fi
+    command -v notify-send >/dev/null && notify-send 'flash-docks' "$serial: $result" || true
+}
+
+[[ $(cat /sys/class/power_supply/AC*/online 2>/dev/null | sort -r | head -n 1) == 1 ]] ||
+    printf 'flash-docks: warning, laptop is not on mains power\n' >&2
+
+say 'refreshing firmware metadata'
+fwupdmgr refresh || [[ $? == 2 ]] || die 'metadata refresh failed'
+
+declare -A seen=()
+last=''
+while :; do
+    serial=$(dock_id)
+    if [[ -z $serial || -n ${seen[$serial]:-} ]]; then
+        if [[ $last != "${serial:-none}" ]]; then
+            say 'plug in the next dock (ctrl+c to stop)'
+            last=${serial:-none}
+        fi
+        sleep 3
+        continue
+    fi
+    seen[$serial]=1
+    flash_one "$serial"
+    ((once)) && break
+    last=''
+done
+say "log: $log_file"

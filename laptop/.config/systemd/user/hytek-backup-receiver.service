@@ -1,0 +1,10 @@
+[Unit]
+Description=Receive Team Manager backups from the HyTek-Windows11 VM
+
+[Service]
+ExecStart=%h/.local/bin/hytek-backup-receiver
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
