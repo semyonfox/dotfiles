@@ -48,7 +48,7 @@ missing or pre-failing checks in the brief.
 
 ## 2. Start Sol
 
-In T3, call `orchestrator_capabilities`. Use `gpt-6.1-sol` at reasoning effort
+In T3, call `orchestrator_capabilities`. Use `gpt-6.2-sol` at reasoning effort
 high, since Sol defaults to low, unless the user named another version. If Sol
 wrote the change, say so before starting: a model reviewing its own work misses
 its own blind spots, so suggest Fable (`claude-fable-5-2`) as the reviewer. Sol bills Codex credits, so keep to the budget. Use `delegate_task` every round (`role: "review"`,

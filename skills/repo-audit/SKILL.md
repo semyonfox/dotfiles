@@ -14,10 +14,10 @@ A whole-repo review that ends in a fixed branch. Each step goes to the model tha
 
 | Step | Model | Effort |
 | --- | --- | --- |
-| 1. Blind review | `gpt-6.1-sol` and `claude-fable-5-2` in parallel | high |
+| 1. Blind review | `gpt-6.2-sol` and `claude-fable-5-2` in parallel | high |
 | 2. Security review | `claude-opus-5-5` | high |
 | 3. Merge plan | lead (`claude-opus-5-5`) | |
-| 4. Implementation | `gpt-6.1-sol` | high |
+| 4. Implementation | `gpt-6.2-sol` | high |
 | 5. Cross-review | `claude-fable-5-2` | high |
 | 6. Fix and verify | lead | |
 

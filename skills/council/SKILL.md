@@ -13,7 +13,7 @@ Get three models to work out a big decision or review a change together until th
 Start each member with `delegate_task`. Check `orchestrator_capabilities` first and skip a missing model rather than swapping it.
 
 - `claude-opus-5-5`, effort high
-- `gpt-6.1-sol`, reasoning effort high (it defaults to low)
+- `gpt-6.2-sol`, reasoning effort high (it defaults to low)
 - `claude-fable-5-2`, effort high
 
 Members can't see this chat. Leave out secrets. Tell them not to edit anything. If a member fails twice, carry on with the others and say so. Stop after four rounds and take any split to the user.

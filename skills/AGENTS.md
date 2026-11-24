@@ -89,7 +89,7 @@ Pick by job. Use full model IDs, because short aliases can resolve to older mode
 | Job | Model |
 | --- | --- |
 | Lead: plans, product and UI calls, security review, final checks | Opus 5.5 (`claude-opus-5-5`) |
-| Implementation, review of a single diff | GPT-6.1 Sol (`gpt-6.1-sol`) |
+| Implementation, review of a single diff | GPT-6.2 Sol (`gpt-6.2-sol`) |
 | Whole-repo audits, cross-review of another model's work, hard problems Opus has stalled on | Fable 5.2 (`claude-fable-5-2`) |
 | Bulk mechanical work: extraction, classification, summaries, boilerplate | GPT-6 Luna (`gpt-6-luna`) |
 
