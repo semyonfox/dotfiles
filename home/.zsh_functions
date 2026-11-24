@@ -396,6 +396,17 @@ update() {
         fwupdmgr refresh
         firmware_rc=$?
         (( firmware_rc == 0 || firmware_rc == 2 )) || _update_failed 'firmware metadata'
+        # a device that already took an image refuses new ones until it is activated
+        local pending=''
+        command -v jq &>/dev/null && pending=$(fwupdmgr get-devices --json 2>/dev/null |
+            jq -r '.Devices[] | select(.Flags | index("needs-activation")) | .DeviceId')
+        if [[ -n $pending ]]; then
+            if (( firmware )); then
+                fwupdmgr activate ${=pending} || _update_failed 'firmware activation'
+            else
+                notes+=("Firmware: activation pending, run update --firmware")
+            fi
+        fi
         if (( firmware )); then
             fwupdmgr update --assume-yes --no-reboot-check
             firmware_rc=$?
