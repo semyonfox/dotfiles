@@ -124,6 +124,7 @@ Pick by job. Use full model IDs, because short aliases can resolve to older mode
 - Other agents and people can start work on the machine at any time, so leave headroom and don't start several heavy jobs at once.
 - Long or repeated CPU-heavy builds go to a boat.dev sandbox when one fits. Check `boat limits` first and stop or delete the sandbox when done. The steps are in the device-fleet skill.
 - Don't leave watchers, dev servers or background loops running after the task.
+- Throwaway database containers: put the data dir on `--tmpfs` and remove with `docker rm -fv`, never `docker rm -f`, which orphans the data volume.
 
 ## Safety
 
