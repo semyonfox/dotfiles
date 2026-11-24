@@ -16,6 +16,7 @@ This package owns host-specific files:
 - `~/.config/dotfiles/fprintd-sleep.service`, a system unit installed once by hand (see the file)
 - `~/.config/dotfiles/power-mode-write`, the root helper `power-mode.sh` calls through a NOPASSWD sudo rule, installed by hand to `/usr/local/bin` (see the file)
 - `~/.local/bin/cpu-power` and `~/.local/bin/cpu-bench`, set the cpu's sustained power limit and benchmark it
+- `~/.local/bin/zenity`, closes `--progress --auto-close` dialogs on EOF, which zenity 4.2 never does and which left Steam stuck unpacking its runtime
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`

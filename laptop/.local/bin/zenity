@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# zenity 4.2 --progress --auto-close never closes, even on 100, and once its input hits EOF
+# it spins a core forever. steam.sh pipes tar into it when unpacking the runtime, so every
+# runtime update left a stuck "Unpacking Steam Runtime" dialog and steam never started.
+# feed the dialog ourselves and close it when the input ends
+if [[ " $* " == *" --progress "* && " $* " == *" --auto-close "* ]]; then
+  coproc ZEN { exec /usr/bin/zenity "$@"; }
+  zen_pid=$ZEN_PID
+  cat >&"${ZEN[1]}"
+  kill "$zen_pid" 2>/dev/null
+  wait "$zen_pid" 2>/dev/null
+  exit 0
+fi
+exec /usr/bin/zenity "$@"
