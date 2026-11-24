@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# narrow privileged writer for power-mode.sh, only touches whitelisted sysfs paths
+#
+# not stowed, it runs as root through a NOPASSWD sudoers rule. install once with:
+#   sudo install -m 755 -o root -g root ~/.config/dotfiles/power-mode-write /usr/local/bin/power-mode-write
+# and again after editing it
+set -e
+key=${1:-} val=${2:-} cpu=${3:-}
+case "$key" in
+    epp)          [[ "$cpu" =~ ^[0-9]+$ ]] || exit 4; f="/sys/devices/system/cpu/cpu${cpu}/cpufreq/energy_performance_preference" ;;
+    epb)          [[ "$cpu" =~ ^[0-9]+$ ]] || exit 4; f="/sys/devices/system/cpu/cpu${cpu}/power/energy_perf_bias" ;;
+    governor)     [[ "$cpu" =~ ^[0-9]+$ ]] || exit 4; f="/sys/devices/system/cpu/cpu${cpu}/cpufreq/scaling_governor" ;;
+    pl1)
+        # sustained cpu power limit in whole watts, capped at the short-term limit (PL2)
+        # the firmware's mmio limit is the one that bites, the msr one only ever gets raised to match
+        mmio=/sys/class/powercap/intel-rapl-mmio:0/constraint_0_power_limit_uw
+        msr=/sys/class/powercap/intel-rapl:0/constraint_0_power_limit_uw
+        pl2=/sys/class/powercap/intel-rapl:0/constraint_1_power_limit_uw
+        [[ "$val" =~ ^[0-9]+$ ]] || exit 3
+        uw=$(( val * 1000000 ))
+        (( uw >= 5000000 && uw <= $(<"$pl2") )) || exit 3
+        [ -w "$mmio" ] && [ -w "$msr" ] || exit 5
+        (( uw > $(<"$msr") )) && printf '%s\n' "$uw" > "$msr"
+        printf '%s\n' "$uw" > "$mmio"
+        exit 0
+        ;;
+    *) exit 2 ;;
+esac
+[[ "$val" =~ ^[a-zA-Z0-9_-]+$ ]] || exit 3
+[ -w "$f" ] || exit 5
+printf '%s\n' "$val" > "$f"

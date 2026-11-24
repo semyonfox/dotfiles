@@ -113,9 +113,9 @@ hl.config({
 
 -- Laptop-only power mode shortcuts
 local main = "SUPER"
-hl.bind(main .. " + F10", common.exec(home .. "/.local/bin/power-mode.sh saver"))
-hl.bind(main .. " + F11", common.exec(home .. "/.local/bin/power-mode.sh ac"))
-hl.bind(main .. " + F12", common.exec(home .. "/.local/bin/power-mode.sh beast"))
+hl.bind(main .. " + F10", common.exec(home .. "/.local/bin/power-mode.sh power-saver"))
+hl.bind(main .. " + F11", common.exec(home .. "/.local/bin/power-mode.sh balanced"))
+hl.bind(main .. " + F12", common.exec(home .. "/.local/bin/power-mode.sh performance"))
 hl.bind(main .. " + SHIFT + F12", common.exec(home .. "/.local/bin/power-mode.sh cycle"))
 
 -- Keep this literal require in the entrypoint: Noctalia's template hook detects it.

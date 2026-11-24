@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# raise or reset the cpu's sustained power limit (PL1)
+#
+# usage: cpu-power              show the current limits
+#        cpu-power <watts>      set PL1, eg cpu-power 25
+#        cpu-power max          PL1 up to PL2 (64 W), only heat limits it then
+#        cpu-power stock        put back what the firmware had before the first change
+#
+# the firmware sets its own PL1 through the mmio rapl interface (15 W stock) and the cpu obeys
+# whichever of that and the msr one is lower, so both get written
+# the cpu still throttles itself at 100C, so nothing here can cook it. the cost is a hotter
+# case, more fan and faster battery drain
+# the firmware can put its own value back after a charger plug, resume or profile change.
+# run cpu-power to check and rerun the set if it dropped. a reboot always resets it
+set -euo pipefail
+
+readonly mmio=/sys/class/powercap/intel-rapl-mmio:0
+readonly msr=/sys/class/powercap/intel-rapl:0
+readonly helper=/usr/local/bin/power-mode-write
+readonly stock_file="${XDG_STATE_HOME:-$HOME/.local/state}/cpu-power/stock"
+
+watts() { echo $(( $(cat "$1") / 1000000 )); }
+
+status() {
+    local ac
+    ac="$(cat /sys/class/power_supply/AC/online 2>/dev/null || echo 0)"
+    printf 'firmware PL1 (mmio): %s W\n' "$(watts "$mmio/constraint_0_power_limit_uw")"
+    printf 'cpu PL1 (msr):       %s W\n' "$(watts "$msr/constraint_0_power_limit_uw")"
+    printf 'PL2 (short boost):   %s W (mmio) %s W (msr)\n' \
+        "$(watts "$mmio/constraint_1_power_limit_uw")" "$(watts "$msr/constraint_1_power_limit_uw")"
+    printf 'firmware says max:   %s W\n' "$(watts "$mmio/constraint_0_max_power_uw")"
+    printf 'ac:                  %s\n' "$([[ $ac == 1 ]] && echo on || echo off)"
+    [[ -f "$stock_file" ]] && printf 'stock saved:         %s\n' "$(<"$stock_file")"
+    return 0
+}
+
+save_stock() {
+    [[ -f "$stock_file" ]] && return 0
+    mkdir -p "$(dirname "$stock_file")"
+    printf '%s %s\n' "$(cat "$mmio/constraint_0_power_limit_uw")" \
+        "$(cat "$msr/constraint_0_power_limit_uw")" > "$stock_file"
+}
+
+# sets PL1 on both interfaces, given in microwatts. power-mode-write has a NOPASSWD rule,
+# plain sudo is the fallback until its pl1 support is installed
+write_pl1() {
+    local mmio_uw=$1 msr_uw=$2
+    if (( mmio_uw % 1000000 == 0 )) && [[ -x "$helper" ]] &&
+        sudo -n "$helper" pl1 $(( mmio_uw / 1000000 )) 2>/dev/null; then
+        return 0
+    fi
+    printf '%s\n' "$mmio_uw" | sudo tee "$mmio/constraint_0_power_limit_uw" >/dev/null
+    printf '%s\n' "$msr_uw" | sudo tee "$msr/constraint_0_power_limit_uw" >/dev/null
+}
+
+set_watts() {
+    local w=$1 pl2 uw
+    pl2="$(watts "$msr/constraint_1_power_limit_uw")"
+    if (( w < 5 || w > pl2 )); then
+        printf 'cpu-power: pick between 5 and %s W (PL2)\n' "$pl2" >&2
+        exit 2
+    fi
+    if [[ "$(cat /sys/class/power_supply/AC/online 2>/dev/null || echo 0)" != 1 ]]; then
+        echo 'cpu-power: on battery, this will drain it fast' >&2
+    fi
+    save_stock
+    uw=$(( w * 1000000 ))
+    # the msr PL1 only needs raising, never lower it below what it already was
+    local msr_uw
+    msr_uw="$(cat "$msr/constraint_0_power_limit_uw")"
+    (( uw > msr_uw )) && msr_uw=$uw
+    write_pl1 "$uw" "$msr_uw"
+    if [[ "$(cat "$mmio/constraint_0_power_limit_uw")" != "$uw" ]]; then
+        echo 'cpu-power: the firmware did not take the new limit' >&2
+        status
+        exit 1
+    fi
+    status
+}
+
+case "${1:-status}" in
+    status) status ;;
+    max) set_watts "$(watts "$msr/constraint_1_power_limit_uw")" ;;
+    stock)
+        if [[ ! -f "$stock_file" ]]; then
+            echo 'cpu-power: nothing saved, the limits were never changed' >&2
+            exit 1
+        fi
+        read -r mmio_uw msr_uw < "$stock_file"
+        write_pl1 "$mmio_uw" "$msr_uw"
+        status
+        ;;
+    *[!0-9]*|'')
+        echo 'usage: cpu-power [status|<watts>|max|stock]' >&2
+        exit 2
+        ;;
+    *) set_watts "$1" ;;
+esac

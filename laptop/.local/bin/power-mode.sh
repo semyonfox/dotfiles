@@ -23,7 +23,7 @@ exec 9>"${cache_file}.lock"
 flock 9
 
 current_mode() {
-    cat "$cache_file" 2>/dev/null || echo ac
+    cat "$cache_file" 2>/dev/null || echo balanced
 }
 
 write_mode() {
@@ -72,6 +72,8 @@ set_epb_all() { for_each_cpu set_epb_one "$1"; }
 set_governor_one() { priv_write governor "$2" "$1"; }
 set_epp_one() { priv_write epp "$2" "$1"; }
 set_epb_one() { priv_write epb "$2" "$1"; }
+# sustained cpu power limit in watts. the firmware holds it at 15, performance lifts it to PL2 (64)
+set_pl1() { priv_write pl1 "$1"; }
 
 apply_desktop_performance() {
     local policy gpu
@@ -91,11 +93,11 @@ apply_desktop_performance() {
             write_if_writable 1 "$gpu/pp_power_profile_mode"
     done < <(find /sys/devices -name power_dpm_force_performance_level -type f 2>/dev/null)
 
-    write_mode beast
+    write_mode performance
 }
 
 apply_laptop() {
-    local powerprofiles=$1 governor=$2 epp=$3 epb=$4 mode=$5
+    local powerprofiles=$1 governor=$2 epp=$3 epb=$4 pl1=$5 mode=$6
 
     set_governor_all "$governor"
     if [[ "$(powerprofilesctl get 2>/dev/null || true)" != "$powerprofiles" ]]; then
@@ -103,29 +105,32 @@ apply_laptop() {
     fi
     set_epp_all "$epp"
     set_epb_all "$epb"
+    set_pl1 "$pl1"
     write_mode "$mode"
 }
 
-apply_laptop_beast() {
-    apply_laptop performance performance performance 0 beast
+apply_laptop_performance() {
+    apply_laptop performance performance performance 0 64 performance
 }
 
-apply_laptop_ac() {
-    apply_laptop balanced powersave balance_performance 4 ac
+# balanced follows the power source, AC tuning when plugged in and battery tuning when not
+apply_laptop_balanced() {
+    if ac_online; then
+        apply_laptop balanced powersave balance_performance 4 28 balanced
+    else
+        apply_laptop balanced powersave balance_power 8 15 balanced
+    fi
 }
 
-apply_laptop_mobile() {
-    apply_laptop balanced powersave balance_power 8 mobile
-}
-
-apply_laptop_saver() {
-    apply_laptop power-saver powersave power 15 saver
+apply_laptop_power_saver() {
+    apply_laptop power-saver powersave power 15 15 power-saver
 }
 
 apply_laptop_extras() {
-    local epb=$1 mode=$2
+    local epb=$1 pl1=$2 mode=$3
 
     set_epb_all "$epb"
+    set_pl1 "$pl1"
     write_mode "$mode"
 }
 
@@ -156,7 +161,7 @@ apply_noctalia_profile() {
 
     if [[ "$requested" != performance ]]; then
         # intel_pstate rejects non-performance EPP while its pseudo-governor is
-        # performance. Beast selects that governor, so unlock EPP before asking
+        # performance. performance selects that governor, so unlock EPP before asking
         # power-profiles-daemon to move back down.
         set_governor_all powersave
     fi
@@ -166,15 +171,15 @@ apply_noctalia_profile() {
     wait_for_power_profile "$requested"
 
     case "$requested" in
-        performance) apply_laptop_extras 0 beast ;;
+        performance) apply_laptop_extras 0 64 performance ;;
         balanced)
             if ac_online; then
-                apply_laptop_extras 4 ac
+                apply_laptop_extras 4 28 balanced
             else
-                apply_laptop_extras 8 mobile
+                apply_laptop_extras 8 15 balanced
             fi
             ;;
-        power-saver) apply_laptop_extras 15 saver ;;
+        power-saver) apply_laptop_extras 15 15 power-saver ;;
         *) usage ;;
     esac
 }
@@ -185,26 +190,22 @@ apply_mode() {
     case "$machine_profile" in
         laptop)
             case "$requested" in
-                beast|performance|apply) apply_laptop_beast ;;
-                ac|balanced) apply_laptop_ac ;;
-                mobile) apply_laptop_mobile ;;
-                saver|power-saver) apply_laptop_saver ;;
+                performance) apply_laptop_performance ;;
+                balanced) apply_laptop_balanced ;;
+                power-saver) apply_laptop_power_saver ;;
                 auto)
+                    # performance drops to balanced on battery, power-saver is kept either way
                     target="$(current_mode)"
-                    if ac_online; then
-                        [[ "$target" == mobile ]] && target=ac
-                    elif [[ "$target" == beast || "$target" == ac ]]; then
-                        target=mobile
-                    fi
+                    ac_online || [[ "$target" != performance ]] || target=balanced
                     apply_mode "$target"
                     ;;
                 on-ac)
-                    [[ "$(current_mode)" == mobile ]] && apply_laptop_ac || true
+                    # pick up the AC tuning, an explicit performance or power-saver is left alone
+                    [[ "$(current_mode)" == balanced ]] && apply_laptop_balanced || true
                     ;;
                 on-battery)
-                    # Preserve an explicitly selected saver profile. Everything
-                    # else switches to the battery-oriented balanced profile.
-                    [[ "$(current_mode)" == saver ]] || apply_laptop_mobile
+                    # keep an explicit power-saver, everything else goes to battery tuning
+                    [[ "$(current_mode)" == power-saver ]] || apply_laptop_balanced
                     ;;
                 *)
                     usage
@@ -213,7 +214,7 @@ apply_mode() {
             ;;
         pc|desktop)
             case "$requested" in
-                beast|performance|apply|auto|ac|balanced|mobile|saver|power-saver|on-ac|on-battery)
+                performance|balanced|power-saver|auto|on-ac|on-battery)
                     apply_desktop_performance
                     ;;
                 *)
@@ -232,21 +233,22 @@ apply_mode() {
 
 cycle() {
     case "$machine_profile:$(current_mode)" in
-        laptop:ac) apply_laptop_beast ;;
-        laptop:beast) apply_laptop_saver ;;
-        laptop:saver) apply_laptop_mobile ;;
-        laptop:mobile|laptop:*) apply_laptop_ac ;;
+        laptop:balanced) apply_laptop_performance ;;
+        laptop:performance) apply_laptop_power_saver ;;
+        laptop:*) apply_laptop_balanced ;;
         *) apply_desktop_performance ;;
     esac
 }
 
 status() {
-    local gov=none epp=none epb=none ppd=none gpu_dpm=none gpu_profile=none lact=inactive lact_profile=none
+    local pl1=none gov=none epp=none epb=none ppd=none gpu_dpm=none gpu_profile=none lact=inactive lact_profile=none
 
     gov="$(cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor 2>/dev/null || echo none)"
     epp="$(cat /sys/devices/system/cpu/cpufreq/policy0/energy_performance_preference 2>/dev/null || echo none)"
     epb="$(cat /sys/devices/system/cpu/cpu0/power/energy_perf_bias 2>/dev/null || echo none)"
     ppd="$(powerprofilesctl get 2>/dev/null || echo none)"
+    [[ -r /sys/class/powercap/intel-rapl-mmio:0/constraint_0_power_limit_uw ]] &&
+        pl1="$(( $(cat /sys/class/powercap/intel-rapl-mmio:0/constraint_0_power_limit_uw) / 1000000 ))W"
     gpu_dpm="$(find /sys/devices -name power_dpm_force_performance_level -type f -exec cat {} \; 2>/dev/null | head -n1)"
     gpu_profile="$(find /sys/devices -name pp_power_profile_mode -type f -exec awk '/[*]/ {gsub(/[*:]/, "", $2); print $2; exit}' {} \; 2>/dev/null | head -n1)"
     [[ -n "$gpu_dpm" ]] || gpu_dpm=none
@@ -257,11 +259,12 @@ status() {
         lact_profile="$(lact cli profile get 2>/dev/null | awk -F': ' '/Current profile/ {print $2; found=1} END {if (!found) print "none"}')"
     fi
 
-    printf 'machine_profile: %s\nmode: %s\nac: %s\npowerprofilesctl: %s\ncpu_governor: %s\ncpu_epp: %s\ncpu_epb: %s\ngpu_dpm: %s\ngpu_profile: %s\nlact: %s\nlact_profile: %s\n' \
+    printf 'machine_profile: %s\nmode: %s\nac: %s\npowerprofilesctl: %s\ncpu_pl1: %s\ncpu_governor: %s\ncpu_epp: %s\ncpu_epb: %s\ngpu_dpm: %s\ngpu_profile: %s\nlact: %s\nlact_profile: %s\n' \
         "$machine_profile" \
         "$(current_mode)" \
         "$(ac_online && echo on || echo off)" \
         "$ppd" \
+        "$pl1" \
         "$gov" \
         "$epp" \
         "$epb" \
@@ -272,7 +275,7 @@ status() {
 }
 
 usage() {
-    echo "usage: $0 {beast|ac|mobile|saver|balanced|performance|apply|cycle|auto|on-ac|on-battery|status|noctalia PROFILE ORIGIN}" >&2
+    echo "usage: $0 {performance|balanced|power-saver|cycle|auto|on-ac|on-battery|status|noctalia PROFILE ORIGIN}" >&2
     exit 1
 }
 
@@ -284,7 +287,7 @@ case "${1:-status}" in
         apply_noctalia_profile "$2" "$3"
         status
         ;;
-    beast|ac|mobile|saver|balanced|performance|apply|auto|on-ac|on-battery|power-saver)
+    performance|balanced|power-saver|auto|on-ac|on-battery)
         apply_mode "$1"
         status
         ;;

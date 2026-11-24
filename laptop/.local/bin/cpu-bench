@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# run geekbench with a 1s temp, clock and power log, then compare every run so far
+#
+# usage: cpu-bench <label>     eg cpu-power max && cpu-bench max
+#        cpu-bench             just print the comparison table
+#
+# runs land in $CPU_BENCH_DIR (default ~/.local/state/cpu-bench/<label>)
+# package power needs root to read, so it asks for sudo once at the start. without a terminal
+# or cached sudo it runs anyway and leaves the watts column empty
+# temps.csv columns: epoch, coretemp mC, fan rpm, avg clock MHz, ac online, PL1 W, package W
+set -euo pipefail
+
+readonly bench_dir="${CPU_BENCH_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/cpu-bench}"
+readonly rapl=/sys/class/powercap/intel-rapl:0
+readonly mmio=/sys/class/powercap/intel-rapl-mmio:0
+
+table() {
+    local d
+    printf '%-14s %6s %6s %5s %6s %6s %4s %6s %6s %5s\n' \
+        run single multi peak avgC clock hot pkgW PL1 acoff
+    for d in "$bench_dir"/*/; do
+        [[ -f "$d/temps.csv" ]] || continue
+        local single multi
+        single="$(awk '/Single-Core Score/ {print $NF}' "$d/geekbench.txt" 2>/dev/null || true)"
+        multi="$(awk '/Multi-Core Score/ {print $NF}' "$d/geekbench.txt" 2>/dev/null || true)"
+        awk -F, -v run="$(basename "$d")" -v s="${single:--}" -v m="${multi:--}" '
+            { t = $2 / 1000; st += t; clk += $4; n++
+              if (t > peak) peak = t
+              if (t >= 99) hot++
+              if (NF >= 5 && $5 != 1) acoff++
+              if (NF >= 6) pl = (pl == "" || $6 < pl) ? $6 : pl
+              if ($7 != "") { pw += $7; pn++ } }
+            END {
+              printf "%-14s %6s %6s %5d %6.1f %6d %4d %6s %6s %5d\n", run, s, m, peak, st / n,
+                clk / n, hot, pn ? sprintf("%.1f", pw / pn) : "-", pl == "" ? "-" : pl, acoff
+            }' "$d/temps.csv"
+    done
+    echo
+    echo 'PL1 is the lowest seen during the run, so a drop means the firmware put its limit back'
+}
+
+if [[ $# -eq 0 ]]; then
+    table
+    exit 0
+fi
+
+label=$1
+out="$bench_dir/$label"
+if [[ -e "$out" ]]; then
+    echo "cpu-bench: $out already exists, pick another label" >&2
+    exit 2
+fi
+
+hwmon="$(dirname "$(grep -l '^coretemp$' /sys/class/hwmon/*/name | head -n1)")"
+[[ "$(cat /sys/class/power_supply/AC/online)" == 1 ]] || echo 'cpu-bench: warning, on battery' >&2
+read -r load _ < /proc/loadavg
+awk -v l="$load" 'BEGIN { exit !(l >= 3) }' && echo "cpu-bench: warning, load is $load" >&2
+
+as_root=(sudo)
+if [[ -t 0 ]]; then
+    sudo -v || as_root=()
+else
+    sudo -n true 2>/dev/null || as_root=()
+fi
+[[ ${#as_root[@]} -eq 0 ]] && echo 'cpu-bench: no sudo, logging without package watts' >&2
+mkdir -p "$out"
+ps -eo pid,pcpu,etime,comm --sort=-pcpu | head -n6 > "$out/top.txt"
+powerprofilesctl get > "$out/profile.txt" 2>/dev/null || true
+cat /sys/class/power_supply/BAT0/status > "$out/battery.txt"
+cat /proc/loadavg > "$out/loadavg.txt"
+
+# the logger runs as root to read energy_uj, the redirect stays ours so the csv is user owned
+stop="$out/.stop"
+# shellcheck disable=SC2016 # expanded by the root shell
+"${as_root[@]}" bash -c '
+    hwmon=$1 rapl=$2 mmio=$3 stop=$4
+    prev=$(cat "$rapl/energy_uj" 2>/dev/null || echo 0); prev_t=$(date +%s%N)
+    while [[ ! -e $stop ]]; do
+        sleep 1
+        e=$(cat "$rapl/energy_uj" 2>/dev/null || echo 0); now=$(date +%s%N)
+        temp=$(cat "$hwmon/temp1_input")
+        fan=$(awk "/^speed:/ {print \$2}" /proc/acpi/ibm/fan)
+        clk=$(cat /sys/devices/system/cpu/cpu[0-9]*/cpufreq/scaling_cur_freq | awk "{s += \$1; n++} END {printf \"%d\", s / n / 1000}")
+        ac=$(cat /sys/class/power_supply/AC/online)
+        pl1=$(( $(cat "$mmio/constraint_0_power_limit_uw") / 1000000 ))
+        # uJ per ns times 1000 is watts, skip the sample if the counter wrapped
+        pkg=$(awk -v e=$e -v de=$((e - prev)) -v dt=$((now - prev_t)) "BEGIN {if (e > 0) printf \"%.1f\", (de > 0 ? de * 1000 / dt : 0)}")
+        echo "$(date +%s),$temp,$fan,$clk,$ac,$pl1,$pkg"
+        prev=$e; prev_t=$now
+    done
+' _ "$hwmon" "$rapl" "$mmio" "$stop" >> "$out/temps.csv" &
+logger_pid=$!
+trap 'touch "$stop"; wait "$logger_pid" 2>/dev/null; rm -f "$stop"' EXIT
+
+echo "running geekbench into $out, takes about 7 to 10 min"
+geekbench --cpu > "$out/geekbench.txt" 2>&1 || echo 'cpu-bench: geekbench failed, see geekbench.txt' >&2
+grep -E 'browser.geekbench.com' "$out/geekbench.txt" || true
+echo
+table

@@ -14,6 +14,8 @@ This package owns host-specific files:
 - `~/.config/noctalia/idle.toml`
 - `~/.config/noctalia/lockscreen-login.toml`
 - `~/.config/dotfiles/fprintd-sleep.service`, a system unit installed once by hand (see the file)
+- `~/.config/dotfiles/power-mode-write`, the root helper `power-mode.sh` calls through a NOPASSWD sudo rule, installed by hand to `/usr/local/bin` (see the file)
+- `~/.local/bin/cpu-power` and `~/.local/bin/cpu-bench`, set the cpu's sustained power limit and benchmark it
 - `~/.config/hypr/monitors.conf`
 - `~/.config/hypr/monitors.json`
 - `~/.config/hypr/userprefs.conf`
@@ -21,11 +23,15 @@ This package owns host-specific files:
 
 Shared Noctalia config and helpers come from the `hyprland`, `noctalia`, and `home` packages.
 
-Noctalia maps its standard power profiles onto the laptop helper's tuning:
+`power-mode.sh` uses Noctalia's three power profiles as its modes, and Super+F10/F11/F12 select them directly:
 
-- `performance` selects Beast.
-- `balanced` selects AC or Mobile based on the current power source.
-- `power-saver` selects Saver.
+- `performance`: full tuning, cpu sustained power limit (PL1) 64 W. Drops to `balanced` when unplugged or at login on battery.
+- `balanced`: follows the power source, AC tuning and 28 W when plugged in, battery tuning and 15 W when not.
+- `power-saver`: lowest tuning and 15 W, kept across plugging and unplugging.
+
+The firmware otherwise holds PL1 at 15 W.
+
+Charge limits are separate from the power profiles. UPower owns them and the "Battery charging" toggle in Noctalia's control centre switches between stopping at 80% (resuming below 75%, from the `CHARGE_LIMIT` hwdb default) and charging to 100%. UPower remembers the choice across reboots.
 
 Hyprland remains the compositor and Noctalia owns the shell surfaces. The retired waybar/swaync/rofi stack lives on the `legacy-shell-stack` branch. See [the changeover handover](../docs/noctalia-laptop-changeover-handover.md).
 

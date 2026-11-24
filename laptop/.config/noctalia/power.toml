@@ -1,5 +1,5 @@
-# Map Noctalia profiles to Beast, source-aware AC/Mobile, and Saver. PPD owns
-# governor, EPP, and platform profile, the helper adds EPB. Charge limits belong
-# to UPower through the battery charging toggle in the control centre.
+# Noctalia's profiles are power-mode.sh's modes, balanced follows the power source. PPD owns
+# governor, EPP, and platform profile, the helper adds EPB and PL1. Charge limits
+# belong to UPower through the battery charging toggle in the control centre.
 [hooks]
 power_profile_changed = "/home/semyon/.local/bin/power-mode.sh noctalia \"$NOCTALIA_POWER_PROFILE\" \"$NOCTALIA_POWER_PROFILE_ORIGIN\""

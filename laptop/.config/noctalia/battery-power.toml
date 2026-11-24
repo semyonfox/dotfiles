@@ -1,6 +1,6 @@
 # Hyprland applies the cached mode at startup. Follow power-source changes
-# here so balanced uses mobile tuning on battery and AC tuning when plugged in.
-# An explicitly selected Saver mode remains untouched by the helper.
+# here so balanced uses battery tuning on battery and AC tuning when plugged in.
+# An explicitly selected power-saver mode remains untouched by the helper.
 [hooks]
 battery_charging = "~/.local/bin/power-mode.sh on-ac"
 battery_plugged = "~/.local/bin/power-mode.sh on-ac"
