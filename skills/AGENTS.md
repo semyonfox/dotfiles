@@ -40,7 +40,9 @@ Investigate, build, fix, refactor, research, improve → own the work. Inspect t
 inspect → decide → act → verify → report
 ```
 
-Never say something is done without evidence: a test, command output, diff, visual check, or a concrete blocker.
+Never say something is done without evidence: a test, command output, diff, visual check, or a concrete blocker. A claim only covers what you checked, so before changing something shared, find everything that uses it, and say what you didn't check.
+
+Zen Browser work: before starting, read `~/.claude/projects/-home-semyon--t3-scratch-2026-10-30-i-made-some-contribs-to-3c19148f/memory/zen-browser-contrib-workflow.md`.
 
 Ask me when a choice materially changes the product, costs money, touches production, risks data, needs credentials, or goes beyond what I asked. Otherwise don't make me approve routine local decisions.
 

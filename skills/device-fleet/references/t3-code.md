@@ -4,9 +4,11 @@ Last refreshed: 2026-07-03 from `server` using non-sudo local and SSH probes.
 
 ## Key Rule
 
-Do not tell agents to start Semyon's normal T3 Code with `npx t3@nightly serve`. That is a public quickstart pattern, not the verified fleet setup.
+Verified 2026-11-01: `server` runs the native `t3code.service` (`t3 service install`, nightly, runtime under `~/.t3/runtime/versions`), replacing the custom `t3-code-headless.service`, which is disabled and must not be re-enabled. `~/.t3/service.env` holds only `T3CODE_LAN=true`; the default port 3773 is what the `t3.semyon.ie` tunnel uses. The `t3` CLI is the official install (`~/.local/bin/t3` symlink into the runtime). T3 finds harnesses through its login-shell PATH lookup (`os-jank.ts`), so no PATH drop-in or binary path setting is needed, and `/proc/<pid>/environ` does not show that lookup. npm harnesses live under `--prefix ~/.local`, because bare `npm -g` on `server` lands in `nvm/v24.22.1`, which is not on the login PATH. There is no update timer: Semyon updates from client apps (Settings → Environments or the sidebar update button). T3 Connect is on for `server` (relay `https://relay.t3.codes`, agent activity publishing off); laptop, PC and phone sign-in was still pending on this date. Everything below this section that describes the custom unit is history.
 
-The verified setup on `server` is an installed global `t3` CLI wrapped by user systemd units and helper scripts. User lingering is enabled, so the user service manager can start services without an interactive login.
+`t3 connect status` and other `t3` subcommands can run migrations on the live db even with a different version serving, so they are not read-only: on 2026-11-01 one moved live from migration 72 to 76. Use `t3 status`, or read the db, and do not run a newer CLI against live data to inspect it.
+
+Do not tell agents to start Semyon's normal T3 Code with `npx t3@nightly serve`. That is a public quickstart pattern, not the verified fleet setup.
 
 ## `server`
 
@@ -237,3 +239,8 @@ Verified on 2026-07-03:
 - 9 laptop-local threads (7 to 14 November) were imported with no outage into a new server project `Laptop` (`~/laptop-threads`, id `mcp:8732d96f-b30d-4ebb-b8e4-81adbec7708d`) as 10 `import:<provider>:<session>` threads. The notification-focus thread switched Claude to Codex, so it arrived as two threads.
 - Method: copy the laptop's native Claude/Codex transcripts to the server (no overwrite, mtimes kept), rewrite only their `cwd` fields to the project root, then call the WS RPCs `agentSessions.scan` and `agentSessions.import {projectId, expectedWorkspaceRoot}` on `ws://127.0.0.1:3773/ws?orchestrationProtocol=2` with a short-lived `t3 auth session issue --scope orchestration:read --scope orchestration:operate` bearer, revoked afterwards.
 - Limits: the importer skips anything under `~/.t3` (so never "No project"), only takes transcripts whose cwd is exactly the project root, uses a 30-day mtime window and caps at 100 transcripts. Threads cannot be moved between projects afterwards. It imports messages only: mid-turn steer messages and some interim assistant notes are not in native transcripts (dock thread lost 1 steer and 2 notes, DaVinci 3 notes). Laptop originals untouched.
+## Laptop and server settings sync, verified 2026-11-14
+
+- Server-level settings live in `~/.t3/userdata/settings.json` on each backend. The server watches that file and reloads it live, so a direct edit applies without a restart.
+- Laptop `settings.json` now matches `server` apart from `deviceHosts` and `environmentIcon` (server only) and `grok` and `antigravity` being disabled, since neither is installed on the laptop. Pre-sync backup: `~/.local/state/t3-settings-sync-20261114/` on the laptop.
+- `keybindings.json` held the same bindings on both, in a different order. `client-settings.json` and `desktop-settings.json` on `server` are stale leftovers from June and July (no desktop app runs there), so the laptop copies are the real ones and should not be synced.
