@@ -8,25 +8,25 @@ package.path = home .. "/.config/hypr/?.lua;" .. package.path
 hl.monitor({
     output = "desc:Dell Inc. DELL G2422HS 6TG6XJ3",
     mode = "1920x1080@165.00",
-    position = "3456x0",
+    position = "3520x0",
     scale = 1,
 })
 hl.monitor({
     output = "desc:Dell Inc. DELL G2422HS G6H6XJ3",
     mode = "1920x1080@165.00",
-    position = "1536x0",
+    position = "1600x0",
     scale = 1,
 })
 hl.monitor({
     output = "eDP-1",
     mode = "1920x1200@60.00",
     position = "0x0",
-    scale = 1.25,
+    scale = 1.2,
 })
 hl.monitor({
     output = "WAYLAND-1",
     mode = "1280x720@60.00",
-    position = "5376x0",
+    position = "5440x0",
     scale = 1,
 })
 hl.monitor({
@@ -68,6 +68,7 @@ hl.config({
     input = {
         touchpad = {
             natural_scroll = true,
+            disable_while_typing = false,
         },
     },
 })
