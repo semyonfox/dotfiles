@@ -53,6 +53,7 @@ export PATH="$PNPM_HOME/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
 export OLLAMA_NUM_CTX=16384   # 16k context window for Ollama models
+export CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1  # sessions started with this on only resume with it on
 
 # ======================================================================
 # HISTORY CONFIGURATION

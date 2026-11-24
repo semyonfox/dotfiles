@@ -30,8 +30,10 @@ Lead with the agreed approach, then why it won and what each member added.
 
 ## Code review
 
+Before the first round, fix known issues and outstanding PR comments and run the relevant checks, so members review the change you'd actually ship. Skip fixes to code the user wants thrown away.
+
 1. Brief each member with the diff command, the intent, what's out of scope and the checks you ran. Ask for findings with file and line, and a score out of 10.
-2. Verify each finding yourself. Make the changes you agree with, then send the new diff for a fresh round. A full review pass is one round.
+2. Verify each finding yourself as soon as its member reports, while the others still run. Don't edit files a member is still reviewing. Make the changes you agree with, then send the new diff for a fresh round. A full review pass is one round. If the user marks a member as non-blocking, don't wait for it. Treat a late result as feedback and give it no score.
 3. Continue until all three are satisfied. Fight scope creep: repeated reviews grow a change one cheap fix at a time, so decline nits and out-of-scope asks with a reason.
 
 Report the rounds and scores in your reply. If a member gives no score, write `no score` and don't invent one:

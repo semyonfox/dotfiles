@@ -125,20 +125,7 @@ narrows code.
 
 ## Comments
 
-Every comment posted on the user's behalf follows the attribution rule in
-global guidance. Unless the repo opts in, it carries no model name, banner, or
-signature.
-
-- Lead with the conclusion.
-- Cite the relevant code, behaviour, check, or reproduction.
-- Keep it short. No canned thanks, filler, or status narration.
-- Separate verified facts from judgement.
-- Check the whole comment, including quotes and attachments, for secrets and
-  private details.
-
-Preview the final Markdown before posting. After posting, confirm GitHub
-returned the comment or review URL. Resolve a review thread only after its
-reply posted.
+Follow `leaving-pr-comments` for every comment and review reply posted on the user's behalf.
 
 ## Base branch and merging
 
