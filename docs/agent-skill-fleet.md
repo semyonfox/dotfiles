@@ -14,7 +14,6 @@ Each shared skill is linked from the relevant provider package:
 ```text
 claude/.claude/skills/<skill-name>  -> canonical skills/<skill-name>
 codex/.agents/skills/<skill-name>   -> canonical skills/<skill-name>
-hermes/.hermes/skills/<skill-name>  -> canonical skills/<skill-name>
 ```
 
 When those packages are deployed, their runtime targets are:
@@ -22,8 +21,9 @@ When those packages are deployed, their runtime targets are:
 ```text
 ~/.claude/skills/<skill-name>
 ~/.agents/skills/<skill-name>
-~/.hermes/skills/<skill-name>
 ```
+
+Hermes is not a Stow package. Hermes owns `~/.hermes/skills`. Its profiles link the shared skills they use straight from the canonical tree, for example `~/.hermes/profiles/<profile>/skills/<skill-name> -> ~/dotfiles/skills/<skill-name>`.
 
 The checked-in Codex package uses `codex/.agents/skills`. The old runtime `~/.codex/skills` tree is not managed by this package. Inspect its ownership separately before changing it.
 
@@ -67,7 +67,7 @@ $EDITOR skills/<skill-name>/SKILL.md
 For changes to a skill already deployed as a symlink, the runtime sees the edit immediately. If adding a new shared skill, add its source and the appropriate links in both runtime packages, then use a dry-run before deployment:
 
 ```bash
-stow --no-folding --simulate --verbose=2 claude codex hermes
+stow --no-folding --simulate --verbose=2 claude codex
 ```
 
 Do not force Stow over an existing runtime skill. Inspect ownership first; a native or vendor-managed skill may need to stay outside this repository. Claude and Codex support symlinked skill directories, so copying is unnecessary.
@@ -81,10 +81,6 @@ Do not bulk-move every installed skill. First classify it as shared-owned, runti
 1. Keep `/home/semyon/dotfiles/skills/` as the one editable source tree.
 2. Add a provider allowlist or manifest before automating link creation.
 3. Keep the Codex package under `.agents/skills`; inspect any older runtime tree separately before migrating it.
-4. Keep the Hermes corpus separate and link only selected skills into normal development providers.
+4. Keep the Hermes corpus separate. Hermes profiles link only the shared skills they need from `skills/`.
 5. Add a small audit/deploy helper that creates links, refuses to overwrite real directories, validates targets, and runs Stow dry-runs.
 6. Re-scan all live provider directories before calling the migration complete.
-
-## Handoff
-
-The next agent should start with [`docs/skill-fleet-handoff.md`](skill-fleet-handoff.md), inspect the current dirty worktree, and preserve unrelated changes. The repository remote is `git@github.com:semyonfox/dotfiles.git`.

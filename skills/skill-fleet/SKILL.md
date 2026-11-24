@@ -29,7 +29,6 @@ Provider packages contain symlinks, not second copies of skill contents:
 ```text
 /home/semyon/dotfiles/claude/.claude/skills/<skill-name>
 /home/semyon/dotfiles/codex/.agents/skills/<skill-name>  # planned Codex layout
-/home/semyon/dotfiles/hermes/.hermes/skills/<skill-name>
 ```
 
 After Stow deployment, the intended runtime locations are:
@@ -37,10 +36,9 @@ After Stow deployment, the intended runtime locations are:
 ```text
 ~/.claude/skills/<skill-name>
 ~/.agents/skills/<skill-name>
-~/.hermes/skills/<skill-name>
 ```
 
-Hermes is a separate, larger collection. Expose only an explicit allowlist of Hermes skills to normal development workflows.
+Hermes is not a Stow package. Hermes owns `~/.hermes/skills`. Its profiles link the shared skills they use straight from the canonical tree, for example `~/.hermes/profiles/<profile>/skills/<skill-name> -> ~/dotfiles/skills/<skill-name>`. Hermes is a separate, larger collection, so link only an explicit allowlist.
 
 ## Metadata rules
 
@@ -83,7 +81,6 @@ Relevant local paths:
 - Canonical skills: `/home/semyon/dotfiles/skills/`
 - Claude Stow package: `/home/semyon/dotfiles/claude/`
 - Codex Stow package: `/home/semyon/dotfiles/codex/`
-- Hermes Stow package: `/home/semyon/dotfiles/hermes/`
 - Fleet notes: `/home/semyon/dotfiles/docs/agent-skill-fleet.md`
 - Setup entrypoint: `/home/semyon/dotfiles/setup.sh`
 
