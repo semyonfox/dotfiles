@@ -72,7 +72,6 @@ set_epb_all() { for_each_cpu set_epb_one "$1"; }
 set_governor_one() { priv_write governor "$2" "$1"; }
 set_epp_one() { priv_write epp "$2" "$1"; }
 set_epb_one() { priv_write epb "$2" "$1"; }
-set_thresholds() { priv_write charge-start "$1"; priv_write charge-end "$2"; }
 
 apply_desktop_performance() {
     local policy gpu
@@ -96,7 +95,7 @@ apply_desktop_performance() {
 }
 
 apply_laptop() {
-    local powerprofiles=$1 governor=$2 epp=$3 epb=$4 start=$5 end=$6 mode=$7
+    local powerprofiles=$1 governor=$2 epp=$3 epb=$4 mode=$5
 
     set_governor_all "$governor"
     if [[ "$(powerprofilesctl get 2>/dev/null || true)" != "$powerprofiles" ]]; then
@@ -104,31 +103,29 @@ apply_laptop() {
     fi
     set_epp_all "$epp"
     set_epb_all "$epb"
-    set_thresholds "$start" "$end"
     write_mode "$mode"
 }
 
 apply_laptop_beast() {
-    apply_laptop performance performance performance 0 0 100 beast
+    apply_laptop performance performance performance 0 beast
 }
 
 apply_laptop_ac() {
-    apply_laptop balanced powersave balance_performance 4 40 80 ac
+    apply_laptop balanced powersave balance_performance 4 ac
 }
 
 apply_laptop_mobile() {
-    apply_laptop balanced powersave balance_power 8 40 80 mobile
+    apply_laptop balanced powersave balance_power 8 mobile
 }
 
 apply_laptop_saver() {
-    apply_laptop power-saver powersave power 15 40 80 saver
+    apply_laptop power-saver powersave power 15 saver
 }
 
 apply_laptop_extras() {
-    local epb=$1 start=$2 end=$3 mode=$4
+    local epb=$1 mode=$2
 
     set_epb_all "$epb"
-    set_thresholds "$start" "$end"
     write_mode "$mode"
 }
 
@@ -169,15 +166,15 @@ apply_noctalia_profile() {
     wait_for_power_profile "$requested"
 
     case "$requested" in
-        performance) apply_laptop_extras 0 0 100 beast ;;
+        performance) apply_laptop_extras 0 beast ;;
         balanced)
             if ac_online; then
-                apply_laptop_extras 4 40 80 ac
+                apply_laptop_extras 4 ac
             else
-                apply_laptop_extras 8 40 80 mobile
+                apply_laptop_extras 8 mobile
             fi
             ;;
-        power-saver) apply_laptop_extras 15 40 80 saver ;;
+        power-saver) apply_laptop_extras 15 saver ;;
         *) usage ;;
     esac
 }
