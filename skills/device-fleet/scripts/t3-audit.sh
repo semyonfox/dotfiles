@@ -26,11 +26,11 @@ loginctl show-user "$(id -un)" -p Linger -p State -p RuntimePath -p Service 2>/d
 printf "\n## User units\n"
 systemctl --user list-unit-files --no-pager --plain 2>/dev/null | grep -Ei "t3|code|codex|agent" || true
 printf "\n## T3 unit state\n"
-systemctl --user show t3-code-headless.service --no-pager -p Id -p LoadState -p ActiveState -p SubState -p UnitFileState -p FragmentPath -p ExecStart -p WorkingDirectory -p MainPID -p Restart -p RestartUSec 2>/dev/null || true
+systemctl --user show t3code.service --no-pager -p Id -p LoadState -p ActiveState -p SubState -p UnitFileState -p FragmentPath -p ExecStart -p WorkingDirectory -p MainPID -p Restart -p RestartUSec 2>/dev/null || true
 printf "\n## T3 unit file\n"
-systemctl --user cat t3-code-headless.service --no-pager 2>/dev/null || true
+systemctl --user cat t3code.service --no-pager 2>/dev/null || true
 printf "\n## Related T3 units\n"
-systemctl --user show t3-code-headless-update.path t3-code-headless-restart.service t3code-hyperion.service --no-pager -p Id -p LoadState -p ActiveState -p SubState -p UnitFileState -p FragmentPath -p ExecStart -p Unit 2>/dev/null || true
+systemctl --user show t3code-hyperion.service --no-pager -p Id -p LoadState -p ActiveState -p SubState -p UnitFileState -p FragmentPath -p ExecStart -p Unit 2>/dev/null || true
 printf "\n## T3 files\n"
 find ~/.config/systemd/user ~/bin ~/.local/bin -maxdepth 3 \( -name "*t3*" -o -name "*T3*" \) -print 2>/dev/null || true
 printf "\n## T3 listeners\n"

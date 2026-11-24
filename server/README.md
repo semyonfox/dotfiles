@@ -13,16 +13,9 @@ This package owns:
 - `~/.config/dotfiles/machine-profile`
 - `~/.config/dotfiles/host.bash`
 - `~/.config/dotfiles/host.zsh`
-- `~/.config/systemd/user/t3-code-headless.service`
-- `~/bin/t3-headless-preflight`
-- `~/bin/t3-headless-run`
 
-After first deploy, enable the T3 user service manually:
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable --now t3-code-headless.service
-```
+T3 Code is not part of this package. It installs and updates itself and runs
+under its own `t3code.service`.
 
 The server NAS backup timer runs `server-nas-restic`. If restic creates a partial
 snapshot because it cannot read some source files, the job exits with status 3

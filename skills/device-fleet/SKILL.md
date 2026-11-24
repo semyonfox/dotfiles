@@ -56,12 +56,12 @@ Use the `mcq-remote` skill to take over a quiz or browser tab on the laptop.
 
 ## T3 Code and Tailscale
 
-Do **not** default to `npx t3@nightly serve`: the verified server setup uses global `t3` plus an enabled user systemd service. `references/t3-code.md` has the exact unit, wrappers, ports, and safe management commands. Read-only checks:
+Do **not** default to `npx t3@nightly serve`. The server runs T3's native runtime (`~/.t3/runtime/versions/<ver>/t3`) under upstream `t3code.service`, which T3 installs and updates itself (`t3 update`). The old custom `t3-code-headless.service` and its wrappers were removed on 2026-11-18. `references/t3-code.md` has history. Read-only checks:
 
 ```bash
-systemctl --user status t3-code-headless.service --no-pager -l
-systemctl --user cat t3-code-headless.service --no-pager
-journalctl --user -u t3-code-headless.service -n 80 --no-pager
+systemctl --user status t3code.service --no-pager -l
+systemctl --user cat t3code.service --no-pager
+journalctl --user -u t3code.service -n 80 --no-pager
 ```
 
 Restart, enable, disable, or alter it only at user request. Never use Tailscale Funnel/public exposure without explicit request.

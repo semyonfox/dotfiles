@@ -117,7 +117,7 @@ fi
 section "T3 Code summary"
 printf 'For full local or remote T3 startup details, run scripts/t3-audit.sh [ssh-target].\n'
 if command -v systemctl >/dev/null 2>&1; then
-  systemctl --user show t3-code-headless.service --no-pager \
+  systemctl --user show t3code.service --no-pager \
     -p Id -p LoadState -p ActiveState -p SubState -p UnitFileState -p FragmentPath -p ExecStart 2>/dev/null || true
 fi
 ss -ltnp 'sport = :3773' 2>/dev/null || ss -ltn 'sport = :3773' 2>/dev/null || true

@@ -132,23 +132,6 @@ cp -a "$HOME/dotfiles_backup_YYYYMMDD_HHMMSS"/. "$HOME"/
 
 Automatic restoration is attempted only when the failed run created a backup.
 
-## Optional server service
-
-The server profile contains a host-specific T3 Code user service. Review its hard-coded paths, port and executable before enabling it; it is not a generic profile prerequisite.
-
-```bash
-systemctl --user daemon-reload
-systemctl --user enable --now t3-code-headless.service
-systemctl --user status t3-code-headless.service
-journalctl --user -u t3-code-headless.service -n 50 --no-pager
-```
-
-Disable it deliberately with:
-
-```bash
-systemctl --user disable --now t3-code-headless.service
-```
-
 ## Scope
 
 Host-specific paths, service names, device identifiers and dependencies intentionally need adaptation outside this environment. The repository records configuration and safety practices for a small personal fleet; it does not claim production provisioning, fleet management or universal cross-platform support.
